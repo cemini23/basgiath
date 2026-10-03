@@ -38,7 +38,7 @@ jobs:
 
       - name: No series names in the packs
         run: |
-          if grep -Ril -e "fourth wing" -e "empyrean" -e "tairn" -e "andarna" -e "basgiath" addon scripts; then
+          if grep -Ril -e "fourth wing" -e "empyrean" -e "tairn" -e "andarna" -e "xaden" -e "violet sorrengail" addon scripts; then
             echo "::error::Series name found in the packs"
             exit 1
           fi
