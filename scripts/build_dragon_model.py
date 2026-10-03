@@ -18,7 +18,7 @@ from __future__ import annotations
 import json
 import os
 import struct
-from io import BytesIO
+import zlib
 
 from PIL import Image, ImageDraw
 
@@ -262,28 +262,35 @@ def paint(placed, regions):
     return img
 
 
+def _png_chunk(tag: bytes, data: bytes) -> bytes:
+    crc = zlib.crc32(tag + data) & 0xFFFFFFFF
+    return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", crc)
+
+
 def save_png(img, path):
-    """Write a PNG with no time chunk, so two runs match byte for byte."""
-    buf = BytesIO()
-    img.save(buf, format="PNG")
-    data = buf.getvalue()
-    signature = b"\x89PNG\r\n\x1a\n"
-    if not data.startswith(signature):
-        raise RuntimeError("Pillow did not write a PNG")
-    out = bytearray(signature)
-    index = len(signature)
-    while index + 8 <= len(data):
-        length = struct.unpack(">I", data[index : index + 4])[0]
-        chunk_type = data[index + 4 : index + 8]
-        start = index
-        index += 8 + length + 4
-        if chunk_type in (b"tIME", b"tEXt", b"iTXt", b"zTXt"):
-            continue
-        out += data[start:index]
-        if chunk_type == b"IEND":
-            break
+    """Write one stored-block PNG. Pillow's encoder is not stable across machines."""
+    rgb = img.convert("RGB")
+    width, height = rgb.size
+    raw_rows = rgb.tobytes()
+    stride = width * 3
+    raw = bytearray()
+    for y in range(height):
+        raw.append(0)
+        raw += raw_rows[y * stride : (y + 1) * stride]
+    uncompressed = bytes(raw)
+    if len(uncompressed) > 65535:
+        raise RuntimeError("texture is too large for one stored PNG block")
+    nlen = (~len(uncompressed)) & 0xFFFF
+    stored = b"\x01" + struct.pack("<HH", len(uncompressed), nlen) + uncompressed
+    adler = zlib.adler32(uncompressed) & 0xFFFFFFFF
+    zlib_stream = b"\x78\x01" + stored + struct.pack(">I", adler)
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    png = b"\x89PNG\r\n\x1a\n"
+    png += _png_chunk(b"IHDR", ihdr)
+    png += _png_chunk(b"IDAT", zlib_stream)
+    png += _png_chunk(b"IEND", b"")
     with open(path, "wb") as fh:
-        fh.write(out)
+        fh.write(png)
 
 
 def main():
