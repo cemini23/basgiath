@@ -1,0 +1,253 @@
+#!/usr/bin/env python3
+"""Check the map, the dragon, and the world zip. No Minecraft client required."""
+
+from __future__ import annotations
+
+import json
+import re
+import subprocess
+import sys
+import zipfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+def _phrase(*parts: str) -> str:
+    return "".join(parts)
+
+
+FORBIDDEN = (
+    _phrase("fourth", " wing"),
+    _phrase("empy", "rean"),
+    _phrase("iron", " flame"),
+    _phrase("onyx", " storm"),
+    _phrase("dragon", "kind"),
+    _phrase("ta", "irn"),
+    _phrase("anda", "rna"),
+    _phrase("sga", "eyl"),
+    _phrase("xa", "den"),
+    _phrase("violet", " sorrengail"),
+    _phrase("yar", "ros"),
+)
+FILL = re.compile(
+    r"^fill (~?-?\d*) (~?-?\d*) (~?-?\d*) (~?-?\d*) (~?-?\d*) (~?-?\d*) \S+"
+)
+REQUIRED_BONES = (
+    "body",
+    "head",
+    "neck",
+    "jaw",
+    "wing_left",
+    "wing_left_mid",
+    "wing_left_tip",
+    "wing_right",
+    "wing_right_mid",
+    "wing_right_tip",
+    "tail",
+    "tail_2",
+    "tail_3",
+    "tail_4",
+    "leg_front_left",
+    "leg_front_right",
+    "leg_back_left",
+    "leg_back_right",
+)
+
+
+def coord(token: str) -> int:
+    if token == "~":
+        return 0
+    return int(token[1:])
+
+
+def fail(message: str) -> None:
+    print(message, file=sys.stderr)
+    sys.exit(1)
+
+
+def run(cmd: list[str]) -> None:
+    result = subprocess.run(cmd, cwd=ROOT, check=False)
+    if result.returncode != 0:
+        fail(f"command failed: {' '.join(cmd)}")
+
+
+def forbidden_in(path: Path) -> None:
+    text = path.read_text(encoding="utf-8", errors="replace").lower()
+    for name in FORBIDDEN:
+        if name in text:
+            fail(f"forbidden name {name!r} in {path}")
+
+
+def check_names() -> None:
+    roots = [ROOT / "addon", ROOT / "scripts"]
+    for root in roots:
+        for path in root.rglob("*"):
+            if not path.is_file():
+                continue
+            if path.suffix.lower() in {".png", ".mcaddon", ".mcworld"}:
+                continue
+            forbidden_in(path)
+
+
+def check_map() -> None:
+    functions = ROOT / "addon/behavior_pack/functions"
+    tick = json.loads((functions / "tick.json").read_text())
+    if tick.get("values") != ["basgiath/tick"]:
+        fail(f"tick.json values are {tick.get('values')}")
+    folder = functions / "basgiath"
+    build = (folder / "build.mcfunction").read_text()
+    if 'summon armor_stand "build_anchor"' not in build:
+        fail("build function does not summon the anchor")
+    if "#stage" not in build:
+        fail("build function does not set the stage")
+    live = (folder / "live.mcfunction").read_text()
+    for needle in ("spawnpoint", "cp_west", "cp_east", "cp_quad", "cp_valley", "~0.18"):
+        if needle not in live:
+            fail(f"live function missing {needle}")
+    summon = (folder / "summon_dragon.mcfunction").read_text()
+    if "dragon_rider:dragon" not in summon:
+        fail("summon function does not summon dragon_rider:dragon")
+    blob = "\n".join(path.read_text() for path in sorted(folder.glob("*.mcfunction")))
+    for needle in (
+        "lodestone",
+        "setblock ~45 ~8 ~20 air",
+        "setblock ~46 ~8 ~20 air",
+        "setblock ~44 ~8 ~20",
+        "setblock ~47 ~8 ~20",
+        "weather thunder",
+        "Cross the Parapet",
+    ):
+        if needle not in blob:
+            fail(f"map commands missing {needle}")
+    for line in blob.splitlines():
+        match = FILL.match(line.strip())
+        if not match:
+            continue
+        xs = [coord(token) for token in match.groups()]
+        volume = abs(xs[3] - xs[0]) + 1
+        volume *= abs(xs[4] - xs[1]) + 1
+        volume *= abs(xs[5] - xs[2]) + 1
+        if volume > 32768:
+            fail(f"fill volume {volume} exceeds 32768: {line}")
+    stages = sorted(folder.glob("stage_*.mcfunction"))
+    if not stages:
+        fail("no stage functions")
+    for path in stages:
+        count = sum(
+            1
+            for line in path.read_text().splitlines()
+            if line.strip() and not line.startswith("#")
+        )
+        if count > 50:
+            fail(f"{path.name} has {count} commands")
+    for obsolete in (
+        "parapet_wind.mcfunction",
+        "parapet_checkpoint_a.mcfunction",
+        "parapet_checkpoint_b.mcfunction",
+    ):
+        if (functions / obsolete).exists():
+            fail(f"obsolete function still present: {obsolete}")
+    print(f"map ok: {len(stages)} stages")
+
+
+def check_dragon() -> None:
+    geo_path = ROOT / "addon/resource_pack/models/entity/dragon.geo.json"
+    geo = json.loads(geo_path.read_text())
+    desc = geo["minecraft:geometry"][0]
+    if desc["description"]["identifier"] != "geometry.dragon_rider":
+        fail("geometry id changed")
+    if desc["description"]["texture_width"] != 128:
+        fail("texture width is not 128")
+    bones = desc["bones"]
+    by_name = {bone["name"]: bone for bone in bones}
+    for name in REQUIRED_BONES:
+        if name not in by_name:
+            fail(f"missing bone {name}")
+    if by_name["wing_left"]["pivot"][0] <= 0:
+        fail("left wing pivot is not on +X")
+    if by_name["wing_right"]["pivot"][0] >= 0:
+        fail("right wing pivot is not on -X")
+    if by_name["head"].get("parent") != "neck":
+        fail("head is not parented to neck")
+    back_ok = False
+    for cube in by_name["body"]["cubes"]:
+        _, y, z = cube["origin"]
+        _, h, d = cube["size"]
+        if y + h == 32 and z <= 0 <= z + d:
+            back_ok = True
+    if not back_ok:
+        fail("no body cube has its top at y=32 across z=0")
+    try:
+        from PIL import Image
+    except ImportError:
+        fail("Pillow is not installed")
+    image = Image.open(ROOT / "addon/resource_pack/textures/entity/dragon.png")
+    if image.size != (128, 128):
+        fail(f"texture size is {image.size}")
+    print(f"dragon ok: {len(bones)} bones")
+
+
+def check_world() -> None:
+    sys.path.insert(0, str(ROOT))
+    from scripts.nbt_le import decode_level_dat
+
+    run([sys.executable, "scripts/build_world.py"])
+    world = ROOT / "dist/basgiath.mcworld"
+    if not world.exists() or world.stat().st_size < 1000:
+        fail("mcworld is missing or too small")
+    with zipfile.ZipFile(world) as bundle:
+        names = bundle.namelist()
+        for required in (
+            "level.dat",
+            "levelname.txt",
+            "world_behavior_packs.json",
+            "world_resource_packs.json",
+        ):
+            if required not in names:
+                fail(f"mcworld missing {required}")
+        if not any(name.startswith("behavior_packs/basgiath/manifest.json") for name in names):
+            fail("behavior pack is not at the zip root")
+        if not any(name.startswith("resource_packs/basgiath/manifest.json") for name in names):
+            fail("resource pack is not at the zip root")
+        level = decode_level_dat(bundle.read("level.dat"))
+        if level.get("LevelName") != "Basgiath":
+            fail("level name is not Basgiath")
+        if level.get("Generator") != 2 or level.get("commandsEnabled") != 1:
+            fail("world is not a flat world with commands")
+        if "grass_block" not in str(level.get("FlatWorldLayers")):
+            fail("flat layers are missing")
+        behavior = json.loads(bundle.read("world_behavior_packs.json"))
+        manifest = json.loads((ROOT / "addon/behavior_pack/manifest.json").read_text())
+        if behavior[0]["pack_id"] != manifest["header"]["uuid"]:
+            fail("behavior pack uuid mismatch")
+        if behavior[0]["version"] != manifest["header"]["version"]:
+            fail("behavior pack version mismatch")
+    print(f"world ok: {world.stat().st_size} bytes")
+
+
+def check_uuids() -> None:
+    uuids = []
+    for path in (
+        ROOT / "addon/behavior_pack/manifest.json",
+        ROOT / "addon/resource_pack/manifest.json",
+    ):
+        data = json.loads(path.read_text())
+        uuids.append(data["header"]["uuid"])
+        for module in data["modules"]:
+            uuids.append(module["uuid"])
+    if len(uuids) != len(set(uuids)):
+        fail(f"pack UUIDs are not unique: {uuids}")
+
+
+def main() -> None:
+    run([sys.executable, "scripts/build_map.py"])
+    run([sys.executable, "scripts/build_dragon_model.py"])
+    check_names()
+    check_map()
+    check_dragon()
+    check_uuids()
+    check_world()
+    print("release checks ok")
+
+
+if __name__ == "__main__":
+    main()

@@ -20,7 +20,7 @@ jobs:
           node-version: "20"
 
       - name: Install Pillow
-        run: python3 -m pip install --quiet pillow
+        run: python3 -m pip install --quiet "pillow==12.2.0"
 
       - name: Validate pack JSON and UUIDs
         run: bash scripts/validate.sh
@@ -29,19 +29,30 @@ jobs:
         run: node --check addon/behavior_pack/scripts/main.js
 
       - name: Syntax-check the shell scripts
-        run: bash -n scripts/validate.sh scripts/package.sh
+        run: bash -n scripts/*.sh
 
-      - name: Model is in sync with its generator
+      - name: Generated files match the scripts
         run: |
           python3 scripts/build_dragon_model.py
-          git diff --exit-code -- addon/resource_pack/models/entity/dragon.geo.json
+          python3 scripts/build_map.py
+          git diff --exit-code -- \
+            addon/resource_pack/models/entity/dragon.geo.json \
+            addon/resource_pack/textures/entity/dragon.png \
+            addon/behavior_pack/functions
 
       - name: No series names in the packs
         run: |
-          if grep -Ril -e "fourth wing" -e "empyrean" -e "tairn" -e "andarna" -e "xaden" -e "violet sorrengail" addon scripts; then
+          if grep -Ril \
+            -e "fourth wing" -e "empyrean" -e "iron flame" -e "onyx storm" \
+            -e "dragonkind" -e "tairn" -e "andarna" -e "sgaeyl" \
+            -e "xaden" -e "violet sorrengail" -e "yarros" \
+            addon scripts; then
             echo "::error::Series name found in the packs"
             exit 1
           fi
+
+      - name: Release checks
+        run: python3 scripts/test_release.py
 
       - name: Build the .mcaddon
         run: bash scripts/package.sh

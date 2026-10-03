@@ -12,3 +12,7 @@ dist/
 # Local editor
 .vscode/
 .idea/
+
+# Python
+__pycache__/
+*.pyc
