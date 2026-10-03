@@ -5,7 +5,7 @@
     "description": "pack.dragon_rider.description",
     "uuid": "7a3f9c2e-1b4d-4e8a-9f21-0c5d6e7a8b90",
     "version": [0, 1, 0],
-    "min_engine_version": [1, 21, 80]
+    "min_engine_version": [1, 21, 90]
   },
   "modules": [
     {

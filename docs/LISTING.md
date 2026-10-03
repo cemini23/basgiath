@@ -20,7 +20,7 @@ The Quad holds a Bonding Stone. Touch it and answer three questions. You get one
 
 South of the Quad are three barracks. Further on, a sunken valley has a gold pad. Run `/function basgiath/summon_dragon`, mount, and fly.
 
-You need Minecraft Bedrock 1.21.80 or newer, on a phone, a tablet, a console, or Windows.
+You need Minecraft Bedrock 1.21.90 or newer, on a phone, a tablet, a console, or Windows.
 
 How to install:
 
@@ -46,7 +46,7 @@ Touch the lodestone in the Quad for a three-question form. The four results are 
 
 In the valley, `/function basgiath/summon_dragon` puts a rideable dragon on the pad. You steer it in the air.
 
-Install: open `basgiath.mcworld` in Minecraft Bedrock 1.21.80 or newer, then run `/function basgiath/build`. Phones can open the file directly. Cheats are on in the download. This map is free and it is not a Marketplace pack.
+Install: open `basgiath.mcworld` in Minecraft Bedrock 1.21.90 or newer, then run `/function basgiath/build`. Phones can open the file directly. Cheats are on in the download. This map is free and it is not a Marketplace pack.
 
 Fan-made. Not official. Not affiliated with Rebecca Yarros, Entangled Publishing, or Red Tower Books.
 

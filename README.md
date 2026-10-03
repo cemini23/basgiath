@@ -66,7 +66,7 @@ docs/LISTING.md        the download text, six clip scripts, and the tag list
 
 ## How to play
 
-1. Install **Minecraft Bedrock** 1.21.80 or newer.
+1. Install **Minecraft Bedrock** 1.21.90 or newer.
 2. Build the files from the repo root with `bash scripts/package.sh`.
 3. Open `dist/basgiath.mcworld` in Minecraft. On a phone, tap the file and choose Minecraft.
 4. Run `/function basgiath/build`. Wait for the title "Welcome, candidate".

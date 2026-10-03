@@ -11,7 +11,7 @@ From the repo root:
 
 ## 1. Install (about 5 min)
 
-- [ ] Install Minecraft Bedrock 1.21.80 or newer.
+- [ ] Install Minecraft Bedrock 1.21.90 or newer.
 - [ ] Open `dist/basgiath.mcworld`. On a phone, tap the file and choose Minecraft.
 - [ ] Confirm the world name is Basgiath and that cheats are on.
 - [ ] If the form does nothing later, enable the **Beta APIs** experiment and reload.

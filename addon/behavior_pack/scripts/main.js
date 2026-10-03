@@ -76,6 +76,7 @@ function rememberOnWing(player, signetKey) {
 
 async function runSignetQuiz(player) {
   const scores = blankScores();
+  let lastSignet = null;
 
   for (const question of QUESTIONS) {
     const form = new ActionFormData().title("Conscription").body(question.body);
@@ -87,10 +88,17 @@ async function runSignetQuiz(player) {
     if (response.canceled) return;
 
     const choice = question.choices[response.selection];
-    if (choice) scores[choice.signet] += 1;
+    if (choice) {
+      scores[choice.signet] += 1;
+      lastSignet = choice.signet;
+    }
   }
 
-  const signetKey = Object.keys(scores).sort((a, b) => scores[b] - scores[a])[0];
+  // A tie for the top score keeps the last accepted answer.
+  const topScore = Math.max(...Object.values(scores));
+  const leaders = Object.keys(scores).filter((key) => scores[key] === topScore);
+  const signetKey =
+    lastSignet !== null && scores[lastSignet] === topScore ? lastSignet : leaders[0];
   const signet = SIGNETS[signetKey];
 
   player.setDynamicProperty(SIGNET_PROPERTY, signetKey);
@@ -112,10 +120,11 @@ async function runSignetQuiz(player) {
   if (again.selection === 0) runSignetQuiz(player);
 }
 
-world.afterEvents.playerInteractWithBlock.subscribe((event) => {
+world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   if (!event.isFirstEvent) return;
   if (event.block?.typeId !== BONDING_BLOCK) return;
   const player = event.player;
+  event.cancel = true;
   system.run(() => runSignetQuiz(player));
 });
 

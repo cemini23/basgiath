@@ -97,6 +97,10 @@ def check_map() -> None:
     build = (folder / "build.mcfunction").read_text()
     if 'summon armor_stand "build_anchor"' not in build:
         fail("build function does not summon the anchor")
+    if "setblock ~ ~-1 ~ stone" not in build:
+        fail("build function does not place a stone under the player")
+    if "resistance 999999 255" not in build:
+        fail("build function does not give the anchor resistance")
     if "#stage" not in build:
         fail("build function does not set the stage")
     live = (folder / "live.mcfunction").read_text()
@@ -224,6 +228,15 @@ def check_world() -> None:
     print(f"world ok: {world.stat().st_size} bytes")
 
 
+def check_signet() -> None:
+    script = (ROOT / "addon/behavior_pack/scripts/main.js").read_text()
+    if "beforeEvents.playerInteractWithBlock" not in script:
+        fail("signet listener is not on beforeEvents.playerInteractWithBlock")
+    if "afterEvents.playerInteractWithBlock" in script:
+        fail("signet listener still uses afterEvents.playerInteractWithBlock")
+    print("signet listener ok")
+
+
 def check_uuids() -> None:
     uuids = []
     for path in (
@@ -243,6 +256,7 @@ def main() -> None:
     run([sys.executable, "scripts/build_dragon_model.py"])
     check_names()
     check_map()
+    check_signet()
     check_dragon()
     check_uuids()
     check_world()
