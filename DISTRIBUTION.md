@@ -1,5 +1,7 @@
 # Distribution and content plan
 
+The paste-ready download text, six clip scripts, and the tag list are in `docs/LISTING.md`.
+
 ## Where it ships (free only)
 
 | Channel | What goes there | Notes |

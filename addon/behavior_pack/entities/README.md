@@ -2,7 +2,7 @@
 
 Identifier: `dragon_rider:dragon`. Summon it with `/summon dragon_rider:dragon`.
 
-The model is a placeholder box. Flight is not proven until you test it in a world.
+The model comes from `scripts/build_dragon_model.py`. A Bedrock client still has to prove the flight.
 
 ## How the rider flies
 

@@ -4,9 +4,11 @@
 
 Every fan project needs one clip that travels. For this map it is **the Parapet**: a one-block-wide stone span over a deep chasm, in wind and rain, that the player must cross. It looks dangerous. It reads in two seconds on a phone. It is the first thing in every dev-log video.
 
-## The world (v0 scope)
+## The world
 
-Three build zones, in order.
+The player runs `/function basgiath/build`. `scripts/build_map.py` writes the functions. Do not build this by hand.
+
+Four zones, in journey order.
 
 ### 1. The Parapet
 - A chasm about 40 blocks deep and 60 blocks wide.
@@ -18,23 +20,27 @@ Three build zones, in order.
 ### 2. The Quad
 - An open parade ground, about 80 by 80.
 - A **Bonding Stone** (a lodestone) at the centre. Interacting with it opens the signet form.
-- Bleachers, banners, and a bell tower for silhouette.
+- Stepped bleachers, four coloured wool standards, and a bell tower for silhouette.
 
-### 3. The Dorms (stretch)
-- Simple barracks. Cut this first if time is short.
+### 3. The Dorms
+- Three spruce barracks south of the Quad.
+- Wool bunks, lanterns, and open doorways.
+
+### 4. The valley
+- A sunken bowl with a ring of pillars and a gold pad.
+- `/function basgiath/summon_dragon` summons the rideable dragon on that pad.
 
 ## The signet form
 
 Three questions, four outcomes. It runs from the Bonding Stone. The result is stored as a dynamic property, so it persists across sessions. See `addon/behavior_pack/scripts/main.js`.
 
-The outcomes are original archetypes — Stormcaller, Shadowwalker, Emberwright, Stoneward. They are **not** the book's signets. This keeps the work transformative.
+The outcomes are original archetypes — Stormcaller, Shadowwalker, Emberwright, Stoneward. They are original names, so the work stays transformative.
 
 ## Scope cuts, declared up front
 
-- **No rideable dragon in v0.** It is the hardest part. Ship the map first.
 - **No custom dimension.** Bedrock custom dimensions are experimental and void-only. Use an Overworld map plus teleports.
-- **No custom art.** Use vanilla blocks. The resource pack carries text only.
+- **No custom block art.** The college is vanilla blocks. The dragon texture is generated, and it is original.
 
-## What v1 adds
+## What persists
 
-A rideable dragon, a Threshing Valley, and a persistent wing that grows across sessions. That is the thing the official 10-minute experience is not.
+The signet result is a player dynamic property. The wing roster is a world dynamic property. Both survive a reload. The roster keeps the last 24 riders.
