@@ -18,7 +18,7 @@ Local checks on commit `45033da`, then again after the generators ran a second t
 `bash scripts/package.sh` wrote both files from this checkout:
 
 - `dist/basgiath.mcaddon`
-- `dist/basgiath.mcworld` — 19036 bytes, 28 zip entries
+- `dist/basgiath.mcworld` — 18653 bytes after the stable PNG encoder, 28 zip entries
 
 The world zip root holds `level.dat`, `levelname.txt`, both pack lists, and the packs at `behavior_packs/basgiath` and `resource_packs/basgiath`. Decoded `level.dat` has:
 
@@ -59,6 +59,10 @@ Idle animation keys are the tail, the head, and the jaw. The fly keys rotate the
 
 Pack ids stay `dragon_rider:*`. The geometry id stays `geometry.dragon_rider`. The pack UUIDs in the two manifests were not edited. The GitHub repo name is `basgiath`.
 
+GitHub Actions on `main` passed for commit `3cbf749`: https://github.com/cemini23/basgiath/actions/runs/37157510271
+
+The run before it failed. Pillow wrote different PNG bytes on Linux than on this Mac. The generator now writes the PNG itself, with one stored block, so the bytes match. That failed run is https://github.com/cemini23/basgiath/actions/runs/37157437615
+
 ## Unverified
 
 This machine is macOS. Docker is not installed. The RunPod CLI is not installed. The home env files have no RunPod key. No dedicated server was started. A server could load the behavior pack and run the functions. It still could not show the model or the texture.
@@ -70,8 +74,6 @@ Only a real Bedrock client can prove these:
 3. The lodestone opens the form and the buttons work.
 4. The wind push, the gap, the fall rescue, and the four checkpoints feel right in a world.
 5. A phone can open `basgiath.mcworld`, run `/function basgiath/build`, and finish the crossing.
-
-GitHub Actions on `main` is also unverified until the push in this session finishes. The workflow file now runs the local checks above, plus a diff of the generated functions and the dragon PNG.
 
 ## Notes a later edit should keep
 
