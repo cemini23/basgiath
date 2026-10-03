@@ -54,6 +54,26 @@ function blankScores() {
   return { storm: 0, shadow: 0, ember: 0, stone: 0 };
 }
 
+function rememberOnWing(player, signetKey) {
+  let wing = [];
+  try {
+    const raw = world.getDynamicProperty("dragon_rider:wing");
+    if (typeof raw === "string") {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) wing = parsed;
+    }
+  } catch (e) {
+    wing = [];
+  }
+
+  wing = wing.filter((entry) => entry && entry.name !== player.name);
+  wing.push({ name: player.name, signet: signetKey });
+  if (wing.length > 24) wing = wing.slice(-24);
+
+  world.setDynamicProperty("dragon_rider:wing", JSON.stringify(wing));
+  return wing.length;
+}
+
 async function runSignetQuiz(player) {
   const scores = blankScores();
 
@@ -74,12 +94,17 @@ async function runSignetQuiz(player) {
   const signet = SIGNETS[signetKey];
 
   player.setDynamicProperty(SIGNET_PROPERTY, signetKey);
+  const riderCount = rememberOnWing(player, signetKey);
+  const wingLine =
+    riderCount === 1 ? "Your wing has 1 rider." : `Your wing has ${riderCount} riders.`;
+
   player.onScreenDisplay.setTitle(`§6${signet.name}`);
   player.sendMessage(`§7Your signet: §6${signet.name}§7. ${signet.line}`);
+  player.sendMessage(`§7${wingLine}`);
 
   const result = new MessageFormData()
     .title("Your signet")
-    .body(`You are a §6${signet.name}§r.\n\n${signet.line}\n\nTake it again, or share your result.`)
+    .body(`You are a §6${signet.name}§r.\n\n${signet.line}\n\n${wingLine}\n\nTake it again, or share your result.`)
     .button1("Again")
     .button2("Done");
 
