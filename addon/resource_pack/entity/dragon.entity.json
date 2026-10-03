@@ -1,0 +1,25 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "dragon_rider:dragon",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/dragon"
+      },
+      "geometry": {
+        "default": "geometry.dragon_rider"
+      },
+      "animations": {
+        "idle": "animation.dragon.idle",
+        "fly": "animation.dragon.fly"
+      },
+      "scripts": {
+        "animate": ["idle", "fly"]
+      },
+      "render_controllers": ["controller.render.dragon"]
+    }
+  }
+}

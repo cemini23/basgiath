@@ -52,7 +52,7 @@ MCPEDL and CurseForge. Free only. See `DISTRIBUTION.md`.
 
 ## Status
 
-Scaffold. Nothing is built in-world yet. The signet script is written and needs in-game testing.
+v1 code added. The dragon is a placeholder box until art exists. Nothing is built in-world yet. The signet script still needs an in-game test.
 
 ## Version note
 

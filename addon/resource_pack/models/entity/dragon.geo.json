@@ -1,0 +1,76 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.dragon_rider",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 8,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [0, 1.5, 0]
+      },
+      "bones": [
+        {
+          "name": "body",
+          "pivot": [0, 24, 0],
+          "cubes": [
+            {
+              "origin": [-16, 16, -32],
+              "size": [32, 16, 56],
+              "uv": [0, 0]
+            }
+          ]
+        },
+        {
+          "name": "head",
+          "parent": "body",
+          "pivot": [0, 28, -32],
+          "cubes": [
+            {
+              "origin": [-8, 20, -48],
+              "size": [16, 16, 16],
+              "uv": [0, 32]
+            }
+          ]
+        },
+        {
+          "name": "wing_left",
+          "parent": "body",
+          "pivot": [16, 32, -8],
+          "cubes": [
+            {
+              "origin": [16, 30, -16],
+              "size": [36, 2, 28],
+              "uv": [32, 0]
+            }
+          ]
+        },
+        {
+          "name": "wing_right",
+          "parent": "body",
+          "pivot": [-16, 32, -8],
+          "cubes": [
+            {
+              "origin": [-52, 30, -16],
+              "size": [36, 2, 28],
+              "uv": [32, 16]
+            }
+          ]
+        },
+        {
+          "name": "tail",
+          "parent": "body",
+          "pivot": [0, 22, 24],
+          "cubes": [
+            {
+              "origin": [-4, 18, 24],
+              "size": [8, 6, 24],
+              "uv": [0, 48]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

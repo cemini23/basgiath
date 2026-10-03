@@ -1,0 +1,109 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "dragon_rider:dragon",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "component_groups": {
+      "dragon_rider": {
+        "minecraft:physics": {
+          "has_collision": true,
+          "has_gravity": false
+        },
+        "minecraft:flying_speed": {
+          "value": 0.15
+        },
+        "minecraft:input_air_controlled": {
+          "strafe_speed_modifier": 1.0,
+          "backwards_movement_modifier": 0.5
+        },
+        "minecraft:vertical_movement_action": {
+          "vertical_velocity": 0.4
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": ["dragon", "mob"]
+      },
+      "minecraft:health": {
+        "value": 200,
+        "max": 200
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0,
+        "breathes_air": true,
+        "breathes_water": false
+      },
+      "minecraft:physics": {
+        "has_collision": true,
+        "has_gravity": false
+      },
+      "minecraft:collision_box": {
+        "width": 2.5,
+        "height": 2.0
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:knockback_resistance": {
+        "value": 0.8
+      },
+      "minecraft:persistent": {},
+      "minecraft:can_fly": {},
+      "minecraft:navigation.fly": {
+        "can_path_from_air": true,
+        "can_path_over_water": true,
+        "can_path_over_lava": true
+      },
+      "minecraft:movement.fly": {},
+      "minecraft:movement": {
+        "value": 0.25
+      },
+      "minecraft:flying_speed": {
+        "value": 0.15
+      },
+      "minecraft:rideable": {
+        "seat_count": 1,
+        "family_types": ["player"],
+        "controlling_seat": 0,
+        "pull_in_entities": false,
+        "interact_text": "action.dragon_rider:dragon.ride",
+        "seats": {
+          "position": [0.0, 2.1, -0.2]
+        }
+      },
+      "minecraft:input_air_controlled": {
+        "strafe_speed_modifier": 1.0,
+        "backwards_movement_modifier": 0.5
+      },
+      "minecraft:vertical_movement_action": {
+        "vertical_velocity": 0.4
+      },
+      "minecraft:behavior.controlled_by_player": {
+        "priority": 0,
+        "mount_speed_multiplier": 1.2
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "fall",
+            "deals_damage": false
+          }
+        ]
+      }
+    },
+    "events": {
+      "minecraft:entity_spawned": {
+        "add": {
+          "component_groups": ["dragon_rider"]
+        }
+      }
+    }
+  }
+}
