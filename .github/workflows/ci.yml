@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Pillow
+        run: python3 -m pip install --quiet pillow
+
+      - name: Validate pack JSON and UUIDs
+        run: bash scripts/validate.sh
+
+      - name: Syntax-check the signet script
+        run: node --check addon/behavior_pack/scripts/main.js
+
+      - name: Syntax-check the shell scripts
+        run: bash -n scripts/validate.sh scripts/package.sh
+
+      - name: Model is in sync with its generator
+        run: |
+          python3 scripts/build_dragon_model.py
+          git diff --exit-code -- addon/resource_pack/models/entity/dragon.geo.json
+
+      - name: No series names in the packs
+        run: |
+          if grep -Ril -e "fourth wing" -e "empyrean" -e "tairn" -e "andarna" -e "basgiath" addon scripts; then
+            echo "::error::Series name found in the packs"
+            exit 1
+          fi
+
+      - name: Build the .mcaddon
+        run: bash scripts/package.sh
