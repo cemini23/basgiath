@@ -32,10 +32,12 @@ DESIGN.md              the map spec and the Parapet moment
 BUILD_CHECKLIST.md     step-by-step in-game build
 DISTRIBUTION.md        where it ships and how it gets found
 docs/IP-RULES.md       the non-negotiable fan-project rules
+docs/BLOCKBENCH-SPEC.md the dragon model spec (bones, UV, export)
 addon/
-  behavior_pack/       manifest + scripts/main.js (the signet form)
-  resource_pack/       manifest + language strings
-briefs/                the research that shaped this
+  behavior_pack/       manifest, dragon entity, Parapet functions, scripts/main.js
+  resource_pack/       manifest, client entity, model, animations, texture
+scripts/               validate.sh, package.sh
+briefs/                the research and build handoffs
 ```
 
 ## How to build
