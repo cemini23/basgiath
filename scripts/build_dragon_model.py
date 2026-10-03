@@ -17,6 +17,9 @@ from __future__ import annotations
 
 import json
 import os
+import struct
+from io import BytesIO
+
 from PIL import Image, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,58 +32,99 @@ GEOMETRY_ID = "geometry.dragon_rider"
 # name -> (parent or None, pivot)
 BONES = [
     ("body", None, [0, 24, 0]),
-    ("neck", "body", [0, 30, -30]),
-    ("head", "neck", [0, 32, -44]),
-    ("wing_left", "body", [13, 33, -14]),
-    ("wing_left_mid", "wing_left", [35, 31, -10]),
-    ("wing_left_tip", "wing_left_mid", [61, 31, -8]),
-    ("wing_right", "body", [-13, 33, -14]),
-    ("wing_right_mid", "wing_right", [-35, 31, -10]),
-    ("wing_right_tip", "wing_right_mid", [-61, 31, -8]),
-    ("tail", "body", [0, 24, 18]),
-    ("tail_2", "tail", [0, 24, 48]),
-    ("tail_3", "tail_2", [0, 24, 68]),
-    ("leg_front_left", "body", [10, 16, -18]),
-    ("leg_front_right", "body", [-10, 16, -18]),
-    ("leg_back_left", "body", [10, 16, 14]),
-    ("leg_back_right", "body", [-10, 16, 14]),
+    ("neck", "body", [0, 30, -26]),
+    ("head", "neck", [0, 34, -42]),
+    ("jaw", "head", [0, 28, -56]),
+    ("wing_left", "body", [12, 32, -10]),
+    ("wing_left_mid", "wing_left", [34, 32, -10]),
+    ("wing_left_tip", "wing_left_mid", [58, 32, -10]),
+    ("wing_right", "body", [-12, 32, -10]),
+    ("wing_right_mid", "wing_right", [-34, 32, -10]),
+    ("wing_right_tip", "wing_right_mid", [-58, 32, -10]),
+    ("tail", "body", [0, 22, 20]),
+    ("tail_2", "tail", [0, 21, 36]),
+    ("tail_3", "tail_2", [0, 20, 50]),
+    ("tail_4", "tail_3", [0, 19, 62]),
+    ("leg_front_left", "body", [8, 16, -16]),
+    ("leg_front_right", "body", [-8, 16, -16]),
+    ("leg_back_left", "body", [8, 16, 8]),
+    ("leg_back_right", "body", [-8, 16, 8]),
 ]
 
-# bone, origin, size, material, alt_material (for east/west faces or None)
+# bone, origin, size, material, side_material, down_material
 CUBES = [
-    ("body", [-14, 14, -30], [28, 19, 34], "back", None),
-    ("body", [-12, 12, 4], [24, 16, 26], "back", None),
-    ("neck", [-5, 26, -44], [10, 12, 18], "back", None),
-    ("head", [-7, 24, -62], [14, 14, 18], "head", "eye"),
-    ("head", [-4, 26, -74], [8, 8, 12], "head", None),
-    ("head", [-4, 20, -72], [8, 4, 10], "jaw", None),
-    ("head", [4, 36, -58], [3, 9, 3], "bone", None),
-    ("head", [-7, 36, -58], [3, 9, 3], "bone", None),
-    ("wing_left", [13, 31, -18], [22, 3, 16], "wing", None),
-    ("wing_left_mid", [35, 30, -14], [26, 2, 12], "membrane", None),
-    ("wing_left_tip", [61, 30, -12], [30, 2, 10], "membrane", None),
-    ("wing_right", [-35, 31, -18], [22, 3, 16], "wing", None),
-    ("wing_right_mid", [-61, 30, -14], [26, 2, 12], "membrane", None),
-    ("wing_right_tip", [-91, 30, -12], [30, 2, 10], "membrane", None),
-    ("tail", [-5, 20, 26], [10, 10, 22], "back", None),
-    ("tail_2", [-4, 21, 48], [8, 8, 20], "back", None),
-    ("tail_3", [-3, 22, 68], [6, 6, 18], "back", None),
-    ("leg_front_left", [7, 0, -21], [6, 16, 6], "limb", None),
-    ("leg_front_right", [-13, 0, -21], [6, 16, 6], "limb", None),
-    ("leg_back_left", [7, 0, 11], [6, 16, 6], "limb", None),
-    ("leg_back_right", [-13, 0, 11], [6, 16, 6], "limb", None),
+    # chest and hips. Down faces are sand. Top of the chest is Y=32. Z covers 0.
+    ("body", [-12, 16, -28], [24, 16, 32], "scale", None, "belly"),
+    ("body", [-10, 16, 2], [20, 14, 22], "scale", None, "belly"),
+    # spine ridges
+    ("body", [-2, 32, -20], [4, 3, 6], "scale", None, None),
+    ("body", [-2, 32, -8], [4, 3, 6], "scale", None, None),
+    ("body", [-1, 30, 6], [3, 3, 6], "scale", None, None),
+    ("body", [-1, 30, 14], [3, 2, 5], "scale", None, None),
+    # neck
+    ("neck", [-5, 24, -42], [10, 12, 18], "scale", None, None),
+    # skull. East and west use the eye material. Snout stays on the head.
+    ("head", [-7, 28, -58], [14, 12, 16], "scale", "eye", None),
+    ("head", [-4, 28, -70], [8, 7, 14], "scale", None, None),
+    # two short brow horns and two swept horns (two cubes each), bone colored
+    ("head", [-7, 40, -54], [3, 4, 3], "bone", None, None),
+    ("head", [4, 40, -54], [3, 4, 3], "bone", None, None),
+    ("head", [-8, 38, -50], [3, 8, 3], "bone", None, None),
+    ("head", [-8, 45, -46], [2, 6, 3], "bone", None, None),
+    ("head", [5, 38, -50], [3, 8, 3], "bone", None, None),
+    ("head", [6, 45, -46], [2, 6, 3], "bone", None, None),
+    # lower jaw is a child bone, not a head cube
+    ("jaw", [-4, 24, -68], [8, 4, 12], "jaw", None, None),
+    # left wing: arm from X=12, 22 long; mid joint at X=34; tip joint at X=58
+    ("wing_left", [12, 30, -14], [22, 4, 8], "scale", None, None),
+    ("wing_left_mid", [34, 30, -13], [24, 3, 6], "bone", None, None),
+    ("wing_left_mid", [34, 29, -10], [24, 1, 22], "membrane", None, None),
+    ("wing_left_tip", [58, 30, -12], [22, 2, 4], "bone", None, None),
+    ("wing_left_tip", [58, 29, -8], [24, 1, 16], "membrane", None, None),
+    # right wing is the X mirror. Pivot X is negative. Do not invert the wing lengths.
+    ("wing_right", [-34, 30, -14], [22, 4, 8], "scale", None, None),
+    ("wing_right_mid", [-58, 30, -13], [24, 3, 6], "bone", None, None),
+    ("wing_right_mid", [-58, 29, -10], [24, 1, 22], "membrane", None, None),
+    ("wing_right_tip", [-80, 30, -12], [22, 2, 4], "bone", None, None),
+    ("wing_right_tip", [-82, 29, -8], [24, 1, 16], "membrane", None, None),
+    # tail root, then three child segments tapering toward +Z, plus a flat spade
+    ("tail", [-6, 17, 20], [12, 8, 16], "scale", None, None),
+    ("tail_2", [-5, 17, 36], [10, 7, 14], "scale", None, None),
+    ("tail_3", [-4, 17, 50], [8, 6, 12], "scale", None, None),
+    ("tail_4", [-3, 17, 62], [6, 5, 10], "scale", None, None),
+    ("tail_4", [-9, 20, 70], [18, 1, 14], "scale", None, None),
+    # four legs. Each has a thigh, a shin, and a foot. Feet sit on Y=0.
+    ("leg_front_left", [5, 8, -19], [6, 8, 6], "scale", None, None),
+    ("leg_front_left", [6, 2, -18], [5, 6, 5], "scale", None, None),
+    ("leg_front_left", [5, 0, -23], [6, 2, 8], "scale", None, None),
+    ("leg_front_left", [5, 0, -26], [2, 2, 3], "bone", None, None),
+    ("leg_front_left", [9, 0, -26], [2, 2, 3], "bone", None, None),
+    ("leg_front_right", [-11, 8, -19], [6, 8, 6], "scale", None, None),
+    ("leg_front_right", [-11, 2, -18], [5, 6, 5], "scale", None, None),
+    ("leg_front_right", [-11, 0, -23], [6, 2, 8], "scale", None, None),
+    ("leg_front_right", [-11, 0, -26], [2, 2, 3], "bone", None, None),
+    ("leg_front_right", [-7, 0, -26], [2, 2, 3], "bone", None, None),
+    ("leg_back_left", [5, 8, 5], [6, 8, 6], "scale", None, None),
+    ("leg_back_left", [6, 2, 6], [5, 6, 5], "scale", None, None),
+    ("leg_back_left", [5, 0, 4], [6, 2, 9], "scale", None, None),
+    ("leg_back_left", [5, 0, 1], [2, 2, 3], "bone", None, None),
+    ("leg_back_left", [9, 0, 1], [2, 2, 3], "bone", None, None),
+    ("leg_back_right", [-11, 8, 5], [6, 8, 6], "scale", None, None),
+    ("leg_back_right", [-11, 2, 6], [5, 6, 5], "scale", None, None),
+    ("leg_back_right", [-11, 0, 4], [6, 2, 9], "scale", None, None),
+    ("leg_back_right", [-11, 0, 1], [2, 2, 3], "bone", None, None),
+    ("leg_back_right", [-7, 0, 1], [2, 2, 3], "bone", None, None),
 ]
 
 MATERIALS = {
-    "back": (96, 32, 44),
-    "head": (112, 44, 52),
-    "jaw": (196, 168, 132),
-    "bone": (222, 210, 180),
-    "wing": (88, 28, 40),
-    "membrane": (118, 58, 86),
-    "limb": (84, 28, 38),
-    "eye": (232, 214, 92),
+    "scale": (52, 22, 30),
+    "jaw": (68, 32, 40),
+    "belly": (216, 190, 146),
+    "membrane": (116, 52, 82),
+    "eye": (230, 170, 46),
+    "bone": (228, 212, 178),
 }
+PUPIL = (18, 10, 12)
 
 
 def patch_size(size):
@@ -105,10 +149,12 @@ def pack(pairs):
 
 def build_geometry():
     regions = {}
-    for i, (bone, origin, size, mat, alt) in enumerate(CUBES):
+    for i, (bone, origin, size, mat, side, down) in enumerate(CUBES):
         regions[(i, mat)] = patch_size(size)
-        if alt:
-            regions[(i, alt)] = patch_size(size)
+        if side:
+            regions[(i, side)] = patch_size(size)
+        if down:
+            regions[(i, down)] = patch_size(size)
     placed = pack([(k, w, h) for k, (w, h) in regions.items()])
 
     bones = {name: {"name": name, "pivot": pivot, "cubes": []} for name, _, pivot in BONES}
@@ -116,18 +162,21 @@ def build_geometry():
         if parent:
             bones[name]["parent"] = parent
 
-    for i, (bone, origin, size, mat, alt) in enumerate(CUBES):
+    for i, (bone, origin, size, mat, side, down) in enumerate(CUBES):
         w, h, d = size
         base = placed[(i, mat)]
         uv = {
             "north": {"uv": list(base), "uv_size": [w, h]},
             "south": {"uv": list(base), "uv_size": [w, h]},
             "up": {"uv": list(base), "uv_size": [w, d]},
-            "down": {"uv": list(base), "uv_size": [w, d]},
         }
-        side = placed[(i, alt)] if alt else base
-        uv["east"] = {"uv": list(side), "uv_size": [d, h]}
-        uv["west"] = {"uv": list(side), "uv_size": [d, h]}
+        if down:
+            uv["down"] = {"uv": list(placed[(i, down)]), "uv_size": [w, d]}
+        else:
+            uv["down"] = {"uv": list(base), "uv_size": [w, d]}
+        side_uv = placed[(i, side)] if side else base
+        uv["east"] = {"uv": list(side_uv), "uv_size": [d, h]}
+        uv["west"] = {"uv": list(side_uv), "uv_size": [d, h]}
         bones[bone]["cubes"].append({"origin": list(origin), "size": list(size), "uv": uv})
 
     geometry = {
@@ -138,7 +187,7 @@ def build_geometry():
                     "identifier": GEOMETRY_ID,
                     "texture_width": TEX_W,
                     "texture_height": TEX_H,
-                    "visible_bounds_width": 10,
+                    "visible_bounds_width": 14,
                     "visible_bounds_height": 5,
                     "visible_bounds_offset": [0, 2, 0],
                 },
@@ -160,6 +209,14 @@ def scale_fill(draw, box, color, cell=5):
             draw.line([cx, cy + cell - 2, cx + cell - 1, cy + cell - 2], fill=light, width=1)
 
 
+def belly_fill(draw, box, color):
+    x0, y0, x1, y1 = box
+    draw.rectangle(box, fill=color)
+    light = tuple(min(255, c + 28) for c in color)
+    for cy in range(y0, y1 + 1, 4):
+        draw.line([x0, cy, x1, cy], fill=light, width=1)
+
+
 def membrane_fill(draw, box, color):
     x0, y0, x1, y1 = box
     draw.rectangle(box, fill=color)
@@ -168,6 +225,13 @@ def membrane_fill(draw, box, color):
     for k in range(0, span, 6):
         draw.line([x0 + k, y0, x0 + k + 12, y1], fill=dark, width=1)
     draw.rectangle(box, outline=dark)
+
+
+def bone_fill(draw, box, color):
+    x0, y0, x1, y1 = box
+    draw.rectangle(box, fill=color)
+    edge = tuple(max(0, c - 36) for c in color)
+    draw.rectangle(box, outline=edge)
 
 
 def paint(placed, regions):
@@ -179,14 +243,47 @@ def paint(placed, regions):
         color = MATERIALS[mat]
         if mat == "membrane":
             membrane_fill(d, box, color)
+        elif mat == "belly":
+            belly_fill(d, box, color)
+        elif mat == "bone":
+            bone_fill(d, box, color)
         elif mat == "eye":
-            d.rectangle(box, fill=MATERIALS["head"])
-            cx, cy = x + w // 2, y + h // 2
-            d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=color)
-            d.ellipse([cx - 1, cy - 1, cx + 1, cy + 1], fill=(20, 12, 12))
+            d.rectangle(box, fill=MATERIALS["scale"])
+            _, _, size, _, _, _ = CUBES[i]
+            dw, dh = size[2], size[1]
+            cx = x + max(2, dw // 3)
+            cy = y + max(2, dh // 3)
+            r = max(2, min(dw, dh) // 3)
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
+            pr = max(1, r // 2)
+            d.ellipse([cx - pr, cy - pr, cx + pr, cy + pr], fill=PUPIL)
         else:
             scale_fill(d, box, color)
     return img
+
+
+def save_png(img, path):
+    """Write a PNG with no time chunk, so two runs match byte for byte."""
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    data = buf.getvalue()
+    signature = b"\x89PNG\r\n\x1a\n"
+    if not data.startswith(signature):
+        raise RuntimeError("Pillow did not write a PNG")
+    out = bytearray(signature)
+    index = len(signature)
+    while index + 8 <= len(data):
+        length = struct.unpack(">I", data[index : index + 4])[0]
+        chunk_type = data[index + 4 : index + 8]
+        start = index
+        index += 8 + length + 4
+        if chunk_type in (b"tIME", b"tEXt", b"iTXt", b"zTXt"):
+            continue
+        out += data[start:index]
+        if chunk_type == b"IEND":
+            break
+    with open(path, "wb") as fh:
+        fh.write(out)
 
 
 def main():
@@ -196,7 +293,7 @@ def main():
     with open(GEO_PATH, "w", encoding="utf-8") as fh:
         json.dump(geometry, fh, indent=2)
         fh.write("\n")
-    paint(placed, regions).save(TEX_PATH)
+    save_png(paint(placed, regions), TEX_PATH)
     print(f"wrote {GEO_PATH}")
     print(f"wrote {TEX_PATH} ({TEX_W}x{TEX_H})")
     print(f"bones: {len(BONES)}  cubes: {len(CUBES)}")
