@@ -1,0 +1,14 @@
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Build outputs — ship these via MCPEDL/CurseForge, not git
+*.mcworld
+*.mcaddon
+*.mcpack
+build/
+dist/
+
+# Local editor
+.vscode/
+.idea/
