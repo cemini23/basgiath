@@ -2,12 +2,12 @@
 
 LANE: hard
 PROFILE: claudio
-WORKDIR: /Users/claudiobarone/Projects/dragon-rider-map
+WORKDIR: repo root (GitHub: basgiath)
 EXECUTOR: Grok CLI implements. Plan is filled below, so skip the Grok plan step.
 
 ## WorkDir
 
-/Users/claudiobarone/Projects/dragon-rider-map
+repo root (GitHub: basgiath)
 
 ## Target
 
@@ -22,7 +22,7 @@ The repo has a working v0 scaffold: two pack manifests, `scripts/main.js` (the s
 1. Behavior pack gains a custom entity `dragon_rider:dragon` with `minecraft:rideable` (one seat, player control), flying movement and navigation, and rider control.
 2. Resource pack gains a client entity JSON, a placeholder box geometry, a render controller, an idle and a fly animation, and a language string naming the dragon.
 3. Every entity and resource JSON parses and uses valid Bedrock schema shape (`format_version`, `minecraft:entity`, `minecraft:client_entity`).
-4. `scripts/package.sh` builds `dist/dragon-rider-map.mcaddon` from the two packs.
+4. `scripts/package.sh` builds `dist/basgiath.mcaddon` from the two packs.
 5. `scripts/validate.sh` parses every `addon/**/*.json` and exits 0. It exits non-zero on any parse error. It also fails if the pack UUIDs are not unique.
 6. The existing signet script still passes `node --check`.
 7. No file names the book, its characters, or its signets. Entity id and pack strings use original wording.
@@ -68,7 +68,7 @@ Exact coordinates are placeholders. List which numbers to replace in `addon/beha
 
 ### D. Scripts
 
-- `scripts/package.sh`: zip `addon/behavior_pack` and `addon/resource_pack` into `dist/dragon-rider-map.mcaddon`. Create `dist/`. Make executable.
+- `scripts/package.sh`: zip `addon/behavior_pack` and `addon/resource_pack` into `dist/basgiath.mcaddon`. Create `dist/`. Make executable.
 - `scripts/validate.sh`: parse every `addon/**/*.json` with `python3 -c "import json;json.load(open(f))"` and fail on error. Then read the four UUIDs from the two manifests and fail if any repeat. Make executable.
 
 ### E. Docs
@@ -79,7 +79,7 @@ Exact coordinates are placeholders. List which numbers to replace in `addon/beha
 ## Verify
 
 ```
-cd /Users/claudiobarone/Projects/dragon-rider-map
+# from the repo root
 test -f addon/behavior_pack/entities/dragon.json
 test -f addon/resource_pack/entity/dragon.entity.json
 test -f addon/resource_pack/models/entity/dragon.geo.json
@@ -90,7 +90,7 @@ test -f scripts/package.sh
 test -f scripts/validate.sh
 bash scripts/validate.sh
 node --check addon/behavior_pack/scripts/main.js
-bash scripts/package.sh && test -f dist/dragon-rider-map.mcaddon
+bash scripts/package.sh && test -f dist/basgiath.mcaddon
 grep -ril "fourth wing\|empyrean\|tairn\|andarna\|basgiath" addon/ scripts/ || echo "no IP leak"
 ```
 

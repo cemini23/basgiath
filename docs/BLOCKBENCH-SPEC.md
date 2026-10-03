@@ -75,9 +75,8 @@ Use **Box UV** for the body blocks and **Per-face UV** for the wings and head.
 ## Install and verify
 
 ```
-cd /Users/claudiobarone/Projects/dragon-rider-map
 bash scripts/validate.sh          # every JSON parses, UUIDs unique
-bash scripts/package.sh           # rebuild dist/dragon-rider-map.mcaddon
+bash scripts/package.sh           # rebuild dist/basgiath.mcaddon
 ```
 
 Then load the pack in a Bedrock 26.20 world and run `/summon dragon_rider:dragon`. Check three things:

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Zip the two packs into dist/dragon-rider-map.mcaddon.
+# Zip the two packs into dist/basgiath.mcaddon.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DIST="$ROOT/dist"
-OUT="$DIST/dragon-rider-map.mcaddon"
+OUT="$DIST/basgiath.mcaddon"
 
 mkdir -p "$DIST"
 rm -f "$OUT"

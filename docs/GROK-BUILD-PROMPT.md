@@ -1,7 +1,7 @@
 # Grok Build prompt — finish Basgiath
 
-Paste everything below the line into Grok Build, run from
-`/Users/claudiobarone/Projects/dragon-rider-map`.
+Paste everything below the line into Grok Build, run from the repo root.
+The GitHub repo is `basgiath`.
 
 ---
 
@@ -27,7 +27,7 @@ Rename the GitHub repo to **`basgiath`**:
 
 - `gh repo rename basgiath --yes`
 - Update the remote URL.
-- Replace every path reference to `dragon-rider-map` in docs, scripts, and CI with `basgiath`.
+- Replace every path reference to the old repo folder name in docs, scripts, and CI with `basgiath`.
 - **Do not** change the pack ids (`dragon_rider:*`), the geometry id, or the pack UUIDs. Changing them breaks saved worlds.
 
 ## Hard constraints — never break these
