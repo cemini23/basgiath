@@ -57,7 +57,7 @@ BUILD_CHECKLIST.md     step-by-step in-game build
 DISTRIBUTION.md        where it ships and how it gets found
 docs/IP-RULES.md       the non-negotiable fan-project rules
 docs/BLOCKBENCH-SPEC.md the dragon model spec (bones, UV, export)
-docs/ascii-dragon.txt  the art above, as a plain text file
+docs/ascii-dragon.txt  a larger dragon variant (62 lines, 111 columns)
 addon/
   behavior_pack/       manifest, dragon entity, Parapet functions, scripts/main.js
   resource_pack/       manifest, client entity, model, animations, texture
