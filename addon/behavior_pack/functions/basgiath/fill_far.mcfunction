@@ -1,0 +1,14 @@
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_01
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_02
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_03
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_04
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_05
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_06
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_07
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_08
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_09
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_10
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_11
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_12
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_13
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_14

@@ -1,3 +1,10 @@
+setblock ~6 ~18 ~43 stone_bricks
+setblock ~6 ~19 ~43 sea_lantern
+setblock ~9 ~18 ~43 stone_bricks
+setblock ~9 ~19 ~43 sea_lantern
+setblock ~7 ~19 ~42 sea_lantern
+setblock ~7 ~20 ~42 air
+setblock ~7 ~21 ~42 air
 setblock ~8 ~19 ~42 sea_lantern
 setblock ~8 ~20 ~42 air
 setblock ~8 ~21 ~42 air
@@ -41,10 +48,3 @@ setblock ~7 ~25 ~38 air
 setblock ~8 ~23 ~38 sea_lantern
 setblock ~8 ~24 ~38 air
 setblock ~8 ~25 ~38 air
-setblock ~6 ~23 ~38 stone_bricks
-setblock ~6 ~24 ~38 sea_lantern
-setblock ~9 ~23 ~38 stone_bricks
-setblock ~9 ~24 ~38 sea_lantern
-setblock ~7 ~24 ~37 sea_lantern
-setblock ~7 ~25 ~37 air
-setblock ~7 ~26 ~37 air

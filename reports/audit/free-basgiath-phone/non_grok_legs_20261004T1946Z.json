@@ -1,0 +1,19 @@
+{
+  "ts": "20261004T1946Z",
+  "written": [
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-phone/auditor-claude-ds.md",
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-phone/auditor-or-nvidia-nemotron-3-ultra-550b-a55b-free.md",
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-phone/auditor-or-nvidia-nemotron-3.5-lightning-free.md"
+  ],
+  "errors": [
+    "auditor-or-google-gemma-4-26b-a4b-it-free/google/gemma-4-26b-a4b-it:free: HTTP Error 429: Too Many Requests",
+    "auditor-or-google-gemma-4-26b-a4b-it-free/thinkingmachines/inkling-small:free: HTTP Error 403: Forbidden"
+  ],
+  "degraded": [],
+  "free_models": [
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "google/gemma-4-26b-a4b-it:free"
+  ],
+  "bundle_chars": 54445,
+  "ok_or_count": 2
+}

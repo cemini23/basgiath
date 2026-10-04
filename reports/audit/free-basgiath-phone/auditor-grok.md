@@ -1,0 +1,23 @@
+<!-- model=grok-4.7 channel=grok ts=2026-10-04T19:50:00Z -->
+
+### Verdict
+FAIL — the east stairs and the plaza are still outside the chunk range the phone has already proven, and the "Welcome" title can fire when those blocks were not placed.
+
+### Findings
+| Severity | Finding | Evidence (file:line or quote) | Fix |
+|----------|---------|----------------------------------|-----|
+| critical | The only command proven to place blocks on this phone is the body of `/function basgiath/build`. During that command the player stands on the anchor. A phone simulates about 4 chunks (about 64 blocks, up to 79 if the player stands on the west edge of a chunk). Stairs start at x=91 and the plaza at x=96, so those setblocks fail in the first pass. The file that removed this inline pass placed nothing. | Playtest notes in the audit prompt. `far_01.mcfunction` `setblock ~91 ~32 ~20`. `build.mcfunction` calls `stage_01` through `stage_20` in the same command that summons the anchor. | Place the stairs and the plaza again only after those chunks are loaded. Do not treat the first pass as enough for x>=80. |
+| critical | The second pass is unproven on this phone, and the done signal does not mean the blocks exist. `raise` always sets `#done` to 1 after the far calls. A failed `setblock` does not stop a function. The title still shows. `fill_far` can also have run too early, so nothing retries after that. | `build.mcfunction` lines 25–26: `schedule on_area_loaded add tickingarea college_d basgiath/fill_far` and `schedule delay add basgiath/raise 300`. `raise.mcfunction` lines 13–18: welcome commands, then `scoreboard players set #done map_state 1` with no block check. | Run the far place twice, at chunk-load and again after a delay. Show "Welcome, candidate" only on the later pass. Keep a copy of the far place that still runs if the player is standing in the east chunks. |
+| warn | The far cutoff treats x=65..79 and z=65..79 as near. Those blocks are not in `far_*.mcfunction`. On the east edge of a chunk, sim distance 4 reaches only about 64 blocks. The gate at x=78 is then missed and never retried. The last playtest reached x=78, so this is not every run, but the next spawn position can change it. | `scripts/build_map.py` `is_far`: `x1 > 79 or z1 > 79`. Gate helpers use x=78. | Retry every command that leaves a 48-block box around the anchor. 48 stays inside 4 chunks from either edge of the player's chunk. |
+| warn | `raise.mcfunction` line 17 is `execute if score ... run execute as ...`. If that line fails to parse, Bedrock rejects the whole function and the timed pass never runs. | `raise.mcfunction` line 17. | Use one `execute`: `execute if score #done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run tp @p ~8 ~0 ~66 180 0`. |
+| info | The first pass also runs the far fills, including the ground fill out to x=170. A fill that touches an unloaded chunk can fail for the whole box or hitch the phone. The near tower still has its own fill, so the Parapet can appear. | `build_text` spreads every stage into `build.mcfunction`. Ground fill is `fill(0, -2, 0, 170, -2, 150, ...)`. | Leave the near stage calls in `build`. Do not add a third full copy of the ground fill. |
+| info | `tick.json` is empty and `#stage` is set to 0. That matches the phone. The script tick is only for wind and checkpoints. Do not move block placement back onto that loop. | `tick.json` `{"values": []}`. `build.mcfunction` sets `#stage` to 0. `main.js` calls `function basgiath/tick`. | No change to that split. |
+
+### Root cause (if debugging)
+The college is built at the player's feet, then continues more than 80 blocks east. The phone only keeps nearby chunks live while `/function basgiath/build` runs, so the Parapet and the near gate can appear and the stairs cannot. The current repair waits 15 seconds and also waits for a ticking area. That can work, but the welcome title is tied to the timer, not to a loaded chunk. The earlier "nothing" playtest was a separate bug: that file did not place any stages inside the build command. The current file does. A player who walks before "Welcome, candidate" can still reach an empty east end if the timed pass lost the race.
+
+### Confidence
+medium — the chunk limit matches the photos (gate at the edge, nothing past it). A phone run of this exact 0.1.5 file would raise confidence. Seeing the stairs at x=91 before the welcome title would refute the critical finding.
+
+### Unique angle
+The safe loaded box is about 48 blocks, not 79. Chunk alignment depends on where the player stands inside the chunk. The classifier uses the best case. One bad spawn point drops the gate out of the first pass and out of the retry.

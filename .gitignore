@@ -16,3 +16,6 @@ dist/
 # Python
 __pycache__/
 *.pyc
+
+# Generated audit packs (file copies, rebuilt per run)
+reports/audit/pack-*/

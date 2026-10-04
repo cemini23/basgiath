@@ -1,0 +1,18 @@
+{
+  "picked_at": "2026-10-04T19:44:04+00:00",
+  "count": 2,
+  "models": [
+    {
+      "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "family": "nvidia",
+      "context_length": 1000000
+    },
+    {
+      "id": "google/gemma-4-26b-a4b-it:free",
+      "family": "google",
+      "context_length": 262144
+    }
+  ],
+  "excluded": "deepseek, grok, x-ai, thinkingmachines/inkling-small:free (HTTP 403 on this machine, not a product vote)",
+  "note": "prepare_free_audit.py picked inkling-small first. That model returns HTTP 403 here, so slot 3 is Nemotron and slot 4 is Gemma."
+}

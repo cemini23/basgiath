@@ -1,7 +1,11 @@
 // Dragon Rider Map — the signet form.
 // Target: Minecraft Bedrock 26.x, @minecraft/server 2.x
 //
-// Trigger: interact with a lodestone (the "Bonding Stone").
+// Trigger: interact with a lodestone (the "Bonding Stone") after the bond.
+//          Canon puts the signet weeks after a dragon chooses the rider,
+//          so the form opens only for a player with the "bonded" tag.
+//          Threshing sets that tag (and the #bond score) when a dragon
+//          chooses the player. This script only reads the tag.
 // Test:    /scriptevent dragon_rider:signet
 //
 // Original archetypes only. Do not replace these with the book's signets.
@@ -12,6 +16,8 @@ import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 const BONDING_BLOCK = "minecraft:lodestone";
 const SIGNET_PROPERTY = "dragon_rider:signet";
 const TEST_EVENT = "dragon_rider:signet";
+const BOND_TAG = "bonded";
+const NO_BOND_LINE = "§7A signet comes after a dragon chooses you.";
 
 const QUESTIONS = [
   {
@@ -79,7 +85,7 @@ async function runSignetQuiz(player) {
   let lastSignet = null;
 
   for (const question of QUESTIONS) {
-    const form = new ActionFormData().title("Conscription").body(question.body);
+    const form = new ActionFormData().title("Signet").body(question.body);
     for (const choice of question.choices) {
       form.button(choice.text);
     }
@@ -120,17 +126,35 @@ async function runSignetQuiz(player) {
   if (again.selection === 0) runSignetQuiz(player);
 }
 
+// A lodestone use is always cancelled so the compass screen never opens.
+// The form itself waits for the bond. The plaza stone stays where it is.
 world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   if (!event.isFirstEvent) return;
   if (event.block?.typeId !== BONDING_BLOCK) return;
   const player = event.player;
   event.cancel = true;
-  system.run(() => runSignetQuiz(player));
+  system.run(() => {
+    if (player.hasTag(BOND_TAG)) {
+      runSignetQuiz(player);
+    } else {
+      player.sendMessage(NO_BOND_LINE);
+    }
+  });
 });
 
+// Test bypass. It opens the quiz without the bond tag.
 system.afterEvents.scriptEventReceive.subscribe((event) => {
   if (event.id !== TEST_EVENT) return;
   const entity = event.sourceEntity;
   if (entity?.typeId !== "minecraft:player") return;
   system.run(() => runSignetQuiz(entity));
 });
+
+// A phone does not run tick.json. This runs the same function once per tick.
+system.runInterval(() => {
+  try {
+    world.getDimension("overworld").runCommand("function basgiath/tick");
+  } catch (e) {
+    // The world can tick before the function files are ready.
+  }
+}, 1);

@@ -70,7 +70,7 @@ docs/LISTING.md        the download text, six clip scripts, and the tag list
 1. Install **Minecraft Bedrock** 1.21.90 or newer. Use a full copy. The free trial turns commands off, so it cannot run the build function.
 2. Build the files from the repo root with `bash scripts/package.sh`.
 3. Open `dist/basgiath.mcworld` in Minecraft. On a phone, tap the file and choose Minecraft.
-4. Run `/function basgiath/build`. The screen says "Building" at once. Then it says "Welcome, candidate". If the screen stays dark, quit Minecraft, delete the old Basgiath world, and import this file again.
+4. Run `/function basgiath/build`. Close chat. The screen says "Building". Stay still for about 20 seconds. The game moves you onto the plaza, then back to the start. Then the screen says "Welcome, candidate". If the screen stays dark, quit Minecraft, delete the old Basgiath world, and import this file again.
 5. You land on a glowing path. Climb the stairs in front of you, then cross the Parapet. Touch the lodestone in the Quad with an empty hand. In the valley, run `/function basgiath/summon_dragon` and ride.
 
 A phone, a tablet, or Windows can open the file. A Nintendo Switch cannot open it from a folder. Upload the world to a Realm from a phone or from Windows. Then download it on the Switch with the same Microsoft account. Minecraft on a Mac is Java. It cannot open this file.

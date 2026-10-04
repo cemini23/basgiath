@@ -1,0 +1,19 @@
+{
+  "ts": "20261004T1659Z",
+  "written": [
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-bench/auditor-claude-ds.md",
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-bench/auditor-or-nvidia-nemotron-3-ultra-550b-a55b-free.md"
+  ],
+  "errors": [
+    "auditor-or-thinkingmachines-inkling-small-free/thinkingmachines/inkling-small:free: HTTP Error 403: Forbidden",
+    "auditor-or-thinkingmachines-inkling-small-free/thinkingmachines/inkling:free: HTTP Error 403: Forbidden",
+    "auditor-or-nvidia-nemotron-3-ultra-550b-a55b-free/nvidia/nemotron-3-ultra-550b-a55b:free: \"no choices in response: {'message': 'Upstream error from Nvidia: Service temporarily overloaded', 'code': 503, 'metadata': {'error_type': 'provider_overloaded'}}\""
+  ],
+  "degraded": [],
+  "free_models": [
+    "thinkingmachines/inkling-small:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free"
+  ],
+  "bundle_chars": 48350,
+  "ok_or_count": 1
+}

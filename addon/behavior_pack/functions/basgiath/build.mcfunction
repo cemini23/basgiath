@@ -1,4 +1,4 @@
-titleraw @s times 0 40 5
+titleraw @s times 0 80 10
 titleraw @s title {"rawtext":[{"text":"Building"}]}
 titleraw @s subtitle {"rawtext":[{"text":"Stay still"}]}
 scoreboard objectives add map_state dummy
@@ -10,6 +10,40 @@ execute at @s run setblock ~-1 ~-1 ~-1 sea_lantern
 execute at @s run summon armor_stand "build_anchor" ~ ~ ~
 execute at @s run effect @e[type=armor_stand,name="build_anchor",c=1] invisibility 999999 1 true
 execute at @s run effect @e[type=armor_stand,name="build_anchor",c=1] resistance 999999 255 true
-scoreboard players set #stage map_state 1
-tellraw @s {"rawtext":[{"text":"The college is rising. Stay still. Fan-made. Not official. Not affiliated with any publisher."}]}
 gamerule sendcommandfeedback false
+gamemode adventure @a
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea remove college_a
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea add circle ~40 ~32 ~40 4 college_a true
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea remove college_b
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea add circle ~120 ~32 ~40 4 college_b true
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea remove college_c
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea add circle ~40 ~32 ~110 4 college_c true
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea remove college_d
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea add circle ~120 ~32 ~110 4 college_d true
+scoreboard players set #done map_state 0
+scoreboard players set #pass map_state 1
+schedule on_area_loaded add tickingarea college_b basgiath/fill_far
+schedule on_area_loaded add tickingarea college_d basgiath/fill_far
+schedule delay add basgiath/raise 300
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_01
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_02
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_03
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_04
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_05
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_06
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_07
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_08
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_09
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_10
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_11
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_12
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_13
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_14
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_15
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_16
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_17
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_18
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_19
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_20
+scoreboard players set #stage map_state 0
+tellraw @s {"rawtext":[{"text":"The college is rising. Stay still for 15 seconds. Fan-made. Not official. Not affiliated with any publisher."}]}

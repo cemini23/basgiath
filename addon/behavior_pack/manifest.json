@@ -4,21 +4,21 @@
     "name": "pack.dragon_rider.name",
     "description": "pack.dragon_rider.description",
     "uuid": "7a3f9c2e-1b4d-4e8a-9f21-0c5d6e7a8b90",
-    "version": [0, 1, 1],
+    "version": [0, 1, 6],
     "min_engine_version": [1, 21, 90]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "2d8b4f1a-6c3e-4a9d-b5f7-1e2a3b4c5d6e",
-      "version": [0, 1, 1]
+      "version": [0, 1, 6]
     },
     {
       "type": "script",
       "language": "javascript",
       "uuid": "9e1c7a3d-4f2b-4c8e-a1d3-5b6c7d8e9f01",
       "entry": "scripts/main.js",
-      "version": [0, 1, 1]
+      "version": [0, 1, 6]
     }
   ],
   "dependencies": [

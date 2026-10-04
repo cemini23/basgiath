@@ -1,0 +1,11 @@
+{
+  "mode": "prod-ship",
+  "pack": "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/pack-free-basgiath-ship",
+  "out": "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-ship",
+  "handoff": "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-ship/GROK_HANDOFF.md",
+  "free_models": [
+    "thinkingmachines/inkling-small:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free"
+  ],
+  "next_command": "pwsh -File \"/Users/claudiobarone/Desktop/projects/tipdrop-workspace-kit/scripts/handoff-to-grok.ps1\" -PromptFile \"/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-ship/GROK_HANDOFF.md\" -WorkDir \"/Users/claudiobarone/Projects/dragon-rider-map\""
+}

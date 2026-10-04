@@ -1,0 +1,15 @@
+{
+  "ts": "20261004T1702Z",
+  "written": [
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-bench/auditor-or-inclusionai-ling-3.0-flash-sante-free.md",
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-bench/auditor-or-poolside-laguna-s-2.1-free.md"
+  ],
+  "errors": [],
+  "degraded": [],
+  "free_models": [
+    "inclusionai/ling-3.0-flash-sante:free",
+    "poolside/laguna-s-2.1:free"
+  ],
+  "bundle_chars": 48350,
+  "ok_or_count": 2
+}

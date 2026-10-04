@@ -161,7 +161,7 @@ def assert_walk(blocks: dict[tuple[int, int, int], str]) -> None:
     if not _reachable(
         blocks,
         EAST_ROOF,
-        lambda x, y, z: y == 0 and x >= 90 and 22 <= z <= 40,
+        lambda x, y, z: y == 0 and x >= 90 and SPAN_Z <= z <= 40,
     ):
         fail("no walk from the east roof down to the quad")
 

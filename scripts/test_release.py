@@ -91,8 +91,11 @@ def check_names() -> None:
 def check_map() -> None:
     functions = ROOT / "addon/behavior_pack/functions"
     tick = json.loads((functions / "tick.json").read_text())
-    if tick.get("values") != ["basgiath/tick"]:
+    if tick.get("values") != []:
         fail(f"tick.json values are {tick.get('values')}")
+    script = (ROOT / "addon/behavior_pack/scripts/main.js").read_text()
+    if 'runCommand("function basgiath/tick")' not in script:
+        fail("script does not run the map tick")
     folder = functions / "basgiath"
     build = (folder / "build.mcfunction").read_text()
     if 'titleraw @s title {"rawtext":[{"text":"Building"}]}' not in build:
@@ -107,8 +110,43 @@ def check_map() -> None:
         fail("build function does not place a stone under the player")
     if "resistance 999999 255" not in build:
         fail("build function does not give the anchor resistance")
-    if "#stage" not in build:
-        fail("build function does not set the stage")
+    if "scoreboard players set #stage map_state 0" not in build:
+        fail("build function leaves the stage running")
+    if "#wait" in build:
+        fail("build function waits for a tick the phone does not run")
+    if "function basgiath/stage_01" not in build or "function basgiath/stage_20" not in build:
+        fail("build function does not place the college")
+    if "tickingarea add circle" not in build:
+        fail("build function does not load the college chunks")
+    if "schedule on_area_loaded add tickingarea college_b basgiath/fill_far" not in build:
+        fail("build function does not fill the plaza when the stair chunks load")
+    if "schedule on_area_loaded add tickingarea college_d basgiath/fill_far" not in build:
+        fail("build function does not fill the valley when those chunks load")
+    if "schedule delay add basgiath/raise 300" not in build:
+        fail("build function has no timed second pass")
+    if "scoreboard players set #done map_state 0" not in build:
+        fail("build function does not arm the welcome")
+    tick_fn = (folder / "tick.mcfunction").read_text()
+    if "#wait" in tick_fn:
+        fail("tick function still waits")
+    fill_far = (folder / "fill_far.mcfunction").read_text()
+    if "function basgiath/far_01" not in fill_far:
+        fail("fill_far does not place the far college")
+    raise_fn = (folder / "raise.mcfunction").read_text()
+    if "slow_falling" not in raise_fn or "tp @p ~120 ~8 ~40" not in raise_fn:
+        fail("raise function does not move the player onto the plaza")
+    if "schedule delay add basgiath/open 80" not in raise_fn:
+        fail("raise function does not place the plaza after the move")
+    open_fn = (folder / "open.mcfunction").read_text()
+    if "function basgiath/far_01" not in open_fn:
+        fail("open function does not place the far college")
+    if "Welcome, candidate" not in open_fn or "scoreboard players set #done map_state 1" not in open_fn:
+        fail("open function does not welcome the player")
+    if "run execute " in open_fn:
+        fail("open function nests execute")
+    far_blob = "\n".join(path.read_text() for path in sorted(folder.glob("far_*.mcfunction")))
+    if "fill ~ ~-2 ~ ~170 " in far_blob:
+        fail("far pass still refills the whole ground plane")
     live = (folder / "live.mcfunction").read_text()
     for needle in ("spawnpoint", "cp_west", "cp_east", "cp_quad", "cp_valley", "~0.18"):
         if needle not in live:

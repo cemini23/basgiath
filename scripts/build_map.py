@@ -13,12 +13,20 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from zones.dorms import build as build_dorms
+from zones.parapet import build as build_parapet
+from zones.quad import build as build_quad
+from zones.valley import build as build_valley
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "addon" / "behavior_pack" / "functions"
 BASGIATH = OUT / "basgiath"
 
 MAX_FILL = 32768
 MAX_CMDS = 50
+# Phone sim distance 4 reaches about 64 blocks, less from the far edge of a chunk.
+# Keep the first pass inside this box. Retry everything outside it.
+LOADED = 48
 # The span sits this many blocks above the player's feet.
 # A fall onto the ground is fatal. 23 blocks is the kill line.
 DECK_Y = 32
@@ -78,10 +86,12 @@ class Builder:
         self.lines.append(command)
 
     def fill(self, x0: int, y0: int, z0: int, x1: int, y1: int, z1: int, block: str) -> None:
-        for box in _split_box(x0, y0, z0, x1, y1, z1):
-            a = " ".join(rel(n) for n in box[:3])
-            b = " ".join(rel(n) for n in box[3:])
-            self.add(f"fill {a} {b} {block}")
+        for sx0, sx1 in _segments(x0, x1):
+            for sz0, sz1 in _segments(z0, z1):
+                for box in _split_box(sx0, y0, sz0, sx1, y1, sz1):
+                    a = " ".join(rel(n) for n in box[:3])
+                    b = " ".join(rel(n) for n in box[3:])
+                    self.add(f"fill {a} {b} {block}")
 
     def setblock(self, x: int, y: int, z: int, block: str) -> None:
         self.add(f"setblock {rel(x)} {rel(y)} {rel(z)} {block}")
@@ -94,216 +104,94 @@ def shell(builder: Builder, x0: int, y0: int, z0: int, x1: int, y1: int, z1: int
         builder.fill(x0 + 1, y0 + 1, z0 + 1, x1 - 1, y1 - 1, z1 - 1, "air")
 
 
-def ground(builder: Builder) -> None:
-    builder.fill(0, -2, 0, 170, -2, 150, "stone")
-    builder.fill(0, -1, 0, 170, -1, 150, "grass_block")
+class ZoneCtx:
+    """The fixed input for scripts/zones. build(ctx) returns commands."""
+
+    def __init__(self) -> None:
+        self._builder = Builder()
+        self.DECK_Y = DECK_Y
+        self.SPAN_Z = SPAN_Z
+        self.START = START
+
+    def add(self, command: str) -> None:
+        self._builder.add(command)
+
+    def fill(self, x0: int, y0: int, z0: int, x1: int, y1: int, z1: int, block: str) -> None:
+        self._builder.fill(x0, y0, z0, x1, y1, z1, block)
+
+    def setblock(self, x: int, y: int, z: int, block: str) -> None:
+        self._builder.setblock(x, y, z, block)
+
+    def shell(self, x0: int, y0: int, z0: int, x1: int, y1: int, z1: int, block: str) -> None:
+        shell(self._builder, x0, y0, z0, x1, y1, z1, block)
+
+    def take(self) -> list[str]:
+        lines = self._builder.lines
+        self._builder.lines = []
+        return lines
 
 
-def chasm(builder: Builder) -> None:
-    """Open air under the span. The floor stays at ground level so the fall kills."""
-    builder.fill(15, -1, 12, 77, -1, 28, "stone")
-    builder.fill(15, 0, 12, 77, DECK_Y - 1, 28, "air")
+def paths(ctx: ZoneCtx) -> None:
+    ctx.fill(90, -1, 18, 96, -1, 22, "stone_bricks")
+    ctx.fill(108, -1, 79, 112, -1, 89, "stone_bricks")
+    ctx.fill(71, -1, 116, 98, -1, 120, "stone_bricks")
 
 
-def tower(builder: Builder, x0: int, z0: int, x1: int, z1: int) -> None:
-    builder.fill(x0, -1, z0, x1, DECK_Y, z1, "stone_bricks")
-    builder.fill(x0 + 1, 0, z0 + 1, x1 - 1, DECK_Y - 1, z1 - 1, "air")
-
-
-def _stair(builder: Builder, x0: int, x1: int, y: int, z: int) -> None:
-    """One glowing step. x0 and x1 are the walk blocks. Curbs sit one block outside."""
-    for x in range(x0, x1 + 1):
-        builder.setblock(x, y, z, "sea_lantern")
-        builder.setblock(x, y + 1, z, "air")
-        builder.setblock(x, y + 2, z, "air")
-    for x in (x0 - 1, x1 + 1):
-        builder.setblock(x, y, z, "stone_bricks")
-        builder.setblock(x, y + 1, z, "sea_lantern")
-
-
-def west_climb(builder: Builder) -> None:
-    """Glowing stairs on the ground, south of the west tower, then a lit roof path."""
-    for step in range(DECK_Y + 1):
-        _stair(builder, 7, 8, step, 61 - step)
-    builder.fill(6, -1, 62, 9, -1, 68, "sea_lantern")
-    for z in range(SPAN_Z, 29):
-        builder.setblock(7, DECK_Y, z, "sea_lantern")
-        builder.setblock(8, DECK_Y, z, "sea_lantern")
-    for x in range(7, 15):
-        builder.setblock(x, DECK_Y, SPAN_Z, "sea_lantern")
-    for z in range(12, 29):
-        if z == SPAN_Z:
-            continue
-        builder.setblock(14, DECK_Y + 1, z, "stone_brick_wall")
-        builder.setblock(14, DECK_Y + 2, z, "stone_brick_wall")
-
-
-def east_climb(builder: Builder) -> None:
-    """Lit roof path, then glowing stairs down to a sidewalk into the quad."""
-    for x in range(78, 86):
-        builder.setblock(x, DECK_Y, SPAN_Z, "sea_lantern")
-    for z in range(SPAN_Z, 29):
-        builder.setblock(84, DECK_Y, z, "sea_lantern")
-        builder.setblock(85, DECK_Y, z, "sea_lantern")
-    for step in range(DECK_Y + 1):
-        _stair(builder, 84, 85, DECK_Y - step, 29 + step)
-    builder.fill(83, -1, 22, 96, -1, 63, "sea_lantern")
-
-
-def parapet(builder: Builder) -> None:
-    for x in range(15, 78):
-        if x in (45, 46):
-            continue
-        if x <= 18:
-            block = "sea_lantern"
-        elif x in (44, 47):
-            block = "polished_blackstone"
-        elif (x - 15) % 4 == 0:
-            block = "chiseled_stone_bricks"
-        else:
-            block = "stone_bricks"
-        builder.setblock(x, DECK_Y, SPAN_Z, block)
-
-
-def bleachers(builder: Builder) -> None:
-    for row, height in enumerate((3, 2, 1, 0)):
-        builder.fill(100, 0, 4 + row, 164, height, 4 + row, "stone_bricks")
-        builder.fill(100, 0, 78 - row, 164, height, 78 - row, "stone_bricks")
-
-
-def wool_poles(builder: Builder) -> None:
-    poles = (
-        (122, 34, "cyan_wool"),
-        (134, 34, "purple_wool"),
-        (122, 46, "orange_wool"),
-        (134, 46, "light_gray_wool"),
-    )
-    for x, z, wool in poles:
-        builder.fill(x, 0, z, x, 4, z, wool)
-
-
-def lantern_posts(builder: Builder) -> None:
-    for x in (104, 116, 140, 152):
-        for z in (20, 60):
-            builder.setblock(x, 0, z, "stone_bricks")
-            builder.setblock(x, 1, z, "lantern")
-
-
-def quad(builder: Builder) -> None:
-    builder.fill(96, -1, 4, 168, -1, 78, "stone_bricks")
-    builder.fill(124, 0, 36, 132, 0, 44, "stone_bricks")
-    builder.setblock(128, 0, 40, "lodestone")
-    bleachers(builder)
-    wool_poles(builder)
-    lantern_posts(builder)
-    shell(builder, 158, -1, 8, 164, 16, 14, "stone_bricks")
-    builder.setblock(161, 15, 11, "bell")
-    builder.setblock(161, 16, 11, "sea_lantern")
-
-
-def dorm(builder: Builder, x0: int, z0: int, x1: int, z1: int) -> None:
-    builder.fill(x0, -1, z0, x1, -1, z1, "stone_bricks")
-    builder.fill(x0, 0, z0, x1, 4, z1, "spruce_planks")
-    builder.fill(x0 + 1, 0, z0 + 1, x1 - 1, 4, z1 - 1, "air")
-    builder.fill(x0, 5, z0, x1, 5, z1, "spruce_planks")
-    door = (x0 + x1) // 2
-    for dx in (0, 1):
-        builder.setblock(door + dx, 0, z1, "air")
-        builder.setblock(door + dx, 1, z1, "air")
-    for x in range(x0 + 2, x1 - 1, 2):
-        builder.setblock(x, 0, z0 + 1, "red_wool")
-    mid_x = (x0 + x1) // 2
-    mid_z = (z0 + z1) // 2
-    builder.setblock(mid_x, 0, mid_z, "stone_bricks")
-    builder.setblock(mid_x, 1, mid_z, "lantern")
-
-
-def dorms(builder: Builder) -> None:
-    dorm(builder, 98, 90, 118, 102)
-    dorm(builder, 122, 90, 142, 102)
-    dorm(builder, 98, 108, 118, 120)
-
-
-def valley(builder: Builder) -> None:
-    """A one-block bowl. Deeper would fall through the flat world."""
-    builder.fill(16, -2, 94, 70, -2, 140, "grass_block")
-    builder.fill(16, -1, 94, 70, -1, 140, "air")
-    for x in range(18, 69, 10):
-        builder.fill(x, -1, 96, x, 2, 96, "stone_bricks")
-        builder.fill(x, -1, 138, x, 2, 138, "stone_bricks")
-    for z in range(106, 139, 10):
-        builder.fill(18, -1, z, 18, 2, z, "stone_bricks")
-        builder.fill(68, -1, z, 68, 2, z, "stone_bricks")
-    builder.fill(38, -2, 112, 48, -2, 122, "stone_bricks")
-    builder.setblock(43, -2, 117, "gold_block")
-    for z in (117, 118):
-        builder.setblock(70, -2, z, "stone_bricks")
-        builder.setblock(70, -1, z, "air")
-
-
-def paths(builder: Builder) -> None:
-    builder.fill(90, -1, 18, 96, -1, 22, "stone_bricks")
-    builder.fill(108, -1, 79, 112, -1, 89, "stone_bricks")
-    builder.fill(71, -1, 116, 98, -1, 120, "stone_bricks")
-
-
-def finish(builder: Builder) -> None:
-    builder.setblock(45, DECK_Y, SPAN_Z, "air")
-    builder.setblock(46, DECK_Y, SPAN_Z, "air")
-    builder.setblock(5, DECK_Y + 1, SPAN_Z, "stone_pressure_plate")
-    builder.setblock(86, DECK_Y + 1, SPAN_Z, "stone_pressure_plate")
-    builder.setblock(128, 0, 46, "stone_pressure_plate")
-    builder.setblock(43, -1, 115, "stone_pressure_plate")
-    builder.add("time set night")
-    builder.add("weather thunder 999999")
-    builder.add("gamerule dodaylightcycle false")
-    builder.add("gamerule doweathercycle false")
-    builder.add("gamerule domobspawning false")
-    builder.add("gamerule keepinventory true")
-    builder.add("gamerule sendcommandfeedback false")
-    builder.add("gamerule commandblockoutput false")
-    builder.add("gamerule doimmediaterespawn true")
-    builder.add("gamemode adventure @a")
-    builder.add('titleraw @p title {"rawtext":[{"text":"Welcome, candidate"}]}')
-    builder.add('titleraw @p subtitle {"rawtext":[{"text":"Cross the Parapet"}]}')
-    builder.add(
-        'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. The glowing stairs are in front of you. A fall from the span sends you back here. Touch the stone in the Quad. Then run /function basgiath/summon_dragon"}]}'
-    )
-    sx, sy, sz = START
-    builder.add(f"spawnpoint @p ~{sx} ~{sy} ~{sz}")
-    builder.add(f"tp @p ~{sx} ~{sy} ~{sz} 180 0")
+def finish(ctx: ZoneCtx) -> None:
+    ctx.setblock(45, ctx.DECK_Y, ctx.SPAN_Z, "air")
+    ctx.setblock(46, ctx.DECK_Y, ctx.SPAN_Z, "air")
+    ctx.setblock(5, ctx.DECK_Y + 1, ctx.SPAN_Z, "stone_pressure_plate")
+    ctx.setblock(86, ctx.DECK_Y + 1, ctx.SPAN_Z, "stone_pressure_plate")
+    ctx.setblock(128, 0, 46, "stone_pressure_plate")
+    ctx.setblock(43, -1, 115, "stone_pressure_plate")
+    ctx.add("time set night")
+    ctx.add("weather thunder 999999")
+    ctx.add("gamerule dodaylightcycle false")
+    ctx.add("gamerule doweathercycle false")
+    ctx.add("gamerule domobspawning false")
+    ctx.add("gamerule keepinventory true")
+    ctx.add("gamerule sendcommandfeedback false")
+    ctx.add("gamerule commandblockoutput false")
+    ctx.add("gamerule doimmediaterespawn true")
+    sx, sy, sz = ctx.START
+    ctx.add(f"spawnpoint @p ~{sx} ~{sy} ~{sz}")
 
 
 def geometry() -> list[str]:
-    builder = Builder()
-    ground(builder)
-    chasm(builder)
-    tower(builder, 2, 12, 14, 28)
-    west_climb(builder)
-    tower(builder, 78, 12, 90, 28)
-    east_climb(builder)
-    parapet(builder)
-    quad(builder)
-    dorms(builder)
-    valley(builder)
-    paths(builder)
-    finish(builder)
-    return builder.lines
+    """Join the zones, then the paths and the world rules.
+
+    Phase 0 keeps this order. The command list must match the four-zone world.
+    """
+    ctx = ZoneCtx()
+    lines: list[str] = []
+    lines.extend(build_parapet(ctx))
+    lines.extend(build_quad(ctx))
+    lines.extend(build_dorms(ctx))
+    lines.extend(build_valley(ctx))
+    paths(ctx)
+    finish(ctx)
+    lines.extend(ctx.take())
+    return lines
+
+
+def write_named_stages(prefix: str, commands: list[str]) -> int:
+    BASGIATH.mkdir(parents=True, exist_ok=True)
+    stages = [commands[i : i + MAX_CMDS] for i in range(0, len(commands), MAX_CMDS)]
+    names = {f"{prefix}_{index:02d}.mcfunction" for index in range(1, len(stages) + 1)}
+    for index, chunk in enumerate(stages, start=1):
+        path = BASGIATH / f"{prefix}_{index:02d}.mcfunction"
+        path.write_text("\n".join(chunk) + "\n", encoding="utf-8")
+    for path in BASGIATH.glob(f"{prefix}_*.mcfunction"):
+        if path.name not in names:
+            path.unlink()
+    return len(stages)
 
 
 def write_functions(commands: list[str]) -> int:
-    stages = [commands[i : i + MAX_CMDS] for i in range(0, len(commands), MAX_CMDS)]
-    BASGIATH.mkdir(parents=True, exist_ok=True)
-    for index, chunk in enumerate(stages, start=1):
-        path = BASGIATH / f"stage_{index:02d}.mcfunction"
-        path.write_text("\n".join(chunk) + "\n", encoding="utf-8")
-    stale = [path for path in BASGIATH.glob("stage_*.mcfunction") if path.name not in {f"stage_{i:02d}.mcfunction" for i in range(1, len(stages) + 1)}]
-    for path in stale:
-        path.unlink()
-
+    count = write_named_stages("stage", commands)
     tick_lines = ["scoreboard players operation #now map_state = #stage map_state"]
-    for index in range(1, len(stages) + 1):
-        nxt = index + 1 if index < len(stages) else 0
+    for index in range(1, count + 1):
+        nxt = index + 1 if index < count else 0
         name = f"stage_{index:02d}"
         tick_lines.append(
             f'execute if score #now map_state matches {index} as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/{name}'
@@ -313,25 +201,130 @@ def write_functions(commands: list[str]) -> int:
         )
     tick_lines.append('execute if score #now map_state matches 0 run function basgiath/live')
     (BASGIATH / "tick.mcfunction").write_text("\n".join(tick_lines) + "\n", encoding="utf-8")
-    return len(stages)
+    return count
 
 
-BUILD = """titleraw @s times 0 40 5
-titleraw @s title {"rawtext":[{"text":"Building"}]}
-titleraw @s subtitle {"rawtext":[{"text":"Stay still"}]}
-scoreboard objectives add map_state dummy
-kill @e[type=armor_stand,name="build_anchor"]
-execute at @s run setblock ~ ~-1 ~ stone
-execute at @s run setblock ~ ~-1 ~-1 sea_lantern
-execute at @s run setblock ~1 ~-1 ~-1 sea_lantern
-execute at @s run setblock ~-1 ~-1 ~-1 sea_lantern
-execute at @s run summon armor_stand "build_anchor" ~ ~ ~
-execute at @s run effect @e[type=armor_stand,name="build_anchor",c=1] invisibility 999999 1 true
-execute at @s run effect @e[type=armor_stand,name="build_anchor",c=1] resistance 999999 255 true
-scoreboard players set #stage map_state 1
-tellraw @s {"rawtext":[{"text":"The college is rising. Stay still. Fan-made. Not official. Not affiliated with any publisher."}]}
-gamerule sendcommandfeedback false
-"""
+def at_anchor(command: str) -> str:
+    return (
+        'execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run ' + command
+    )
+
+
+def stage_calls(prefix: str, count: int) -> list[str]:
+    return [at_anchor(f"function basgiath/{prefix}_{index:02d}") for index in range(1, count + 1)]
+
+
+def _segments(a0: int, a1: int, limit: int = LOADED) -> list[tuple[int, int]]:
+    """Split an axis so each piece is fully inside or fully outside the loaded box."""
+    lo, hi = sorted((a0, a1))
+    points = {lo, hi + 1}
+    if lo < -limit <= hi:
+        points.add(-limit)
+    if lo <= limit < hi:
+        points.add(limit + 1)
+    ordered = sorted(points)
+    spans: list[tuple[int, int]] = []
+    for start, end_excl in zip(ordered, ordered[1:]):
+        end = end_excl - 1
+        if start <= end:
+            spans.append((start, end))
+    return spans
+
+
+def _box(line: str) -> tuple[int, int, int, int] | None:
+    parts = line.split()
+    if parts[0] == "setblock" and len(parts) >= 4:
+        x = _rel(parts[1])
+        z = _rel(parts[3])
+        return (x, z, x, z)
+    if parts[0] == "fill" and len(parts) >= 7:
+        x0, z0 = _rel(parts[1]), _rel(parts[3])
+        x1, z1 = _rel(parts[4]), _rel(parts[6])
+        return (min(x0, x1), min(z0, z1), max(x0, x1), max(z0, z1))
+    return None
+
+
+def is_far(line: str) -> bool:
+    """True when a phone at sim distance 4 may not have this chunk yet."""
+    box = _box(line)
+    if box is None:
+        return False
+    x0, z0, x1, z1 = box
+    return x0 < -LOADED or z0 < -LOADED or x1 > LOADED or z1 > LOADED
+
+
+def build_text(stage_count: int) -> str:
+    """Place the college from the build command.
+
+    The phone runs this command. It does not run the tick loop.
+    A later pass places the stairs and the plaza after those chunks load.
+    """
+    areas = (
+        ("college_a", 40, 40),
+        ("college_b", 120, 40),
+        ("college_c", 40, 110),
+        ("college_d", 120, 110),
+    )
+    area_lines = []
+    for name, x, z in areas:
+        area_lines.append(at_anchor(f"tickingarea remove {name}"))
+        area_lines.append(at_anchor(f"tickingarea add circle ~{x} ~32 ~{z} 4 {name} true"))
+    lines = [
+        "titleraw @s times 0 80 10",
+        'titleraw @s title {"rawtext":[{"text":"Building"}]}',
+        'titleraw @s subtitle {"rawtext":[{"text":"Stay still"}]}',
+        "scoreboard objectives add map_state dummy",
+        'kill @e[type=armor_stand,name="build_anchor"]',
+        "execute at @s run setblock ~ ~-1 ~ stone",
+        "execute at @s run setblock ~ ~-1 ~-1 sea_lantern",
+        "execute at @s run setblock ~1 ~-1 ~-1 sea_lantern",
+        "execute at @s run setblock ~-1 ~-1 ~-1 sea_lantern",
+        'execute at @s run summon armor_stand "build_anchor" ~ ~ ~',
+        'execute at @s run effect @e[type=armor_stand,name="build_anchor",c=1] invisibility 999999 1 true',
+        'execute at @s run effect @e[type=armor_stand,name="build_anchor",c=1] resistance 999999 255 true',
+        "gamerule sendcommandfeedback false",
+        "gamemode adventure @a",
+        *area_lines,
+        "scoreboard players set #done map_state 0",
+        "scoreboard players set #pass map_state 1",
+        "schedule on_area_loaded add tickingarea college_b basgiath/fill_far",
+        "schedule on_area_loaded add tickingarea college_d basgiath/fill_far",
+        "schedule delay add basgiath/raise 300",
+        *stage_calls("stage", stage_count),
+        "scoreboard players set #stage map_state 0",
+        'tellraw @s {"rawtext":[{"text":"The college is rising. Stay still for 15 seconds. Fan-made. Not official. Not affiliated with any publisher."}]}',
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def welcome_lines() -> list[str]:
+    """Run once, after the player is standing in the loaded plaza."""
+    sx, sy, sz = START
+    once = "execute if score #done map_state matches 0 as @e[type=armor_stand,name=\"build_anchor\",c=1] at @s run "
+    return [
+        'execute if score #done map_state matches 0 run gamemode adventure @a',
+        once + 'titleraw @p title {"rawtext":[{"text":"Welcome, candidate"}]}',
+        once + 'titleraw @p subtitle {"rawtext":[{"text":"Cross the Parapet"}]}',
+        once
+        + 'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. The glowing stairs are in front of you. A fall from the span sends you back here. Touch the stone in the Quad. Then run /function basgiath/summon_dragon"}]}',
+        once + f"tp @p ~{sx} ~{sy} ~{sz} 180 0",
+        "scoreboard players set #done map_state 1",
+    ]
+
+
+def raise_text() -> str:
+    """Move the player onto the plaza so the phone loads those chunks.
+
+    The move is 8 blocks up. Slow falling keeps a miss from killing them.
+    The blocks are placed 4 seconds later, then the player returns to the start.
+    """
+    lines = [
+        "effect @p slow_falling 8 0 true",
+        "effect @p resistance 8 5 true",
+        at_anchor("tp @p ~120 ~8 ~40"),
+        "schedule delay add basgiath/open 80",
+    ]
+    return "\n".join(lines) + "\n"
 
 LIVE = """scoreboard players add #wind map_state 1
 execute if score #wind map_state matches 4.. run scoreboard players set #wind map_state 0
@@ -361,11 +354,11 @@ README = """# Functions
 
 `/function basgiath/build` raises the college around an armor stand named `build_anchor`.
 
-The stand is the origin. Every later command is relative to it. The build stays at your feet. The screen says "Building" at once. It places one stone under the stand, then gives that stand invisibility and resistance. The stone keeps the stand from falling. The build runs one stage per tick.
+The stand is the origin. Every later command is relative to it. The build stays at your feet. The screen says "Building" at once. It places one stone under the stand, then gives that stand invisibility and resistance. The stone keeps the stand from falling. The same command places every stage. About 15 seconds later the game moves you onto the plaza for a few seconds, places the stairs, then returns you to the start. Close chat. Do not walk until the screen says "Welcome, candidate".
 
 `/function basgiath/summon_dragon` summons `dragon_rider:dragon` on the valley pad.
 
-`functions/tick.json` runs `basgiath/tick`. After the build, that tick runs `basgiath/live` for wind, checkpoints, and the storm. A fall from the span is fatal. You respawn on the ground path until you reach the east tower.
+The script runs `basgiath/tick` every tick. After the build, that tick runs `basgiath/live` for wind, checkpoints, and the storm. A fall from the span is fatal. You respawn on the ground path until you reach the east tower.
 
 Do not run the old placeholder functions. They are gone. Coordinates live in `scripts/build_map.py`.
 """
@@ -459,7 +452,7 @@ def assert_walk(lines: list[str]) -> None:
     if not _reachable(
         blocks,
         (84, DECK_Y + 1, SPAN_Z),
-        lambda x, y, z: y == 0 and x >= 90 and 22 <= z <= 40,
+        lambda x, y, z: y == 0 and x >= 90 and SPAN_Z <= z <= 40,
     ):
         raise SystemExit("no walk from the east roof down to the quad")
 
@@ -467,12 +460,30 @@ def assert_walk(lines: list[str]) -> None:
 def main() -> None:
     commands = geometry()
     assert_walk(commands)
+    far = [line for line in commands if is_far(line)]
+    if not any(line.startswith("setblock ~91 ") for line in far):
+        raise SystemExit("far retry missed the east stairs")
+    if not any("lodestone" in line for line in far):
+        raise SystemExit("far retry missed the lodestone")
+    if any(line.startswith("fill ~ ~-2 ~ ~170 ") for line in far):
+        raise SystemExit("far pass still refills the whole ground plane")
     count = write_functions(commands)
-    (BASGIATH / "build.mcfunction").write_text(BUILD, encoding="utf-8")
+    far_count = write_named_stages("far", far)
+    if far_count < 1:
+        raise SystemExit("far retry has no commands")
+    far_calls = stage_calls("far", far_count)
+    (BASGIATH / "build.mcfunction").write_text(build_text(count), encoding="utf-8")
+    (BASGIATH / "fill_far.mcfunction").write_text("\n".join(far_calls) + "\n", encoding="utf-8")
+    (BASGIATH / "raise.mcfunction").write_text(raise_text(), encoding="utf-8")
+    (BASGIATH / "open.mcfunction").write_text(
+        "\n".join(["scoreboard players set #pass map_state 2", *far_calls, *welcome_lines()]) + "\n",
+        encoding="utf-8",
+    )
     (BASGIATH / "live.mcfunction").write_text(LIVE, encoding="utf-8")
     (BASGIATH / "summon_dragon.mcfunction").write_text(SUMMON, encoding="utf-8")
+    # The phone does not run tick.json. main.js runs basgiath/tick instead.
     (OUT / "tick.json").write_text(
-        json.dumps({"values": ["basgiath/tick"]}, indent=2) + "\n",
+        json.dumps({"values": []}, indent=2) + "\n",
         encoding="utf-8",
     )
     (OUT / "README.md").write_text(README, encoding="utf-8")

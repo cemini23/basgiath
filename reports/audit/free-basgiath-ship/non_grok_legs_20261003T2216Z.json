@@ -1,0 +1,19 @@
+{
+  "ts": "20261003T2216Z",
+  "written": [
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-ship/auditor-claude-ds.md",
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-ship/auditor-or-nvidia-nemotron-3-ultra-550b-a55b-free.md",
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-ship/auditor-or-nvidia-nemotron-3.5-lightning-free.md"
+  ],
+  "errors": [
+    "auditor-or-thinkingmachines-inkling-small-free/thinkingmachines/inkling-small:free: HTTP Error 403: Forbidden",
+    "auditor-or-thinkingmachines-inkling-small-free/thinkingmachines/inkling:free: HTTP Error 403: Forbidden"
+  ],
+  "degraded": [],
+  "free_models": [
+    "thinkingmachines/inkling-small:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free"
+  ],
+  "bundle_chars": 84158,
+  "ok_or_count": 2
+}

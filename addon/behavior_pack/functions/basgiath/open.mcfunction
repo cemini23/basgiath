@@ -1,0 +1,21 @@
+scoreboard players set #pass map_state 2
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_01
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_02
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_03
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_04
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_05
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_06
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_07
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_08
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_09
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_10
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_11
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_12
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_13
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_14
+execute if score #done map_state matches 0 run gamemode adventure @a
+execute if score #done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run titleraw @p title {"rawtext":[{"text":"Welcome, candidate"}]}
+execute if score #done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run titleraw @p subtitle {"rawtext":[{"text":"Cross the Parapet"}]}
+execute if score #done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. The glowing stairs are in front of you. A fall from the span sends you back here. Touch the stone in the Quad. Then run /function basgiath/summon_dragon"}]}
+execute if score #done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run tp @p ~8 ~0 ~66 180 0
+scoreboard players set #done map_state 1

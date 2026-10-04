@@ -1,0 +1,11 @@
+{
+  "mode": "code-debug",
+  "pack": "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/pack-free-basgiath-bench",
+  "out": "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-bench",
+  "handoff": "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-bench/GROK_HANDOFF.md",
+  "free_models": [
+    "thinkingmachines/inkling-small:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free"
+  ],
+  "next_command": "pwsh -File \"/Users/claudiobarone/Desktop/projects/tipdrop-workspace-kit/scripts/handoff-to-grok.ps1\" -PromptFile \"/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-bench/GROK_HANDOFF.md\" -WorkDir \"/Users/claudiobarone/Projects/dragon-rider-map\""
+}
