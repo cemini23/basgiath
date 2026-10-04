@@ -1,5 +1,7 @@
 # Routed handoff — Dragon Rider Map v1 (dragon + Parapet + packaging)
 
+Historical. Do not follow this task. The shipped map is in `scripts/build_map.py` and `scripts/build_dragon_model.py`. The dragon is not a placeholder box.
+
 LANE: hard
 PROFILE: claudio
 WORKDIR: repo root (GitHub: basgiath)

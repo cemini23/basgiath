@@ -2,6 +2,10 @@
 
 Date: 2026-10-03. This report separates what a command proved from what a Bedrock client still has to prove.
 
+A later commit, `65c4e18`, changed four things this report does not re-measure. The lodestone form listens on `beforeEvents.playerInteractWithBlock`. The build places one stone under the anchor and gives that stand resistance. Both packs and the world need engine `1.21.90`. The world also writes the `gametest` byte. GitHub Actions passed for that commit: https://github.com/cemini23/basgiath/actions/runs/37158913681
+
+The tables below still describe the checks at the commits they name. A Bedrock client has still not played the map.
+
 ## Proven
 
 Local checks on commit `45033da`, then again after the generators ran a second time. `git diff` on the generated files was empty.

@@ -59,22 +59,25 @@ docs/ascii-dragon.txt  a larger dragon variant (62 lines, 111 columns)
 addon/
   behavior_pack/       manifest, dragon entity, Parapet functions, scripts/main.js
   resource_pack/       manifest, client entity, model, animations, texture
-scripts/               validate.sh, package.sh, build_map.py, build_dragon_model.py
+scripts/               validate.sh, package.sh, test_release.py, build_map.py,
+                       build_dragon_model.py, build_world.py, nbt_le.py
 briefs/                the research and build handoffs
 docs/LISTING.md        the download text, six clip scripts, and the tag list
 ```
 
 ## How to play
 
-1. Install **Minecraft Bedrock** 1.21.90 or newer.
+1. Install **Minecraft Bedrock** 1.21.90 or newer. Use a full copy. The free trial turns commands off, so it cannot run the build function.
 2. Build the files from the repo root with `bash scripts/package.sh`.
 3. Open `dist/basgiath.mcworld` in Minecraft. On a phone, tap the file and choose Minecraft.
 4. Run `/function basgiath/build`. Wait for the title "Welcome, candidate".
-5. Cross the Parapet. Touch the lodestone in the Quad. In the valley, run `/function basgiath/summon_dragon` and ride.
+5. Cross the Parapet. Touch the lodestone in the Quad with an empty hand. In the valley, run `/function basgiath/summon_dragon` and ride.
 
-Cheats are already on in that world. The build sets adventure mode, locks the night, and starts a storm.
+A phone, a tablet, or Windows can open the file. A Nintendo Switch cannot open it from a folder. Upload the world to a Realm from a phone or from Windows. Then download it on the Switch with the same Microsoft account. Minecraft on a Mac is Java. It cannot open this file.
 
-To use the packs in a flat world you already have, import `dist/basgiath.mcaddon`. Enable both packs, cheats, and the **Beta APIs** toggle. Stand on open ground and run the same function. The function lifts you if the ground is too close to the bottom of the world.
+Cheats are already on in that world. The build sets adventure mode, locks the night, and starts a storm. The script uses stable `@minecraft/server` 2.0.0 and `@minecraft/server-ui` 2.0.0. Do not enable Beta APIs.
+
+To use the packs in a flat world you already have, import `dist/basgiath.mcaddon`. Enable both packs and cheats. Stand on open ground and run the same function. The function lifts you if the ground is too close to the bottom of the world.
 
 ## How to build the files
 
@@ -97,13 +100,15 @@ MCPEDL and CurseForge. Free only. See `DISTRIBUTION.md`.
 
 ## Status
 
-The map is built by `/function basgiath/build`. The signet form stores a result and a wing roster. The dragon is a generated model with a horned head, a jaw, a neck, three-segment wings, four legs, and a segmented tail.
+The map is built by `/function basgiath/build`. That function places one stone under the anchor and gives the anchor resistance, so the stand stays put. An empty-hand interact on the lodestone opens the signet form. The form stores a result and a wing roster. The dragon is a generated model with a horned head, a jaw, a neck, three-segment wings, four legs, and a segmented tail.
 
 These checks do not open a Bedrock client. A phone or a Windows client still has to show the model, the texture, the form, and a Parapet crossing before you call those parts proven.
 
 ## Version note
 
-Bedrock uses year versioning. Current stable is **26.20**. The manifests here target `@minecraft/server` 2.x. If the game rejects the pack, bump the dependency versions to match your game build.
+The packs and the world need Bedrock **1.21.90** or newer. That engine is the June 2025 Chase the Skies drop. In October 2026 the retail drop is **26.50**, Wilderness Bound (15 September 2026). Small hotfixes after it are 26.51 and 26.52. A 26.x client can open this world.
+
+The manifests pin `@minecraft/server` 2.0.0 and `@minecraft/server-ui` 2.0.0. Those modules are stable. Do not enable Beta APIs. Do not bump the dependency versions.
 
 ## Support
 

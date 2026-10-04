@@ -1,6 +1,7 @@
 # Grok Build prompt — finish Basgiath
 
-Paste everything below the line into Grok Build, run from the repo root.
+This prompt is done. The product is on `main`. Do not paste it into a new session. Task 0 would try to rename the repo again. The text below is the record of that task. The constraints stay in force.
+
 The GitHub repo is `basgiath`.
 
 ---

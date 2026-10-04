@@ -19,7 +19,7 @@ Four zones, in journey order.
 
 ### 2. The Quad
 - An open parade ground, about 80 by 80.
-- A **Bonding Stone** (a lodestone) at the centre. Interacting with it opens the signet form.
+- A **Bonding Stone** (a lodestone) at the centre. An empty-hand interact opens the signet form. The script listens before the block use, and it cancels the lodestone screen. No compass is required.
 - Stepped bleachers, four coloured wool standards, and a bell tower for silhouette.
 
 ### 3. The Dorms
@@ -32,7 +32,7 @@ Four zones, in journey order.
 
 ## The signet form
 
-Three questions, four outcomes. It runs from the Bonding Stone. The result is stored as a dynamic property, so it persists across sessions. See `addon/behavior_pack/scripts/main.js`.
+Three questions, four outcomes. It runs from the Bonding Stone. The script uses stable `@minecraft/server` 2.0.0 and `@minecraft/server-ui` 2.0.0. Do not enable Beta APIs. The result is stored as a dynamic property, so it persists across sessions. See `addon/behavior_pack/scripts/main.js`.
 
 The outcomes are original archetypes — Stormcaller, Shadowwalker, Emberwright, Stoneward. They are original names, so the work stays transformative.
 

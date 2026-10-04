@@ -1,5 +1,7 @@
 # Task: draw a better ASCII dragon
 
+Historical. The art is already in `docs/ascii-dragon.txt`. Do not overwrite it.
+
 Overwrite the file `docs/ascii-dragon.txt` with a single, large ASCII art dragon. Nothing else in that file — no code fences, no caption, no title, no explanation.
 
 ## Requirements

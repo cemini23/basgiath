@@ -43,7 +43,7 @@ The fandom is peaking right now. A free, transformative, clearly-labelled fan pr
 - **Discovery.** MCPEDL (~7.8M visits a month) favours recency and early download velocity. CurseForge and Planet Minecraft add long-tail search. Aggregators scrape and rehost MCPEDL files, which gives free reach but no analytics. Marketplace is paid-only.
 - **Precedent.** **No Empyrean Bedrock add-on or map exists.** Dragon-mount add-ons are a proven, high-demand genre. The niche is open.
 - **Effort.** 8-14 person-weeks for a slice, 4-7 months for a fuller release.
-- **Version note.** Bedrock moved to year versioning. Current stable is **26.20**.
+- **Version note.** Bedrock moved to year versioning. This line first said the current stable was 26.20. That was already old on this date. 26.20 shipped in May 2026. On 2026-10-03 the retail drop is **26.50**, Wilderness Bound (15 September 2026), with small hotfixes 26.51 and 26.52. This map needs **1.21.90** or newer.
 
 ## Legal
 

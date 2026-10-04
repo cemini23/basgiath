@@ -1,6 +1,13 @@
 # Finish plan — Basgiath
 
-Date: 2026-10-03. Status: approved for build. This file is the spec.
+Date: 2026-10-03. Status: shipped. The code in `scripts/` and `addon/` is the spec. Where this plan and the code differ, follow the code.
+
+Commit `65c4e18` changed four things after this plan was written:
+
+- Both packs and the world need Bedrock 1.21.90 or newer.
+- The lodestone form listens on `beforeEvents.playerInteractWithBlock`. An empty-hand interact opens it. The script does not need Beta APIs.
+- The build places one stone under `build_anchor` and gives that stand resistance.
+- The world writes the `gametest` byte and the `beta_apis` byte. Stable script modules do not need the Beta APIs toggle.
 
 ## Goal
 
@@ -77,7 +84,7 @@ Clear and rebuild a pad from X=0..170, Z=0..150. Lay grass at Y=-1. Carve the ch
 ### Parapet (the clip)
 
 - Chasm air: X=18..74, Z=8..32, Y=-39..-1, after a deepslate shell.
-- Water: Y=-40..-37 inside the chasm.
+- Water: Y=-39..-37 inside the chasm. The deepslate floor stays at Y=-40.
 - Deck: one block wide, `stone_bricks`, at Y=8, Z=20, X=15..77.
 - Gap: X=45 and X=46 stay air. Set them to air again in the last stage.
 - No rail and no center support.
@@ -120,7 +127,7 @@ Last stage: night, `weather thunder 999999`, gamerules for a map (no mob spawn, 
 
 `/function basgiath/summon_dragon` summons `dragon_rider:dragon` above the valley pad. If the anchor is missing, it tells the player to run the build.
 
-Delete the old absolute functions `parapet_wind.mcfunction`, `parapet_checkpoint_a.mcfunction`, and `parapet_checkpoint_b.mcfunction`. They target a placeholder at Y=80.
+Done. The old absolute functions `parapet_wind.mcfunction`, `parapet_checkpoint_a.mcfunction`, and `parapet_checkpoint_b.mcfunction` are deleted. Do not add them back.
 
 ## Signet wing
 

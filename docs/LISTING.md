@@ -20,7 +20,7 @@ The Quad holds a Bonding Stone. Touch it and answer three questions. You get one
 
 South of the Quad are three barracks. Further on, a sunken valley has a gold pad. Run `/function basgiath/summon_dragon`, mount, and fly.
 
-You need Minecraft Bedrock 1.21.90 or newer, on a phone, a tablet, a console, or Windows.
+You need Minecraft Bedrock 1.21.90 or newer. A phone, a tablet, or Windows can open the file. A Nintendo Switch can play it after a Realm download from a phone or from Windows, with the same Microsoft account. Minecraft on a Mac cannot open this file. The free trial turns commands off, so it cannot run the build.
 
 How to install:
 
@@ -32,7 +32,7 @@ How to install:
 
 Cheats are already on. The build sets adventure mode, locks the night, and starts a storm. The file is free. It stays free.
 
-`basgiath.mcaddon` is the same packs, if you want them in a flat world you already have. Enable both packs, cheats, and Beta APIs, then run the same function.
+`basgiath.mcaddon` is the same packs, if you want them in a flat world you already have. Enable both packs and cheats. Do not enable Beta APIs. Stand on open ground and run the same function.
 
 Fan-made. Not official. Not affiliated with Rebecca Yarros, Entangled Publishing, or Red Tower Books.
 
@@ -46,7 +46,7 @@ Touch the lodestone in the Quad for a three-question form. The four results are 
 
 In the valley, `/function basgiath/summon_dragon` puts a rideable dragon on the pad. You steer it in the air.
 
-Install: open `basgiath.mcworld` in Minecraft Bedrock 1.21.90 or newer, then run `/function basgiath/build`. Phones can open the file directly. Cheats are on in the download. This map is free and it is not a Marketplace pack.
+Install: open `basgiath.mcworld` in Minecraft Bedrock 1.21.90 or newer, then run `/function basgiath/build`. A phone, a tablet, or Windows can open the file. A Switch needs a Realm download from one of those, with the same Microsoft account. Minecraft on a Mac cannot open the file. The free trial cannot run the function. Cheats are on in the download. Do not enable Beta APIs. This map is free and it is not a Marketplace pack.
 
 Fan-made. Not official. Not affiliated with Rebecca Yarros, Entangled Publishing, or Red Tower Books.
 

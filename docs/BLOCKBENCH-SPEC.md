@@ -49,10 +49,10 @@ The chest top is `Y=32` and its Z range covers `0`, so the seat stays valid. The
 
 ```
 bash scripts/validate.sh          # every JSON parses, UUIDs unique
-bash scripts/package.sh           # rebuild dist/basgiath.mcaddon
+bash scripts/package.sh           # rebuild dist/basgiath.mcaddon and dist/basgiath.mcworld
 ```
 
-Then load the pack in a Bedrock 26.20 world and run `/summon dragon_rider:dragon`. Check three things:
+Then load the pack in a Bedrock world on 1.21.90 or newer and run `/summon dragon_rider:dragon`. A 26.x client can open the pack. Check three things:
 
 1. The model renders with the right texture.
 2. You can ride it and steer while flying.

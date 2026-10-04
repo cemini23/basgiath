@@ -8,7 +8,7 @@ The model comes from `scripts/build_dragon_model.py`. A Bedrock client still has
 
 The seat count is 1. A player mounts from the ride prompt. Look where you want to go, then move forward. Jump adds upward speed.
 
-`minecraft:behavior.controlled_by_player` is on the entity. That goal steers a mount when the rider holds a control item. This mount has no control item. Steering in the air uses `minecraft:input_air_controlled` and `minecraft:vertical_movement_action`. Those components need entity format `1.21.90`. The pack min engine is `1.21.90`. Test on Bedrock 26.20.
+`minecraft:behavior.controlled_by_player` is on the entity. That goal steers a mount when the rider holds a control item. This mount has no control item. Steering in the air uses `minecraft:input_air_controlled` and `minecraft:vertical_movement_action`. Those components need entity format `1.21.90`. The pack min engine is `1.21.90`. Test on Bedrock 1.21.90 or newer. A 26.x client can open the pack.
 
 The `dragon_rider` component group is added on spawn. It keeps gravity off and sets the fly speed again. Gravity is already off on the base entity, so the dragon hovers when you leave it.
 

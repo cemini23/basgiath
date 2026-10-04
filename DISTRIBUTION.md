@@ -18,15 +18,18 @@ Do **not** use the Minecraft Marketplace. It is paid-only, so it is off-limits f
 
 The map will not be found by itself. **The clip is the distribution.** Roblox and MCPEDL both give zero traffic to a new upload. The traffic comes from the video you post, and the download is the conversion.
 
-## Content plan (post during the build, not after)
+## Content plan
 
-| When | Post |
+The map is built. Post the clips now. Use this order. The spoken lines and the on-screen titles are in `docs/LISTING.md`.
+
+| Clip | Post |
 |---|---|
-| Day 1 | "I'm building the Parapet from Fourth Wing in Minecraft." Show the empty chasm. |
-| Day 2-3 | The span going in. Show the wind and the gap. |
-| Day 4 | First playtest. Show yourself falling off. |
-| Day 5 | The Quad and the Bonding Stone. Show the signet result card. |
-| Day 6 | The finished clip. "Free download in the comments." |
+| 1 | The empty chasm, before the span exists. |
+| 2 | The span, the wind, and the two-block gap. |
+| 3 | A fall, then the respawn on the near tower. |
+| 4 | The Quad and the Bonding Stone. Show the signet result. |
+| 5 | The dragon lift from the valley pad. |
+| 6 | The full crossing. End with "Free download in the comments." |
 
 Use the tags the fandom already uses: `#fourthwing #empyreanseries #booktok #rebeccayarros #threshingday #dragonkind`. Add `#minecraft`.
 

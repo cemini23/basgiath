@@ -11,10 +11,11 @@ From the repo root:
 
 ## 1. Install (about 5 min)
 
-- [ ] Install Minecraft Bedrock 1.21.90 or newer.
-- [ ] Open `dist/basgiath.mcworld`. On a phone, tap the file and choose Minecraft.
+- [ ] Install Minecraft Bedrock 1.21.90 or newer. Use a full copy. The free trial turns commands off.
+- [ ] Open `dist/basgiath.mcworld` on a phone, a tablet, or Windows. On a phone, tap the file and choose Minecraft.
+- [ ] On a Nintendo Switch, upload that world to a Realm from the phone or from Windows. Then download it on the Switch with the same Microsoft account. Minecraft on a Mac cannot open the file.
 - [ ] Confirm the world name is Basgiath and that cheats are on.
-- [ ] If the form does nothing later, enable the **Beta APIs** experiment and reload.
+- [ ] Leave Beta APIs off. The script uses stable `@minecraft/server` 2.0.0. If the form does nothing, confirm the behavior pack is active. Then use the interact button on the lodestone with an empty hand.
 
 ## 2. Raise the college (about 1 min)
 
