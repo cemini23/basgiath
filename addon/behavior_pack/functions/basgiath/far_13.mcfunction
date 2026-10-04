@@ -1,50 +1,50 @@
-setblock ~100 ~ ~91 red_wool
-setblock ~102 ~ ~91 red_wool
-setblock ~104 ~ ~91 red_wool
-setblock ~106 ~ ~91 red_wool
-setblock ~108 ~ ~91 red_wool
-setblock ~110 ~ ~91 red_wool
-setblock ~112 ~ ~91 red_wool
-setblock ~114 ~ ~91 red_wool
-setblock ~116 ~ ~91 red_wool
-setblock ~108 ~ ~96 stone_bricks
-setblock ~108 ~1 ~96 lantern
-fill ~122 ~-1 ~90 ~142 ~-1 ~102 stone_bricks
-fill ~122 ~ ~90 ~142 ~4 ~102 spruce_planks
-fill ~123 ~ ~91 ~141 ~4 ~101 air
-fill ~122 ~5 ~90 ~142 ~5 ~102 spruce_planks
-setblock ~132 ~ ~102 air
-setblock ~132 ~1 ~102 air
-setblock ~133 ~ ~102 air
-setblock ~133 ~1 ~102 air
-setblock ~124 ~ ~91 red_wool
-setblock ~126 ~ ~91 red_wool
-setblock ~128 ~ ~91 red_wool
-setblock ~130 ~ ~91 red_wool
-setblock ~132 ~ ~91 red_wool
-setblock ~134 ~ ~91 red_wool
-setblock ~136 ~ ~91 red_wool
-setblock ~138 ~ ~91 red_wool
-setblock ~140 ~ ~91 red_wool
-setblock ~132 ~ ~96 stone_bricks
-setblock ~132 ~1 ~96 lantern
-fill ~98 ~-1 ~108 ~118 ~-1 ~120 stone_bricks
-fill ~98 ~ ~108 ~118 ~4 ~120 spruce_planks
-fill ~99 ~ ~109 ~117 ~4 ~119 air
-fill ~98 ~5 ~108 ~118 ~5 ~120 spruce_planks
-setblock ~108 ~ ~120 air
-setblock ~108 ~1 ~120 air
-setblock ~109 ~ ~120 air
-setblock ~109 ~1 ~120 air
-setblock ~100 ~ ~109 red_wool
-setblock ~102 ~ ~109 red_wool
-setblock ~104 ~ ~109 red_wool
-setblock ~106 ~ ~109 red_wool
-setblock ~108 ~ ~109 red_wool
-setblock ~110 ~ ~109 red_wool
-setblock ~112 ~ ~109 red_wool
-setblock ~114 ~ ~109 red_wool
-setblock ~116 ~ ~109 red_wool
-setblock ~108 ~ ~114 stone_bricks
-setblock ~108 ~1 ~114 lantern
-fill ~16 ~-2 ~94 ~48 ~-2 ~140 grass_block
+setblock ~128 ~1 ~34 lectern
+fill ~96 ~-1 ~80 ~145 ~-1 ~122 stone_bricks
+fill ~100 ~-1 ~88 ~120 ~7 ~108 stone_bricks
+fill ~101 ~ ~89 ~119 ~6 ~107 air
+fill ~107 ~-1 ~88 ~113 ~-1 ~91 smooth_stone
+fill ~107 ~ ~88 ~113 ~1 ~91 air
+fill ~107 ~-1 ~105 ~113 ~-1 ~108 smooth_stone
+fill ~107 ~ ~105 ~113 ~1 ~108 air
+fill ~100 ~-1 ~97 ~102 ~-1 ~99 smooth_stone
+fill ~100 ~ ~97 ~102 ~1 ~99 air
+fill ~118 ~-1 ~97 ~120 ~-1 ~99 smooth_stone
+fill ~118 ~ ~97 ~120 ~1 ~99 air
+fill ~107 ~-1 ~109 ~113 ~-1 ~112 smooth_stone
+fill ~107 ~ ~109 ~113 ~3 ~112 air
+fill ~101 ~2 ~89 ~119 ~2 ~107 polished_andesite
+fill ~109 ~2 ~97 ~111 ~2 ~99 air
+fill ~101 ~5 ~89 ~119 ~5 ~107 polished_andesite
+fill ~109 ~5 ~97 ~111 ~5 ~99 air
+fill ~109 ~-1 ~97 ~111 ~-1 ~99 polished_andesite
+setblock ~110 ~ ~102 lantern
+setblock ~105 ~ ~98 lantern
+setblock ~115 ~ ~98 lantern
+setblock ~101 ~7 ~98 glass
+setblock ~102 ~7 ~94 glass
+setblock ~102 ~7 ~95 glass
+setblock ~102 ~7 ~96 glass
+setblock ~102 ~7 ~97 glass
+setblock ~102 ~7 ~99 glass
+setblock ~102 ~7 ~100 glass
+setblock ~102 ~7 ~101 glass
+setblock ~102 ~7 ~102 glass
+setblock ~103 ~7 ~93 glass
+setblock ~103 ~7 ~103 glass
+setblock ~104 ~7 ~92 glass
+setblock ~104 ~7 ~104 glass
+setblock ~105 ~7 ~91 glass
+setblock ~105 ~7 ~105 glass
+setblock ~106 ~7 ~90 glass
+setblock ~106 ~7 ~106 glass
+setblock ~107 ~7 ~90 glass
+setblock ~107 ~7 ~106 glass
+setblock ~108 ~7 ~90 glass
+setblock ~108 ~7 ~106 glass
+setblock ~109 ~7 ~90 glass
+setblock ~109 ~7 ~106 glass
+setblock ~110 ~7 ~89 glass
+setblock ~110 ~7 ~107 glass
+setblock ~111 ~7 ~90 glass
+setblock ~111 ~7 ~106 glass
+setblock ~112 ~7 ~90 glass

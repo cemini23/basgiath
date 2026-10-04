@@ -3,8 +3,10 @@
 
 The .mcworld is a flat world. The college is placed later by the stage
 functions. This script simulates those setblock and fill commands and
-fails when the Parapet contract is broken. It also proves that the same
-checks reject a deleted span, a filled gap, and a safety floor.
+fails when the Parapet contract is broken. It replays the phone path: the
+stage pass lands only inside the loaded box, then the far retry lands
+everything outside it. It also proves that the same checks reject a deleted
+span, a filled gap, and a safety floor.
 """
 
 from __future__ import annotations
@@ -27,12 +29,17 @@ SPAN_X1 = 77
 GAP_X = (45, 46)
 START = (8, 0, 66)
 EAST_ROOF = (84, 33, 20)
-LODESTONE = (128, 0, 40)
+# The plaza marker is now chiseled_stone_bricks. The signet stone moved to
+# the valley floor at 50,-1,130.
+LODESTONE = (50, -1, 130)
 # A full-health player dies on a fall of 23 blocks. Feet stand at y=33.
 # A solid at y=10 or higher under the span makes that fall survivable.
 MAX_SAFE_FLOOR_Y = 9
 
 NON_SOLID = {"air", "lantern", "stone_pressure_plate", "bell"}
+# Phone sim distance 4 reaches about 64 blocks, less from the far edge of a
+# chunk. build_map.py uses the same box to split the stage pass from the retry.
+LOADED = 48
 
 
 def fail(message: str) -> None:
@@ -55,6 +62,55 @@ def stage_lines() -> list[str]:
     for path in stages:
         lines.extend(path.read_text(encoding="utf-8").splitlines())
     return lines
+
+
+def far_lines() -> list[str]:
+    """The retry pass. A phone only reaches these blocks after the load."""
+    fars = sorted(FUNCTIONS.glob("far_*.mcfunction"))
+    if not fars:
+        fail("no far functions")
+    lines: list[str] = []
+    for path in fars:
+        lines.extend(path.read_text(encoding="utf-8").splitlines())
+    return lines
+
+
+def _box(line: str) -> tuple[int, int, int, int] | None:
+    parts = line.split()
+    if not parts:
+        return None
+    if parts[0] == "setblock" and len(parts) >= 4:
+        x, z = rel_coord(parts[1]), rel_coord(parts[3])
+        return (x, z, x, z)
+    if parts[0] == "fill" and len(parts) >= 7:
+        x0, z0 = rel_coord(parts[1]), rel_coord(parts[3])
+        x1, z1 = rel_coord(parts[4]), rel_coord(parts[6])
+        return (min(x0, x1), min(z0, z1), max(x0, x1), max(z0, z1))
+    return None
+
+
+def is_far(line: str) -> bool:
+    """True when a phone at sim distance 4 may not have this chunk yet."""
+    box = _box(line)
+    if box is None:
+        return False
+    x0, z0, x1, z1 = box
+    return x0 < -LOADED or z0 < -LOADED or x1 > LOADED or z1 > LOADED
+
+
+def phone_lines() -> list[str]:
+    """What the phone runs: the loaded stage pass, then the far retry.
+
+    A stage command outside the loaded box is dropped by the phone, so the
+    retry is the only place it lands. The retry must therefore carry every far
+    command, air fills included.
+    """
+    stages = stage_lines()
+    retry = far_lines()
+    covered = [line for line in stages if is_far(line)]
+    if sorted(covered) != sorted(retry):
+        fail("the far retry does not match the far commands in the stage pass")
+    return [line for line in stages if not is_far(line)] + retry
 
 
 def solid_blocks(lines: list[str]) -> dict[tuple[int, int, int], str]:
@@ -247,7 +303,7 @@ def prove(lines: list[str]) -> None:
 
 
 def main() -> None:
-    lines = stage_lines()
+    lines = phone_lines()
     blocks = solid_blocks(lines)
     assert_parapet(blocks)
     assert_walk(blocks)

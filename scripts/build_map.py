@@ -14,9 +14,14 @@ import json
 from pathlib import Path
 
 from zones.dorms import build as build_dorms
+from zones.flight import build as build_flight
+from zones.gauntlet import build as build_gauntlet
+from zones.gauntlet import live_lines as build_gauntlet_live
 from zones.parapet import build as build_parapet
 from zones.quad import build as build_quad
+from zones.signet import build as build_signet
 from zones.valley import build as build_valley
+from zones.valley import live_lines as build_valley_live
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "addon" / "behavior_pack" / "functions"
@@ -132,9 +137,18 @@ class ZoneCtx:
 
 
 def paths(ctx: ZoneCtx) -> None:
-    ctx.fill(90, -1, 18, 96, -1, 22, "stone_bricks")
-    ctx.fill(108, -1, 79, 112, -1, 89, "stone_bricks")
-    ctx.fill(71, -1, 116, 98, -1, 120, "stone_bricks")
+    """The ground walks between the beats.
+
+    The west-walk line used to run 108,-1,79 to 112,-1,89. The Formation
+    courtyard now fills its south rim at x=96..168, z=69..78 and the College
+    court starts at z=80, so that line ran into a wall. The line moves to the
+    west gate: the Parapet landing at 90..96, z=18..22 continues north of the
+    wall and then runs south along x=92..95, outside the ring, to the College
+    court and the valley walk. Nothing it crosses is built on.
+    """
+    ctx.fill(90, -1, 18, 96, -1, 22, "stone_bricks")  # landing to the west gate
+    ctx.fill(92, -1, 23, 95, -1, 79, "stone_bricks")  # around the outside of the ring
+    ctx.fill(71, -1, 116, 98, -1, 120, "stone_bricks")  # valley to the College
 
 
 def finish(ctx: ZoneCtx) -> None:
@@ -158,16 +172,20 @@ def finish(ctx: ZoneCtx) -> None:
 
 
 def geometry() -> list[str]:
-    """Join the zones, then the paths and the world rules.
+    """Join the zones in canon order, then the paths and the world rules.
 
-    Phase 0 keeps this order. The command list must match the four-zone world.
+    Canon order: Parapet, Formation, College, Gauntlet, Presentation,
+    Threshing, Signet. The paths and the world rules stay last.
     """
     ctx = ZoneCtx()
     lines: list[str] = []
-    lines.extend(build_parapet(ctx))
-    lines.extend(build_quad(ctx))
-    lines.extend(build_dorms(ctx))
-    lines.extend(build_valley(ctx))
+    lines.extend(build_parapet(ctx))  # Parapet
+    lines.extend(build_quad(ctx))  # Formation
+    lines.extend(build_dorms(ctx))  # College
+    lines.extend(build_gauntlet(ctx))  # Gauntlet
+    lines.extend(build_flight(ctx))  # Presentation
+    lines.extend(build_valley(ctx))  # Threshing
+    lines.extend(build_signet(ctx))  # Signet
     paths(ctx)
     finish(ctx)
     lines.extend(ctx.take())
@@ -345,6 +363,18 @@ execute if score #storm map_state matches 200.. run scoreboard players set #stor
 execute if score #storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
 """
 
+
+def live_text() -> str:
+    """The tick body: the existing wind, checkpoints, and storm first.
+
+    Then the Gauntlet ropes and the Threshing event. ``zones.flight`` has no
+    live lines. Every line below already carries its own execute-at-anchor.
+    """
+    lines = [LIVE.rstrip("\n")]
+    lines.extend(build_gauntlet_live())
+    lines.extend(build_valley_live())
+    return "\n".join(lines) + "\n"
+
 SUMMON = """execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run summon dragon_rider:dragon ~43 ~-1 ~117
 execute as @e[type=armor_stand,name="build_anchor",c=1] run tellraw @a {"rawtext":[{"text":"A dragon waits on the gold pad. Mount it and fly."}]}
 execute unless entity @e[type=armor_stand,name="build_anchor"] run tellraw @s {"rawtext":[{"text":"Raise the college first. Run /function basgiath/build"}]}
@@ -467,6 +497,12 @@ def main() -> None:
         raise SystemExit("far retry missed the lodestone")
     if any(line.startswith("fill ~ ~-2 ~ ~170 ") for line in far):
         raise SystemExit("far pass still refills the whole ground plane")
+    # A far chunk only sees the retry, so the retry must carry the air fills.
+    # Dropping them leaves buildings hollowed by a solid-then-air pair with
+    # their solid shell and no inside.
+    far_air = sum(1 for line in far if line.split()[-1] == "air")
+    if far_air < 100:
+        raise SystemExit(f"far retry kept only {far_air} air fills")
     count = write_functions(commands)
     far_count = write_named_stages("far", far)
     if far_count < 1:
@@ -479,7 +515,7 @@ def main() -> None:
         "\n".join(["scoreboard players set #pass map_state 2", *far_calls, *welcome_lines()]) + "\n",
         encoding="utf-8",
     )
-    (BASGIATH / "live.mcfunction").write_text(LIVE, encoding="utf-8")
+    (BASGIATH / "live.mcfunction").write_text(live_text(), encoding="utf-8")
     (BASGIATH / "summon_dragon.mcfunction").write_text(SUMMON, encoding="utf-8")
     # The phone does not run tick.json. main.js runs basgiath/tick instead.
     (OUT / "tick.json").write_text(

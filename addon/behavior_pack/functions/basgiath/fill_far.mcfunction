@@ -12,3 +12,14 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgi
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_12
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_13
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_14
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_15
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_16
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_17
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_18
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_19
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_20
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_21
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_22
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_23
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_24
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_25

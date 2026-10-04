@@ -1,44 +1,50 @@
-fill ~18 ~-1 ~138 ~18 ~2 ~138 stone_bricks
-fill ~28 ~-1 ~96 ~28 ~2 ~96 stone_bricks
-fill ~28 ~-1 ~138 ~28 ~2 ~138 stone_bricks
-fill ~38 ~-1 ~96 ~38 ~2 ~96 stone_bricks
-fill ~38 ~-1 ~138 ~38 ~2 ~138 stone_bricks
-fill ~48 ~-1 ~96 ~48 ~2 ~96 stone_bricks
-fill ~48 ~-1 ~138 ~48 ~2 ~138 stone_bricks
-fill ~58 ~-1 ~96 ~58 ~2 ~96 stone_bricks
-fill ~58 ~-1 ~138 ~58 ~2 ~138 stone_bricks
-fill ~68 ~-1 ~96 ~68 ~2 ~96 stone_bricks
-fill ~68 ~-1 ~138 ~68 ~2 ~138 stone_bricks
-fill ~18 ~-1 ~106 ~18 ~2 ~106 stone_bricks
-fill ~68 ~-1 ~106 ~68 ~2 ~106 stone_bricks
-fill ~18 ~-1 ~116 ~18 ~2 ~116 stone_bricks
-fill ~68 ~-1 ~116 ~68 ~2 ~116 stone_bricks
-fill ~18 ~-1 ~126 ~18 ~2 ~126 stone_bricks
-fill ~68 ~-1 ~126 ~68 ~2 ~126 stone_bricks
-fill ~18 ~-1 ~136 ~18 ~2 ~136 stone_bricks
-fill ~68 ~-1 ~136 ~68 ~2 ~136 stone_bricks
-fill ~38 ~-2 ~112 ~48 ~-2 ~122 stone_bricks
-setblock ~43 ~-2 ~117 gold_block
-setblock ~70 ~-2 ~117 stone_bricks
-setblock ~70 ~-1 ~117 air
-setblock ~70 ~-2 ~118 stone_bricks
-setblock ~70 ~-1 ~118 air
-fill ~90 ~-1 ~18 ~96 ~-1 ~22 stone_bricks
-fill ~108 ~-1 ~79 ~112 ~-1 ~89 stone_bricks
-fill ~71 ~-1 ~116 ~98 ~-1 ~120 stone_bricks
-setblock ~45 ~32 ~20 air
-setblock ~46 ~32 ~20 air
-setblock ~5 ~33 ~20 stone_pressure_plate
-setblock ~86 ~33 ~20 stone_pressure_plate
-setblock ~128 ~ ~46 stone_pressure_plate
-setblock ~43 ~-1 ~115 stone_pressure_plate
-time set night
-weather thunder 999999
-gamerule dodaylightcycle false
-gamerule doweathercycle false
-gamerule domobspawning false
-gamerule keepinventory true
-gamerule sendcommandfeedback false
-gamerule commandblockoutput false
-gamerule doimmediaterespawn true
-spawnpoint @p ~8 ~0 ~66
+fill ~107 ~ ~109 ~113 ~3 ~112 air
+fill ~101 ~2 ~89 ~119 ~2 ~107 polished_andesite
+fill ~109 ~2 ~97 ~111 ~2 ~99 air
+fill ~101 ~5 ~89 ~119 ~5 ~107 polished_andesite
+fill ~109 ~5 ~97 ~111 ~5 ~99 air
+fill ~109 ~-1 ~97 ~111 ~-1 ~99 polished_andesite
+setblock ~110 ~ ~102 lantern
+setblock ~105 ~ ~98 lantern
+setblock ~115 ~ ~98 lantern
+setblock ~101 ~7 ~98 glass
+setblock ~102 ~7 ~94 glass
+setblock ~102 ~7 ~95 glass
+setblock ~102 ~7 ~96 glass
+setblock ~102 ~7 ~97 glass
+setblock ~102 ~7 ~99 glass
+setblock ~102 ~7 ~100 glass
+setblock ~102 ~7 ~101 glass
+setblock ~102 ~7 ~102 glass
+setblock ~103 ~7 ~93 glass
+setblock ~103 ~7 ~103 glass
+setblock ~104 ~7 ~92 glass
+setblock ~104 ~7 ~104 glass
+setblock ~105 ~7 ~91 glass
+setblock ~105 ~7 ~105 glass
+setblock ~106 ~7 ~90 glass
+setblock ~106 ~7 ~106 glass
+setblock ~107 ~7 ~90 glass
+setblock ~107 ~7 ~106 glass
+setblock ~108 ~7 ~90 glass
+setblock ~108 ~7 ~106 glass
+setblock ~109 ~7 ~90 glass
+setblock ~109 ~7 ~106 glass
+setblock ~110 ~7 ~89 glass
+setblock ~110 ~7 ~107 glass
+setblock ~111 ~7 ~90 glass
+setblock ~111 ~7 ~106 glass
+setblock ~112 ~7 ~90 glass
+setblock ~112 ~7 ~106 glass
+setblock ~113 ~7 ~90 glass
+setblock ~113 ~7 ~106 glass
+setblock ~114 ~7 ~90 glass
+setblock ~114 ~7 ~106 glass
+setblock ~115 ~7 ~91 glass
+setblock ~115 ~7 ~105 glass
+setblock ~116 ~7 ~92 glass
+setblock ~116 ~7 ~104 glass
+setblock ~117 ~7 ~93 glass
+setblock ~117 ~7 ~103 glass
+setblock ~118 ~7 ~94 glass
+setblock ~118 ~7 ~95 glass

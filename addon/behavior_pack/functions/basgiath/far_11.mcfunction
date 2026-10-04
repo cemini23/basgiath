@@ -1,4 +1,3 @@
-setblock ~122 ~2 ~22 sea_lantern
 setblock ~123 ~ ~20 sea_lantern
 setblock ~123 ~1 ~20 air
 setblock ~123 ~2 ~20 air
@@ -40,11 +39,12 @@ setblock ~76 ~32 ~20 stone_bricks
 setblock ~77 ~32 ~20 stone_bricks
 fill ~96 ~-1 ~4 ~168 ~-1 ~48 stone_bricks
 fill ~96 ~-1 ~49 ~168 ~-1 ~78 stone_bricks
+fill ~96 ~ ~4 ~168 ~7 ~13 stone_bricks
+fill ~96 ~ ~69 ~168 ~7 ~78 stone_bricks
+fill ~96 ~ ~14 ~105 ~7 ~17 stone_bricks
+fill ~96 ~ ~27 ~105 ~7 ~48 stone_bricks
+fill ~96 ~ ~49 ~105 ~7 ~68 stone_bricks
+fill ~96 ~ ~18 ~105 ~7 ~26 air
+fill ~159 ~ ~14 ~168 ~7 ~48 stone_bricks
+fill ~159 ~ ~49 ~168 ~7 ~68 stone_bricks
 fill ~124 ~ ~36 ~132 ~ ~44 stone_bricks
-setblock ~128 ~ ~40 lodestone
-setblock ~124 ~-1 ~20 sea_lantern
-setblock ~124 ~-1 ~21 sea_lantern
-setblock ~124 ~-1 ~22 sea_lantern
-setblock ~124 ~-1 ~23 sea_lantern
-setblock ~124 ~-1 ~24 sea_lantern
-setblock ~124 ~-1 ~25 sea_lantern

@@ -1,0 +1,26 @@
+{
+  "models": [
+    {
+      "id": "thinkingmachines/inkling-small:free",
+      "name": "Thinking Machines: Inkling Small (free)",
+      "context_length": 1048576,
+      "family": "thinkingmachines",
+      "boost": 1
+    },
+    {
+      "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "name": "NVIDIA: Nemotron 3 Ultra (free)",
+      "context_length": 1000000,
+      "family": "nvidia",
+      "boost": 1
+    },
+    {
+      "id": "google/gemma-4-26b-a4b-it:free",
+      "name": "Google: Gemma 4 26B A4B  (free)",
+      "context_length": 262144,
+      "family": "google",
+      "boost": 1
+    }
+  ],
+  "count": 3
+}

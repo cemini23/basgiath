@@ -1,5 +1,3 @@
-setblock ~8 ~32 ~22 sea_lantern
-setblock ~7 ~32 ~23 sea_lantern
 setblock ~8 ~32 ~23 sea_lantern
 setblock ~7 ~32 ~24 sea_lantern
 setblock ~8 ~32 ~24 sea_lantern
@@ -48,3 +46,5 @@ setblock ~14 ~34 ~25 stone_brick_wall
 setblock ~14 ~33 ~26 stone_brick_wall
 setblock ~14 ~34 ~26 stone_brick_wall
 setblock ~14 ~33 ~27 stone_brick_wall
+setblock ~14 ~34 ~27 stone_brick_wall
+setblock ~14 ~33 ~28 stone_brick_wall

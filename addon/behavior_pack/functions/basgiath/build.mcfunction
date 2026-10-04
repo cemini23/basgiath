@@ -45,5 +45,17 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgi
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_18
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_19
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_20
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_21
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_22
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_23
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_24
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_25
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_26
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_27
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_28
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_29
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_31
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_32
 scoreboard players set #stage map_state 0
 tellraw @s {"rawtext":[{"text":"The college is rising. Stay still for 15 seconds. Fan-made. Not official. Not affiliated with any publisher."}]}

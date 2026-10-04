@@ -1,4 +1,3 @@
-setblock ~7 ~11 ~52 air
 setblock ~8 ~9 ~52 sea_lantern
 setblock ~8 ~10 ~52 air
 setblock ~8 ~11 ~52 air
@@ -48,3 +47,4 @@ setblock ~80 ~32 ~21 sea_lantern
 setblock ~81 ~32 ~20 sea_lantern
 setblock ~81 ~32 ~21 sea_lantern
 setblock ~82 ~32 ~20 sea_lantern
+setblock ~82 ~32 ~21 sea_lantern

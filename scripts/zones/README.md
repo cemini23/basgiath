@@ -36,32 +36,40 @@ End `build` with `return ctx.take()`.
 - Do not add a custom dimension.
 - Keep `@minecraft/server` 2.0.0 and `@minecraft/server-ui` 2.0.0.
 
-## Call order today
+## Call order
 
-Phase 0 joins the zones, then the driver adds the paths and the world rules. The emitted commands match the four-zone world.
+The driver joins the zones in canon order, then adds the paths and the world rules.
 
 1. `parapet.py`
 2. `quad.py`
 3. `dorms.py`
-4. `valley.py`
-5. Driver: paths, gap, plates, night, thunder, spawn point
+4. `gauntlet.py`
+5. `flight.py`
+6. `valley.py`
+7. `signet.py`
+8. Driver: paths, gap, plates, night, thunder, spawn point
 
-The writer still splits that full list into groups of 50. The ranges below are reserved for Phase 2. A zone agent must not write `addon/behavior_pack/functions`.
+The writer splits that full list into groups of 50. A zone agent must not write `addon/behavior_pack/functions`.
 
 ## Stage ranges
 
-| Module | Beat | Stages | Who may edit |
+The ranges below were a coordination device for Phase 1, when several agents
+wrote the zones in parallel. They are **not** reserved any more. Phase 2 wired
+the zones in one pass, so the writer now numbers the stage files straight
+through the call order above. Read the numbers as a rough map, not as a lock.
+
+| Module | Beat | Phase 1 range | Who may edit |
 | --- | --- | --- | --- |
-| `parapet.py` | Parapet | 01-12 | No Phase 1 agent. Leave it. |
-| `quad.py` | Formation | 13-20 | Courtyard agent only |
-| `dorms.py` | College | 21-30 | Citadel agent only |
-| `gauntlet.py` | Gauntlet | 31-40 | Gauntlet agent creates this file |
-| `flight.py` | Presentation | 41-48 | Flight-field agent creates this file |
-| `valley.py` | Threshing | 49-60 | Threshing agent only |
-| `signet.py` | Signet | 61-64 | Signet agent creates this file |
+| `parapet.py` | Parapet | 01-12 | Leave it. |
+| `quad.py` | Formation | 13-20 | Courtyard owner |
+| `dorms.py` | College | 21-30 | Citadel owner |
+| `gauntlet.py` | Gauntlet | 31-40 | Gauntlet owner |
+| `flight.py` | Presentation | 41-48 | Flight-field owner |
+| `valley.py` | Threshing | 49-60 | Threshing owner |
+| `signet.py` | Signet | 61-64 | Signet owner |
 | driver paths and finish | shared | 65-68 | Integrator only |
 
-Canon play order is Parapet, Formation, College, Gauntlet, Presentation, Threshing, Signet. The integrator wires that order. Phase 0 does not.
+Canon play order is Parapet, Formation, College, Gauntlet, Presentation, Threshing, Signet. The driver wires that order.
 
 ## Shared signal
 

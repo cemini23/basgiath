@@ -25,9 +25,14 @@ def _ground(ctx) -> None:
 
 
 def _chasm(ctx) -> None:
-    """Open air under the span. The floor stays at ground level so the fall kills."""
+    """Change the floor under the span from grass to stone.
+
+    The floor stays at ground level so the fall kills, and the air above it is
+    already open on the flat world. Carving that air again was a no-op that
+    cost 34,272 air fills on every phone. A non-flat world would need the carve;
+    the shipped world is flat.
+    """
     ctx.fill(15, -1, 12, 77, -1, 28, "stone")
-    ctx.fill(15, 0, 12, 77, ctx.DECK_Y - 1, 28, "air")
 
 
 def _tower(ctx, x0: int, z0: int, x1: int, z1: int) -> None:

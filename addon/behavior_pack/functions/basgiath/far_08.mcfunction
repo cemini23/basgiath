@@ -1,4 +1,3 @@
-setblock ~107 ~17 ~22 sea_lantern
 setblock ~108 ~15 ~20 sea_lantern
 setblock ~108 ~16 ~20 air
 setblock ~108 ~17 ~20 air
@@ -48,3 +47,4 @@ setblock ~112 ~13 ~21 air
 setblock ~112 ~11 ~19 stone_bricks
 setblock ~112 ~12 ~19 sea_lantern
 setblock ~112 ~11 ~22 stone_bricks
+setblock ~112 ~12 ~22 sea_lantern

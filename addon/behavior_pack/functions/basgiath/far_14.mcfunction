@@ -1,35 +1,50 @@
-fill ~49 ~-2 ~94 ~70 ~-2 ~140 grass_block
-fill ~16 ~-1 ~94 ~48 ~-1 ~140 air
-fill ~49 ~-1 ~94 ~70 ~-1 ~140 air
-fill ~18 ~-1 ~96 ~18 ~2 ~96 stone_bricks
-fill ~18 ~-1 ~138 ~18 ~2 ~138 stone_bricks
-fill ~28 ~-1 ~96 ~28 ~2 ~96 stone_bricks
-fill ~28 ~-1 ~138 ~28 ~2 ~138 stone_bricks
-fill ~38 ~-1 ~96 ~38 ~2 ~96 stone_bricks
-fill ~38 ~-1 ~138 ~38 ~2 ~138 stone_bricks
-fill ~48 ~-1 ~96 ~48 ~2 ~96 stone_bricks
-fill ~48 ~-1 ~138 ~48 ~2 ~138 stone_bricks
-fill ~58 ~-1 ~96 ~58 ~2 ~96 stone_bricks
-fill ~58 ~-1 ~138 ~58 ~2 ~138 stone_bricks
-fill ~68 ~-1 ~96 ~68 ~2 ~96 stone_bricks
-fill ~68 ~-1 ~138 ~68 ~2 ~138 stone_bricks
-fill ~18 ~-1 ~106 ~18 ~2 ~106 stone_bricks
-fill ~68 ~-1 ~106 ~68 ~2 ~106 stone_bricks
-fill ~18 ~-1 ~116 ~18 ~2 ~116 stone_bricks
-fill ~68 ~-1 ~116 ~68 ~2 ~116 stone_bricks
-fill ~18 ~-1 ~126 ~18 ~2 ~126 stone_bricks
-fill ~68 ~-1 ~126 ~68 ~2 ~126 stone_bricks
-fill ~18 ~-1 ~136 ~18 ~2 ~136 stone_bricks
-fill ~68 ~-1 ~136 ~68 ~2 ~136 stone_bricks
-fill ~38 ~-2 ~112 ~48 ~-2 ~122 stone_bricks
-setblock ~43 ~-2 ~117 gold_block
-setblock ~70 ~-2 ~117 stone_bricks
-setblock ~70 ~-1 ~117 air
-setblock ~70 ~-2 ~118 stone_bricks
-setblock ~70 ~-1 ~118 air
-fill ~90 ~-1 ~18 ~96 ~-1 ~22 stone_bricks
-fill ~108 ~-1 ~79 ~112 ~-1 ~89 stone_bricks
-fill ~71 ~-1 ~116 ~98 ~-1 ~120 stone_bricks
-setblock ~86 ~33 ~20 stone_pressure_plate
-setblock ~128 ~ ~46 stone_pressure_plate
-setblock ~43 ~-1 ~115 stone_pressure_plate
+setblock ~112 ~7 ~106 glass
+setblock ~113 ~7 ~90 glass
+setblock ~113 ~7 ~106 glass
+setblock ~114 ~7 ~90 glass
+setblock ~114 ~7 ~106 glass
+setblock ~115 ~7 ~91 glass
+setblock ~115 ~7 ~105 glass
+setblock ~116 ~7 ~92 glass
+setblock ~116 ~7 ~104 glass
+setblock ~117 ~7 ~93 glass
+setblock ~117 ~7 ~103 glass
+setblock ~118 ~7 ~94 glass
+setblock ~118 ~7 ~95 glass
+setblock ~118 ~7 ~96 glass
+setblock ~118 ~7 ~97 glass
+setblock ~118 ~7 ~99 glass
+setblock ~118 ~7 ~100 glass
+setblock ~118 ~7 ~101 glass
+setblock ~118 ~7 ~102 glass
+setblock ~119 ~7 ~98 glass
+setblock ~103 ~8 ~98 glass
+setblock ~104 ~8 ~95 glass
+setblock ~104 ~8 ~96 glass
+setblock ~104 ~8 ~97 glass
+setblock ~104 ~8 ~99 glass
+setblock ~104 ~8 ~100 glass
+setblock ~104 ~8 ~101 glass
+setblock ~105 ~8 ~94 glass
+setblock ~105 ~8 ~102 glass
+setblock ~106 ~8 ~93 glass
+setblock ~106 ~8 ~103 glass
+setblock ~107 ~8 ~92 glass
+setblock ~107 ~8 ~104 glass
+setblock ~108 ~8 ~92 glass
+setblock ~108 ~8 ~104 glass
+setblock ~109 ~8 ~92 glass
+setblock ~109 ~8 ~104 glass
+setblock ~110 ~8 ~91 glass
+setblock ~110 ~8 ~105 glass
+setblock ~111 ~8 ~92 glass
+setblock ~111 ~8 ~104 glass
+setblock ~112 ~8 ~92 glass
+setblock ~112 ~8 ~104 glass
+setblock ~113 ~8 ~92 glass
+setblock ~113 ~8 ~104 glass
+setblock ~114 ~8 ~93 glass
+setblock ~114 ~8 ~103 glass
+setblock ~115 ~8 ~94 glass
+setblock ~115 ~8 ~102 glass
+setblock ~116 ~8 ~95 glass
