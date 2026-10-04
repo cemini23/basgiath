@@ -54,5 +54,8 @@ jobs:
       - name: Release checks
         run: python3 scripts/test_release.py
 
+      - name: Static world bench
+        run: python3 scripts/bench_static.py
+
       - name: Build the .mcaddon
         run: bash scripts/package.sh

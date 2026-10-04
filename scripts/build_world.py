@@ -68,7 +68,7 @@ def _level_root() -> dict:
         "falldamage": Byte(1),
         "texturePacksRequired": Byte(1),
         "spawnMobs": Byte(0),
-        "sendcommandfeedback": Byte(0),
+        "sendcommandfeedback": Byte(1),
         "commandblockoutput": Byte(0),
         "commandblocksenabled": Byte(1),
         "rainLevel": Float(1.0),

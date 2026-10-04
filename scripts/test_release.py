@@ -95,6 +95,10 @@ def check_map() -> None:
         fail(f"tick.json values are {tick.get('values')}")
     folder = functions / "basgiath"
     build = (folder / "build.mcfunction").read_text()
+    if 'titleraw @s title {"rawtext":[{"text":"Building"}]}' not in build:
+        fail("build function does not show the Building title")
+    if "gamerule sendcommandfeedback false" not in build:
+        fail("build function leaves command feedback on for the stages")
     if 'summon armor_stand "build_anchor"' not in build:
         fail("build function does not summon the anchor")
     if "~ 80 ~" in build:
@@ -131,6 +135,7 @@ def check_map() -> None:
         fail("the span pit still contains water")
     if 'tp @a[x=~18,y=~-40,z=~8' in live:
         fail("live function still rescues a fall from the span")
+    air_volume = 0
     for line in blob.splitlines():
         match = FILL.match(line.strip())
         if not match:
@@ -141,6 +146,10 @@ def check_map() -> None:
         volume *= abs(xs[5] - xs[2]) + 1
         if volume > 32768:
             fail(f"fill volume {volume} exceeds 32768: {line}")
+        if line.strip().endswith(" air"):
+            air_volume += volume
+    if air_volume > 80000:
+        fail(f"air fill volume {air_volume} is large enough to stall a phone")
     stages = sorted(folder.glob("stage_*.mcfunction"))
     if not stages:
         fail("no stage functions")
@@ -226,6 +235,8 @@ def check_world() -> None:
             fail("level name is not Basgiath")
         if level.get("Generator") != 2 or level.get("commandsEnabled") != 1:
             fail("world is not a flat world with commands")
+        if level.get("sendcommandfeedback") != 1:
+            fail("command errors are hidden before the build runs")
         if "grass_block" not in str(level.get("FlatWorldLayers")):
             fail("flat layers are missing")
         behavior = json.loads(bundle.read("world_behavior_packs.json"))

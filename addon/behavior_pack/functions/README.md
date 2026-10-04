@@ -2,7 +2,7 @@
 
 `/function basgiath/build` raises the college around an armor stand named `build_anchor`.
 
-The stand is the origin. Every later command is relative to it. The build stays at your feet. It places one stone under the stand, then gives that stand invisibility and resistance. The stone keeps the stand from falling. The build runs one stage per tick.
+The stand is the origin. Every later command is relative to it. The build stays at your feet. The screen says "Building" at once. It places one stone under the stand, then gives that stand invisibility and resistance. The stone keeps the stand from falling. The build runs one stage per tick.
 
 `/function basgiath/summon_dragon` summons `dragon_rider:dragon` on the valley pad.
 

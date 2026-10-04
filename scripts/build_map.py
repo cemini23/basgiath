@@ -97,7 +97,6 @@ def shell(builder: Builder, x0: int, y0: int, z0: int, x1: int, y1: int, z1: int
 def ground(builder: Builder) -> None:
     builder.fill(0, -2, 0, 170, -2, 150, "stone")
     builder.fill(0, -1, 0, 170, -1, 150, "grass_block")
-    builder.fill(0, 0, 0, 170, DECK_Y + 8, 150, "air")
 
 
 def chasm(builder: Builder) -> None:
@@ -317,14 +316,21 @@ def write_functions(commands: list[str]) -> int:
     return len(stages)
 
 
-BUILD = """scoreboard objectives add map_state dummy
+BUILD = """titleraw @s times 0 40 5
+titleraw @s title {"rawtext":[{"text":"Building"}]}
+titleraw @s subtitle {"rawtext":[{"text":"Stay still"}]}
+scoreboard objectives add map_state dummy
 kill @e[type=armor_stand,name="build_anchor"]
 execute at @s run setblock ~ ~-1 ~ stone
+execute at @s run setblock ~ ~-1 ~-1 sea_lantern
+execute at @s run setblock ~1 ~-1 ~-1 sea_lantern
+execute at @s run setblock ~-1 ~-1 ~-1 sea_lantern
 execute at @s run summon armor_stand "build_anchor" ~ ~ ~
 execute at @s run effect @e[type=armor_stand,name="build_anchor",c=1] invisibility 999999 1 true
 execute at @s run effect @e[type=armor_stand,name="build_anchor",c=1] resistance 999999 255 true
 scoreboard players set #stage map_state 1
 tellraw @s {"rawtext":[{"text":"The college is rising. Stay still. Fan-made. Not official. Not affiliated with any publisher."}]}
+gamerule sendcommandfeedback false
 """
 
 LIVE = """scoreboard players add #wind map_state 1
@@ -355,7 +361,7 @@ README = """# Functions
 
 `/function basgiath/build` raises the college around an armor stand named `build_anchor`.
 
-The stand is the origin. Every later command is relative to it. The build stays at your feet. It places one stone under the stand, then gives that stand invisibility and resistance. The stone keeps the stand from falling. The build runs one stage per tick.
+The stand is the origin. Every later command is relative to it. The build stays at your feet. The screen says "Building" at once. It places one stone under the stand, then gives that stand invisibility and resistance. The stone keeps the stand from falling. The build runs one stage per tick.
 
 `/function basgiath/summon_dragon` summons `dragon_rider:dragon` on the valley pad.
 
