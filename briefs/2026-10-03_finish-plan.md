@@ -9,7 +9,7 @@ Commit `65c4e18` changed four things after this plan was written:
 - The build places one stone under `build_anchor` and gives that stand resistance.
 - The world writes the `gametest` byte and the `beta_apis` byte. Stable script modules do not need the Beta APIs toggle.
 
-The player starts on the ground south of the west door. The span pit is dry. A fall from the span is fatal. Respawn stays on that ground path until the east tower.
+The player starts on a glowing path at their feet. The build does not lift them to Y=80. Glowing stairs climb 32 blocks to the span. A fall from the span is fatal. Respawn stays on that path until the east tower.
 
 ## Goal
 

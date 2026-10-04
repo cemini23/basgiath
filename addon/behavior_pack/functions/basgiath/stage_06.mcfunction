@@ -1,50 +1,50 @@
-setblock ~140 ~1 ~60 lantern
-setblock ~152 ~ ~20 stone_bricks
-setblock ~152 ~1 ~20 lantern
-setblock ~152 ~ ~60 stone_bricks
-setblock ~152 ~1 ~60 lantern
-fill ~158 ~-1 ~8 ~164 ~16 ~14 stone_bricks
-fill ~159 ~ ~9 ~163 ~15 ~13 air
-setblock ~161 ~15 ~11 bell
-setblock ~161 ~16 ~11 sea_lantern
-fill ~98 ~-1 ~90 ~118 ~-1 ~102 stone_bricks
-fill ~98 ~ ~90 ~118 ~4 ~102 spruce_planks
-fill ~99 ~ ~91 ~117 ~4 ~101 air
-fill ~98 ~5 ~90 ~118 ~5 ~102 spruce_planks
-setblock ~108 ~ ~102 air
-setblock ~108 ~1 ~102 air
-setblock ~109 ~ ~102 air
-setblock ~109 ~1 ~102 air
-setblock ~100 ~ ~91 red_wool
-setblock ~102 ~ ~91 red_wool
-setblock ~104 ~ ~91 red_wool
-setblock ~106 ~ ~91 red_wool
-setblock ~108 ~ ~91 red_wool
-setblock ~110 ~ ~91 red_wool
-setblock ~112 ~ ~91 red_wool
-setblock ~114 ~ ~91 red_wool
-setblock ~116 ~ ~91 red_wool
-setblock ~108 ~ ~96 stone_bricks
-setblock ~108 ~1 ~96 lantern
-fill ~122 ~-1 ~90 ~142 ~-1 ~102 stone_bricks
-fill ~122 ~ ~90 ~142 ~4 ~102 spruce_planks
-fill ~123 ~ ~91 ~141 ~4 ~101 air
-fill ~122 ~5 ~90 ~142 ~5 ~102 spruce_planks
-setblock ~132 ~ ~102 air
-setblock ~132 ~1 ~102 air
-setblock ~133 ~ ~102 air
-setblock ~133 ~1 ~102 air
-setblock ~124 ~ ~91 red_wool
-setblock ~126 ~ ~91 red_wool
-setblock ~128 ~ ~91 red_wool
-setblock ~130 ~ ~91 red_wool
-setblock ~132 ~ ~91 red_wool
-setblock ~134 ~ ~91 red_wool
-setblock ~136 ~ ~91 red_wool
-setblock ~138 ~ ~91 red_wool
-setblock ~140 ~ ~91 red_wool
-setblock ~132 ~ ~96 stone_bricks
-setblock ~132 ~1 ~96 lantern
-fill ~98 ~-1 ~108 ~118 ~-1 ~120 stone_bricks
-fill ~98 ~ ~108 ~118 ~4 ~120 spruce_planks
-fill ~99 ~ ~109 ~117 ~4 ~119 air
+setblock ~9 ~20 ~42 sea_lantern
+setblock ~7 ~20 ~41 sea_lantern
+setblock ~7 ~21 ~41 air
+setblock ~7 ~22 ~41 air
+setblock ~8 ~20 ~41 sea_lantern
+setblock ~8 ~21 ~41 air
+setblock ~8 ~22 ~41 air
+setblock ~6 ~20 ~41 stone_bricks
+setblock ~6 ~21 ~41 sea_lantern
+setblock ~9 ~20 ~41 stone_bricks
+setblock ~9 ~21 ~41 sea_lantern
+setblock ~7 ~21 ~40 sea_lantern
+setblock ~7 ~22 ~40 air
+setblock ~7 ~23 ~40 air
+setblock ~8 ~21 ~40 sea_lantern
+setblock ~8 ~22 ~40 air
+setblock ~8 ~23 ~40 air
+setblock ~6 ~21 ~40 stone_bricks
+setblock ~6 ~22 ~40 sea_lantern
+setblock ~9 ~21 ~40 stone_bricks
+setblock ~9 ~22 ~40 sea_lantern
+setblock ~7 ~22 ~39 sea_lantern
+setblock ~7 ~23 ~39 air
+setblock ~7 ~24 ~39 air
+setblock ~8 ~22 ~39 sea_lantern
+setblock ~8 ~23 ~39 air
+setblock ~8 ~24 ~39 air
+setblock ~6 ~22 ~39 stone_bricks
+setblock ~6 ~23 ~39 sea_lantern
+setblock ~9 ~22 ~39 stone_bricks
+setblock ~9 ~23 ~39 sea_lantern
+setblock ~7 ~23 ~38 sea_lantern
+setblock ~7 ~24 ~38 air
+setblock ~7 ~25 ~38 air
+setblock ~8 ~23 ~38 sea_lantern
+setblock ~8 ~24 ~38 air
+setblock ~8 ~25 ~38 air
+setblock ~6 ~23 ~38 stone_bricks
+setblock ~6 ~24 ~38 sea_lantern
+setblock ~9 ~23 ~38 stone_bricks
+setblock ~9 ~24 ~38 sea_lantern
+setblock ~7 ~24 ~37 sea_lantern
+setblock ~7 ~25 ~37 air
+setblock ~7 ~26 ~37 air
+setblock ~8 ~24 ~37 sea_lantern
+setblock ~8 ~25 ~37 air
+setblock ~8 ~26 ~37 air
+setblock ~6 ~24 ~37 stone_bricks
+setblock ~6 ~25 ~37 sea_lantern
+setblock ~9 ~24 ~37 stone_bricks

@@ -71,13 +71,13 @@ docs/LISTING.md        the download text, six clip scripts, and the tag list
 2. Build the files from the repo root with `bash scripts/package.sh`.
 3. Open `dist/basgiath.mcworld` in Minecraft. On a phone, tap the file and choose Minecraft.
 4. Run `/function basgiath/build`. Wait for the title "Welcome, candidate".
-5. Climb the west stairs, then cross the Parapet. Touch the lodestone in the Quad with an empty hand. In the valley, run `/function basgiath/summon_dragon` and ride.
+5. You land on a glowing path. Climb the stairs in front of you, then cross the Parapet. Touch the lodestone in the Quad with an empty hand. In the valley, run `/function basgiath/summon_dragon` and ride.
 
 A phone, a tablet, or Windows can open the file. A Nintendo Switch cannot open it from a folder. Upload the world to a Realm from a phone or from Windows. Then download it on the Switch with the same Microsoft account. Minecraft on a Mac is Java. It cannot open this file.
 
 Cheats are already on in that world. The build sets adventure mode, locks the night, and starts a storm. The script uses stable `@minecraft/server` 2.0.0 and `@minecraft/server-ui` 2.0.0. Do not enable Beta APIs.
 
-To use the packs in a flat world you already have, import `dist/basgiath.mcaddon`. Enable both packs and cheats. Stand on open ground and run the same function. The function lifts you if the ground is too close to the bottom of the world.
+To use the packs in a flat world you already have, import `dist/basgiath.mcaddon`. Enable both packs and cheats. Stand on open ground and run the same function. The college builds at your feet.
 
 ## How to build the files
 
@@ -100,7 +100,7 @@ MCPEDL and CurseForge. Free only. See `DISTRIBUTION.md`.
 
 ## Status
 
-The map is built by `/function basgiath/build`. You start on the ground, south of the west door. A fall from the span is deep enough to kill you, and you respawn on that path. That function places one stone under the anchor and gives the anchor resistance, so the stand stays put. An empty-hand interact on the lodestone opens the signet form. The form stores a result and a wing roster. The dragon is a generated model with a horned head, a jaw, a neck, three-segment wings, four legs, and a segmented tail.
+The map is built by `/function basgiath/build` at your feet. You start on a glowing path. The stairs in front of you climb 32 blocks to the span. A fall from the span kills you, and you respawn on that path. That function places one stone under the anchor and gives the anchor resistance, so the stand stays put. An empty-hand interact on the lodestone opens the signet form. The form stores a result and a wing roster. The dragon is a generated model with a horned head, a jaw, a neck, three-segment wings, four legs, and a segmented tail.
 
 These checks do not open a Bedrock client. A phone or a Windows client still has to show the model, the texture, the form, and a Parapet crossing before you call those parts proven.
 

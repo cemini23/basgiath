@@ -11,9 +11,9 @@ The player runs `/function basgiath/build`. `scripts/build_map.py` writes the fu
 Four zones, in journey order.
 
 ### 1. The Parapet
-- The player starts on a lit path on the ground, south of the west door.
-- Stairs inside the west tower climb to the roof. A wall on the roof has one gap onto the span.
-- A chasm about 40 blocks deep under the span. The pit is dry. A fall from the span is fatal.
+- The player starts on a glowing path at their feet. The build does not lift them into the sky.
+- Glowing stairs climb 32 blocks to the roof. A wall on the roof has one gap onto the span.
+- The air under the span goes down to the ground. A fall from the span is fatal.
 - The player respawns on the ground path. The east tower is the first checkpoint that moves the spawn.
 - A one-wide stone path across, broken in the middle by a two-block gap.
 - Wind: particles plus a repeating push, so the crossing feels unsafe.

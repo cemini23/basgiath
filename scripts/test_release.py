@@ -97,6 +97,8 @@ def check_map() -> None:
     build = (folder / "build.mcfunction").read_text()
     if 'summon armor_stand "build_anchor"' not in build:
         fail("build function does not summon the anchor")
+    if "~ 80 ~" in build:
+        fail("build function still lifts the player into the sky")
     if "setblock ~ ~-1 ~ stone" not in build:
         fail("build function does not place a stone under the player")
     if "resistance 999999 255" not in build:
@@ -113,14 +115,14 @@ def check_map() -> None:
     blob = "\n".join(path.read_text() for path in sorted(folder.glob("*.mcfunction")))
     for needle in (
         "lodestone",
-        "setblock ~45 ~8 ~20 air",
-        "setblock ~46 ~8 ~20 air",
-        "setblock ~44 ~8 ~20",
-        "setblock ~47 ~8 ~20",
+        "setblock ~45 ~32 ~20 air",
+        "setblock ~46 ~32 ~20 air",
+        "setblock ~44 ~32 ~20",
+        "setblock ~47 ~32 ~20",
         "weather thunder",
         "Cross the Parapet",
-        "spawnpoint @p ~8 ~0 ~36",
-        "tp @p ~8 ~0 ~36",
+        "spawnpoint @p ~8 ~0 ~66",
+        "tp @p ~8 ~0 ~66 180 0",
         "doimmediaterespawn true",
     ):
         if needle not in blob:

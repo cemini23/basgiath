@@ -19,6 +19,11 @@ BASGIATH = OUT / "basgiath"
 
 MAX_FILL = 32768
 MAX_CMDS = 50
+# The span sits this many blocks above the player's feet.
+# A fall onto the ground is fatal. 23 blocks is the kill line.
+DECK_Y = 32
+SPAN_Z = 20
+START = (8, 0, 66)
 
 OLD_FUNCTIONS = (
     "parapet_wind.mcfunction",
@@ -92,71 +97,73 @@ def shell(builder: Builder, x0: int, y0: int, z0: int, x1: int, y1: int, z1: int
 def ground(builder: Builder) -> None:
     builder.fill(0, -2, 0, 170, -2, 150, "stone")
     builder.fill(0, -1, 0, 170, -1, 150, "grass_block")
-    builder.fill(0, 0, 0, 170, 22, 150, "air")
+    builder.fill(0, 0, 0, 170, DECK_Y + 8, 150, "air")
 
 
 def chasm(builder: Builder) -> None:
-    """A dry pit under the span. Water would cancel the fall."""
-    builder.fill(14, -40, 11, 78, -1, 29, "deepslate")
-    builder.fill(15, -39, 12, 77, -1, 28, "air")
-    for x in (30, 50, 70):
-        builder.setblock(x, -20, 20, "crying_obsidian")
+    """Open air under the span. The floor stays at ground level so the fall kills."""
+    builder.fill(15, -1, 12, 77, -1, 28, "stone")
+    builder.fill(15, 0, 12, 77, DECK_Y - 1, 28, "air")
 
 
 def tower(builder: Builder, x0: int, z0: int, x1: int, z1: int) -> None:
-    builder.fill(x0, -1, z0, x1, 8, z1, "stone_bricks")
-    builder.fill(x0 + 1, 0, z0 + 1, x1 - 1, 7, z1 - 1, "air")
-    builder.setblock((x0 + x1) // 2, 9, z0 + 2, "lantern")
+    builder.fill(x0, -1, z0, x1, DECK_Y, z1, "stone_bricks")
+    builder.fill(x0 + 1, 0, z0 + 1, x1 - 1, DECK_Y - 1, z1 - 1, "air")
 
 
-def west_stairs(builder: Builder) -> None:
-    """Two-wide stairs from the south door up to the roof."""
-    for step in range(9):
-        y = step
-        z = 26 - step
-        for x in (6, 7):
-            builder.setblock(x, y, z, "stone_bricks")
-            for head in (y + 1, y + 2):
-                if head <= 7 or y >= 6:
-                    builder.setblock(x, head, z, "air")
-    builder.setblock(8, 0, 28, "air")
-    builder.setblock(8, 1, 28, "air")
-    builder.setblock(9, 0, 28, "air")
-    builder.setblock(9, 1, 28, "air")
-    builder.setblock(8, -1, 22, "sea_lantern")
-    # A wall along the east roof edge, with one gap at the span.
+def _stair(builder: Builder, x0: int, x1: int, y: int, z: int) -> None:
+    """One glowing step. x0 and x1 are the walk blocks. Curbs sit one block outside."""
+    for x in range(x0, x1 + 1):
+        builder.setblock(x, y, z, "sea_lantern")
+        builder.setblock(x, y + 1, z, "air")
+        builder.setblock(x, y + 2, z, "air")
+    for x in (x0 - 1, x1 + 1):
+        builder.setblock(x, y, z, "stone_bricks")
+        builder.setblock(x, y + 1, z, "sea_lantern")
+
+
+def west_climb(builder: Builder) -> None:
+    """Glowing stairs on the ground, south of the west tower, then a lit roof path."""
+    for step in range(DECK_Y + 1):
+        _stair(builder, 7, 8, step, 61 - step)
+    builder.fill(6, -1, 62, 9, -1, 68, "sea_lantern")
+    for z in range(SPAN_Z, 29):
+        builder.setblock(7, DECK_Y, z, "sea_lantern")
+        builder.setblock(8, DECK_Y, z, "sea_lantern")
+    for x in range(7, 15):
+        builder.setblock(x, DECK_Y, SPAN_Z, "sea_lantern")
     for z in range(12, 29):
-        if z == 20:
+        if z == SPAN_Z:
             continue
-        builder.setblock(14, 9, z, "stone_brick_wall")
-        builder.setblock(14, 10, z, "stone_brick_wall")
-    builder.setblock(13, 9, 18, "sea_lantern")
-    builder.setblock(13, 9, 22, "sea_lantern")
+        builder.setblock(14, DECK_Y + 1, z, "stone_brick_wall")
+        builder.setblock(14, DECK_Y + 2, z, "stone_brick_wall")
 
 
-def approach(builder: Builder) -> None:
-    """Lit path on the ground, south of the west door."""
-    builder.fill(7, -1, 29, 9, -1, 36, "stone_bricks")
-    for z in (30, 33, 36):
-        builder.setblock(6, -1, z, "stone_bricks")
-        builder.setblock(6, 0, z, "sea_lantern")
-        builder.setblock(10, -1, z, "stone_bricks")
-        builder.setblock(10, 0, z, "sea_lantern")
-
-
-def east_stairs(builder: Builder) -> None:
-    for step in range(10):
-        builder.setblock(91 + step, 8 - step, 20, "stone_bricks")
+def east_climb(builder: Builder) -> None:
+    """Lit roof path, then glowing stairs down to a sidewalk into the quad."""
+    for x in range(78, 86):
+        builder.setblock(x, DECK_Y, SPAN_Z, "sea_lantern")
+    for z in range(SPAN_Z, 29):
+        builder.setblock(84, DECK_Y, z, "sea_lantern")
+        builder.setblock(85, DECK_Y, z, "sea_lantern")
+    for step in range(DECK_Y + 1):
+        _stair(builder, 84, 85, DECK_Y - step, 29 + step)
+    builder.fill(83, -1, 22, 96, -1, 63, "sea_lantern")
 
 
 def parapet(builder: Builder) -> None:
     for x in range(15, 78):
         if x in (45, 46):
             continue
-        block = "polished_blackstone" if x in (44, 47) else "stone_bricks"
-        if block == "stone_bricks" and (x - 15) % 4 == 0:
+        if x <= 18:
+            block = "sea_lantern"
+        elif x in (44, 47):
+            block = "polished_blackstone"
+        elif (x - 15) % 4 == 0:
             block = "chiseled_stone_bricks"
-        builder.setblock(x, 8, 20, block)
+        else:
+            block = "stone_bricks"
+        builder.setblock(x, DECK_Y, SPAN_Z, block)
 
 
 def bleachers(builder: Builder) -> None:
@@ -219,23 +226,20 @@ def dorms(builder: Builder) -> None:
 
 
 def valley(builder: Builder) -> None:
-    builder.fill(16, -6, 94, 70, -6, 140, "grass_block")
-    builder.fill(16, -5, 94, 70, -1, 140, "air")
+    """A one-block bowl. Deeper would fall through the flat world."""
+    builder.fill(16, -2, 94, 70, -2, 140, "grass_block")
+    builder.fill(16, -1, 94, 70, -1, 140, "air")
     for x in range(18, 69, 10):
-        builder.fill(x, -5, 96, x, 2, 96, "stone_bricks")
-        builder.fill(x, -5, 138, x, 2, 138, "stone_bricks")
+        builder.fill(x, -1, 96, x, 2, 96, "stone_bricks")
+        builder.fill(x, -1, 138, x, 2, 138, "stone_bricks")
     for z in range(106, 139, 10):
-        builder.fill(18, -5, z, 18, 2, z, "stone_bricks")
-        builder.fill(68, -5, z, 68, 2, z, "stone_bricks")
-    builder.fill(38, -6, 112, 48, -6, 122, "stone_bricks")
-    builder.setblock(43, -6, 117, "gold_block")
-    # Five steps from the east path down to the bowl floor.
-    for step in range(1, 6):
-        y = -1 - step
-        for z in (117, 118):
-            builder.setblock(71 - step, y, z, "stone_bricks")
-            builder.setblock(71 - step, y + 1, z, "air")
-            builder.setblock(71 - step, y + 2, z, "air")
+        builder.fill(18, -1, z, 18, 2, z, "stone_bricks")
+        builder.fill(68, -1, z, 68, 2, z, "stone_bricks")
+    builder.fill(38, -2, 112, 48, -2, 122, "stone_bricks")
+    builder.setblock(43, -2, 117, "gold_block")
+    for z in (117, 118):
+        builder.setblock(70, -2, z, "stone_bricks")
+        builder.setblock(70, -1, z, "air")
 
 
 def paths(builder: Builder) -> None:
@@ -245,12 +249,12 @@ def paths(builder: Builder) -> None:
 
 
 def finish(builder: Builder) -> None:
-    builder.setblock(45, 8, 20, "air")
-    builder.setblock(46, 8, 20, "air")
-    builder.setblock(8, 9, 18, "stone_pressure_plate")
-    builder.setblock(84, 9, 18, "stone_pressure_plate")
+    builder.setblock(45, DECK_Y, SPAN_Z, "air")
+    builder.setblock(46, DECK_Y, SPAN_Z, "air")
+    builder.setblock(5, DECK_Y + 1, SPAN_Z, "stone_pressure_plate")
+    builder.setblock(86, DECK_Y + 1, SPAN_Z, "stone_pressure_plate")
     builder.setblock(128, 0, 46, "stone_pressure_plate")
-    builder.setblock(43, -5, 115, "stone_pressure_plate")
+    builder.setblock(43, -1, 115, "stone_pressure_plate")
     builder.add("time set night")
     builder.add("weather thunder 999999")
     builder.add("gamerule dodaylightcycle false")
@@ -264,10 +268,11 @@ def finish(builder: Builder) -> None:
     builder.add('titleraw @p title {"rawtext":[{"text":"Welcome, candidate"}]}')
     builder.add('titleraw @p subtitle {"rawtext":[{"text":"Cross the Parapet"}]}')
     builder.add(
-        'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. Climb the lit stairs. A fall from the span sends you back here. Touch the stone in the Quad. Then run /function basgiath/summon_dragon"}]}'
+        'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. The glowing stairs are in front of you. A fall from the span sends you back here. Touch the stone in the Quad. Then run /function basgiath/summon_dragon"}]}'
     )
-    builder.add("spawnpoint @p ~8 ~0 ~36")
-    builder.add("tp @p ~8 ~0 ~36")
+    sx, sy, sz = START
+    builder.add(f"spawnpoint @p ~{sx} ~{sy} ~{sz}")
+    builder.add(f"tp @p ~{sx} ~{sy} ~{sz} 180 0")
 
 
 def geometry() -> list[str]:
@@ -275,10 +280,9 @@ def geometry() -> list[str]:
     ground(builder)
     chasm(builder)
     tower(builder, 2, 12, 14, 28)
-    west_stairs(builder)
-    approach(builder)
+    west_climb(builder)
     tower(builder, 78, 12, 90, 28)
-    east_stairs(builder)
+    east_climb(builder)
     parapet(builder)
     quad(builder)
     dorms(builder)
@@ -315,7 +319,6 @@ def write_functions(commands: list[str]) -> int:
 
 BUILD = """scoreboard objectives add map_state dummy
 kill @e[type=armor_stand,name="build_anchor"]
-execute as @s if entity @s[y=-64,dy=44] run tp @s ~ 80 ~
 execute at @s run setblock ~ ~-1 ~ stone
 execute at @s run summon armor_stand "build_anchor" ~ ~ ~
 execute at @s run effect @e[type=armor_stand,name="build_anchor",c=1] invisibility 999999 1 true
@@ -326,24 +329,24 @@ tellraw @s {"rawtext":[{"text":"The college is rising. Stay still. Fan-made. Not
 
 LIVE = """scoreboard players add #wind map_state 1
 execute if score #wind map_state matches 4.. run scoreboard players set #wind map_state 0
-execute if score #wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~15 ~9 ~19 as @a[dx=63,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~20 ~10 ~20
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~40 ~10 ~20
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~55 ~10 ~20
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~4,y=~8,z=~14,dx=10,dy=3,dz=14,tag=!cp_west] run tellraw @s {"rawtext":[{"text":"The span is one block wide. A fall sends you back to the ground."}]}
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~4,y=~8,z=~14,dx=10,dy=3,dz=14] add cp_west
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~78,y=~8,z=~14,dx=12,dy=3,dz=14,tag=!cp_east] run spawnpoint @s ~84 ~9 ~20
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~78,y=~8,z=~14,dx=12,dy=3,dz=14] add cp_east
+execute if score #wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~15 ~33 ~19 as @a[dx=63,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~20 ~34 ~20
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~40 ~34 ~20
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~55 ~34 ~20
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~4,y=~32,z=~14,dx=10,dy=3,dz=14,tag=!cp_west] run tellraw @s {"rawtext":[{"text":"The span is one block wide. A fall sends you back to the ground."}]}
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~4,y=~32,z=~14,dx=10,dy=3,dz=14] add cp_west
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~78,y=~32,z=~14,dx=12,dy=3,dz=14,tag=!cp_east] run spawnpoint @s ~84 ~33 ~20
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~78,y=~32,z=~14,dx=12,dy=3,dz=14] add cp_east
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~124,y=~0,z=~44,dx=10,dy=3,dz=8,tag=!cp_quad] run spawnpoint @s ~128 ~0 ~48
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~124,y=~0,z=~44,dx=10,dy=3,dz=8] add cp_quad
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~38,y=~-6,z=~112,dx=12,dy=4,dz=12,tag=!cp_valley] run spawnpoint @s ~43 ~-5 ~117
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~38,y=~-6,z=~112,dx=12,dy=4,dz=12] add cp_valley
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12,tag=!cp_valley] run spawnpoint @s ~43 ~-1 ~117
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12] add cp_valley
 scoreboard players add #storm map_state 1
 execute if score #storm map_state matches 200.. run scoreboard players set #storm map_state 0
 execute if score #storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
 """
 
-SUMMON = """execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run summon dragon_rider:dragon ~43 ~-5 ~117
+SUMMON = """execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run summon dragon_rider:dragon ~43 ~-1 ~117
 execute as @e[type=armor_stand,name="build_anchor",c=1] run tellraw @a {"rawtext":[{"text":"A dragon waits on the gold pad. Mount it and fly."}]}
 execute unless entity @e[type=armor_stand,name="build_anchor"] run tellraw @s {"rawtext":[{"text":"Raise the college first. Run /function basgiath/build"}]}
 """
@@ -352,7 +355,7 @@ README = """# Functions
 
 `/function basgiath/build` raises the college around an armor stand named `build_anchor`.
 
-The stand is the origin. Every later command is relative to it. The build places one stone under the stand, then gives that stand invisibility and resistance. The stone keeps the stand from falling. The build runs one stage per tick.
+The stand is the origin. Every later command is relative to it. The build stays at your feet. It places one stone under the stand, then gives that stand invisibility and resistance. The stone keeps the stand from falling. The build runs one stage per tick.
 
 `/function basgiath/summon_dragon` summons `dragon_rider:dragon` on the valley pad.
 
@@ -362,8 +365,102 @@ Do not run the old placeholder functions. They are gone. Coordinates live in `sc
 """
 
 
+_NON_SOLID = {"air", "lantern", "stone_pressure_plate", "bell"}
+
+
+def _rel(token: str) -> int:
+    if token == "~":
+        return 0
+    if token.startswith("~"):
+        return int(token[1:])
+    return int(token)
+
+
+def solid_blocks(lines: list[str]) -> dict[tuple[int, int, int], str]:
+    blocks: dict[tuple[int, int, int], str] = {}
+    for line in lines:
+        parts = line.split()
+        if len(parts) < 5:
+            continue
+        if parts[0] == "setblock":
+            x, y, z = _rel(parts[1]), _rel(parts[2]), _rel(parts[3])
+            block = parts[4]
+            cells = [(x, y, z)]
+        elif parts[0] == "fill" and len(parts) >= 8:
+            x0, y0, z0 = _rel(parts[1]), _rel(parts[2]), _rel(parts[3])
+            x1, y1, z1 = _rel(parts[4]), _rel(parts[5]), _rel(parts[6])
+            block = parts[7]
+            cells = [
+                (x, y, z)
+                for x in range(min(x0, x1), max(x0, x1) + 1)
+                for y in range(min(y0, y1), max(y0, y1) + 1)
+                for z in range(min(z0, z1), max(z0, z1) + 1)
+            ]
+        else:
+            continue
+        for cell in cells:
+            if block in _NON_SOLID:
+                blocks.pop(cell, None)
+            else:
+                blocks[cell] = block
+    return blocks
+
+
+def _can_stand(blocks: dict[tuple[int, int, int], str], x: int, y: int, z: int) -> bool:
+    below = blocks.get((x, y - 1, z))
+    if below is None or below in _NON_SOLID:
+        return False
+    for dy in (0, 1):
+        body = blocks.get((x, y + dy, z))
+        if body is not None and body not in _NON_SOLID:
+            return False
+    return True
+
+
+def _reachable(blocks: dict[tuple[int, int, int], str], start: tuple[int, int, int], goal) -> bool:
+    from collections import deque
+
+    if not _can_stand(blocks, *start):
+        return False
+    seen = {start}
+    queue = deque([start])
+    while queue:
+        x, y, z = queue.popleft()
+        if goal(x, y, z):
+            return True
+        for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            for ny in (y - 1, y, y + 1):
+                nxt = (x + dx, ny, z + dz)
+                if nxt in seen or not _can_stand(blocks, *nxt):
+                    continue
+                seen.add(nxt)
+                queue.append(nxt)
+    return False
+
+
+def assert_walk(lines: list[str]) -> None:
+    """Fail the build when the start cannot walk onto the span."""
+    if DECK_Y + 1 < 24:
+        raise SystemExit(f"span fall is {DECK_Y + 1} blocks, need at least 24")
+    blocks = solid_blocks(lines)
+    start = START
+    if not _reachable(
+        blocks,
+        start,
+        lambda x, y, z: y == DECK_Y + 1 and z == SPAN_Z and 15 <= x <= 44,
+    ):
+        raise SystemExit(f"no walk from {start} to the span")
+    if not _reachable(
+        blocks,
+        (84, DECK_Y + 1, SPAN_Z),
+        lambda x, y, z: y == 0 and x >= 90 and 22 <= z <= 40,
+    ):
+        raise SystemExit("no walk from the east roof down to the quad")
+
+
 def main() -> None:
     commands = geometry()
+    assert_walk(commands)
     count = write_functions(commands)
     (BASGIATH / "build.mcfunction").write_text(BUILD, encoding="utf-8")
     (BASGIATH / "live.mcfunction").write_text(LIVE, encoding="utf-8")

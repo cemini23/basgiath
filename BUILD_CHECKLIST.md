@@ -21,7 +21,7 @@ From the repo root:
 
 - [ ] Run `/function basgiath/build`.
 - [ ] Wait until the title says "Welcome, candidate".
-- [ ] Confirm you stand on a lit stone path, in a storm, at night. The west door is ahead.
+- [ ] Confirm you stand on a glowing path, in a storm, at night. The stairs are in front of you.
 
 ## 3. The Parapet (about 10 min)
 
