@@ -21,13 +21,14 @@ From the repo root:
 
 - [ ] Run `/function basgiath/build`.
 - [ ] Wait until the title says "Welcome, candidate".
-- [ ] Confirm you are standing on the west tower, in a storm, at night.
+- [ ] Confirm you stand on a lit stone path, in a storm, at night. The west door is ahead.
 
 ## 3. The Parapet (about 10 min)
 
+- [ ] Climb the stairs to the roof. Walk through the gap in the wall.
 - [ ] Walk the one-block span. Confirm the wind pushes you off the line.
 - [ ] Jump the two-block gap.
-- [ ] Fall in on purpose. Confirm you return to the west tower.
+- [ ] Fall in on purpose. Confirm you die and return to the lit path.
 - [ ] Cross again. Confirm the east tower sets a new respawn point.
 
 ## 4. The Quad and the dorms (about 10 min)

@@ -32,19 +32,19 @@ fill ~128 ~ ~75 ~148 ~22 ~112 air
 fill ~149 ~ ~75 ~170 ~22 ~112 air
 fill ~128 ~ ~113 ~148 ~22 ~150 air
 fill ~149 ~ ~113 ~170 ~22 ~150 air
-fill ~17 ~-40 ~7 ~45 ~-1 ~33 deepslate
-fill ~46 ~-40 ~7 ~75 ~-1 ~33 deepslate
-fill ~18 ~-39 ~8 ~45 ~-1 ~32 air
-fill ~46 ~-39 ~8 ~74 ~-1 ~32 air
-fill ~18 ~-39 ~8 ~74 ~-37 ~32 water
-setblock ~20 ~-20 ~10 crying_obsidian
-setblock ~40 ~-20 ~30 crying_obsidian
-setblock ~60 ~-20 ~10 crying_obsidian
-setblock ~70 ~-20 ~30 crying_obsidian
+fill ~14 ~-40 ~11 ~45 ~-1 ~29 deepslate
+fill ~46 ~-40 ~11 ~78 ~-1 ~29 deepslate
+fill ~15 ~-39 ~12 ~45 ~-1 ~28 air
+fill ~46 ~-39 ~12 ~77 ~-1 ~28 air
+setblock ~30 ~-20 ~20 crying_obsidian
+setblock ~50 ~-20 ~20 crying_obsidian
+setblock ~70 ~-20 ~20 crying_obsidian
 fill ~2 ~-1 ~12 ~14 ~8 ~28 stone_bricks
 fill ~3 ~ ~13 ~13 ~7 ~27 air
 setblock ~8 ~9 ~14 lantern
-setblock ~4 ~-1 ~14 stone_bricks
-setblock ~4 ~ ~14 air
-setblock ~4 ~1 ~14 air
-setblock ~4 ~ ~15 stone_bricks
+setblock ~6 ~ ~26 stone_bricks
+setblock ~6 ~1 ~26 air
+setblock ~6 ~2 ~26 air
+setblock ~7 ~ ~26 stone_bricks
+setblock ~7 ~1 ~26 air
+setblock ~7 ~2 ~26 air

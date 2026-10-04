@@ -12,5 +12,7 @@ execute if score #now map_state matches 5 run scoreboard players set #stage map_
 execute if score #now map_state matches 6 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_06
 execute if score #now map_state matches 6 run scoreboard players set #stage map_state 7
 execute if score #now map_state matches 7 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_07
-execute if score #now map_state matches 7 run scoreboard players set #stage map_state 0
+execute if score #now map_state matches 7 run scoreboard players set #stage map_state 8
+execute if score #now map_state matches 8 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_08
+execute if score #now map_state matches 8 run scoreboard players set #stage map_state 0
 execute if score #now map_state matches 0 run function basgiath/live

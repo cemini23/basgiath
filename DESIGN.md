@@ -11,11 +11,13 @@ The player runs `/function basgiath/build`. `scripts/build_map.py` writes the fu
 Four zones, in journey order.
 
 ### 1. The Parapet
-- A chasm about 40 blocks deep and 60 blocks wide.
+- The player starts on a lit path on the ground, south of the west door.
+- Stairs inside the west tower climb to the roof. A wall on the roof has one gap onto the span.
+- A chasm about 40 blocks deep under the span. The pit is dry. A fall from the span is fatal.
+- The player respawns on the ground path. The east tower is the first checkpoint that moves the spawn.
 - A one-wide stone path across, broken in the middle by a two-block gap.
 - Wind: particles plus a repeating push, so the crossing feels unsafe.
 - Rain and thunder locked on for mood.
-- A checkpoint at each end.
 
 ### 2. The Quad
 - An open parade ground, about 80 by 80.

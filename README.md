@@ -71,7 +71,7 @@ docs/LISTING.md        the download text, six clip scripts, and the tag list
 2. Build the files from the repo root with `bash scripts/package.sh`.
 3. Open `dist/basgiath.mcworld` in Minecraft. On a phone, tap the file and choose Minecraft.
 4. Run `/function basgiath/build`. Wait for the title "Welcome, candidate".
-5. Cross the Parapet. Touch the lodestone in the Quad with an empty hand. In the valley, run `/function basgiath/summon_dragon` and ride.
+5. Climb the west stairs, then cross the Parapet. Touch the lodestone in the Quad with an empty hand. In the valley, run `/function basgiath/summon_dragon` and ride.
 
 A phone, a tablet, or Windows can open the file. A Nintendo Switch cannot open it from a folder. Upload the world to a Realm from a phone or from Windows. Then download it on the Switch with the same Microsoft account. Minecraft on a Mac is Java. It cannot open this file.
 
@@ -100,7 +100,7 @@ MCPEDL and CurseForge. Free only. See `DISTRIBUTION.md`.
 
 ## Status
 
-The map is built by `/function basgiath/build`. That function places one stone under the anchor and gives the anchor resistance, so the stand stays put. An empty-hand interact on the lodestone opens the signet form. The form stores a result and a wing roster. The dragon is a generated model with a horned head, a jaw, a neck, three-segment wings, four legs, and a segmented tail.
+The map is built by `/function basgiath/build`. You start on the ground, south of the west door. A fall from the span is deep enough to kill you, and you respawn on that path. That function places one stone under the anchor and gives the anchor resistance, so the stand stays put. An empty-hand interact on the lodestone opens the signet form. The form stores a result and a wing roster. The dragon is a generated model with a horned head, a jaw, a neck, three-segment wings, four legs, and a segmented tail.
 
 These checks do not open a Bedrock client. A phone or a Windows client still has to show the model, the texture, the form, and a Parapet crossing before you call those parts proven.
 

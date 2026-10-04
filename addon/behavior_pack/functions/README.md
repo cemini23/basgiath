@@ -6,6 +6,6 @@ The stand is the origin. Every later command is relative to it. The build places
 
 `/function basgiath/summon_dragon` summons `dragon_rider:dragon` on the valley pad.
 
-`functions/tick.json` runs `basgiath/tick`. After the build, that tick runs `basgiath/live` for wind, checkpoints, chasm rescue, and the storm.
+`functions/tick.json` runs `basgiath/tick`. After the build, that tick runs `basgiath/live` for wind, checkpoints, and the storm. A fall from the span is fatal. You respawn on the ground path until you reach the east tower.
 
 Do not run the old placeholder functions. They are gone. Coordinates live in `scripts/build_map.py`.

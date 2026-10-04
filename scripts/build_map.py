@@ -96,12 +96,11 @@ def ground(builder: Builder) -> None:
 
 
 def chasm(builder: Builder) -> None:
-    builder.fill(17, -40, 7, 75, -1, 33, "deepslate")
-    builder.fill(18, -39, 8, 74, -1, 32, "air")
-    # Keep the deepslate floor at y=-40. Water on that layer would fall.
-    builder.fill(18, -39, 8, 74, -37, 32, "water")
-    for x, z in ((20, 10), (40, 30), (60, 10), (70, 30)):
-        builder.setblock(x, -20, z, "crying_obsidian")
+    """A dry pit under the span. Water would cancel the fall."""
+    builder.fill(14, -40, 11, 78, -1, 29, "deepslate")
+    builder.fill(15, -39, 12, 77, -1, 28, "air")
+    for x in (30, 50, 70):
+        builder.setblock(x, -20, 20, "crying_obsidian")
 
 
 def tower(builder: Builder, x0: int, z0: int, x1: int, z1: int) -> None:
@@ -111,16 +110,38 @@ def tower(builder: Builder, x0: int, z0: int, x1: int, z1: int) -> None:
 
 
 def west_stairs(builder: Builder) -> None:
-    for step in range(10):
-        y = -1 + step
-        z = 14 + step
-        builder.setblock(4, y, z, "stone_bricks")
-        builder.setblock(4, y + 1, z, "air")
-        builder.setblock(4, y + 2, z, "air")
+    """Two-wide stairs from the south door up to the roof."""
+    for step in range(9):
+        y = step
+        z = 26 - step
+        for x in (6, 7):
+            builder.setblock(x, y, z, "stone_bricks")
+            for head in (y + 1, y + 2):
+                if head <= 7 or y >= 6:
+                    builder.setblock(x, head, z, "air")
     builder.setblock(8, 0, 28, "air")
     builder.setblock(8, 1, 28, "air")
     builder.setblock(9, 0, 28, "air")
     builder.setblock(9, 1, 28, "air")
+    builder.setblock(8, -1, 22, "sea_lantern")
+    # A wall along the east roof edge, with one gap at the span.
+    for z in range(12, 29):
+        if z == 20:
+            continue
+        builder.setblock(14, 9, z, "stone_brick_wall")
+        builder.setblock(14, 10, z, "stone_brick_wall")
+    builder.setblock(13, 9, 18, "sea_lantern")
+    builder.setblock(13, 9, 22, "sea_lantern")
+
+
+def approach(builder: Builder) -> None:
+    """Lit path on the ground, south of the west door."""
+    builder.fill(7, -1, 29, 9, -1, 36, "stone_bricks")
+    for z in (30, 33, 36):
+        builder.setblock(6, -1, z, "stone_bricks")
+        builder.setblock(6, 0, z, "sea_lantern")
+        builder.setblock(10, -1, z, "stone_bricks")
+        builder.setblock(10, 0, z, "sea_lantern")
 
 
 def east_stairs(builder: Builder) -> None:
@@ -238,13 +259,15 @@ def finish(builder: Builder) -> None:
     builder.add("gamerule keepinventory true")
     builder.add("gamerule sendcommandfeedback false")
     builder.add("gamerule commandblockoutput false")
+    builder.add("gamerule doimmediaterespawn true")
     builder.add("gamemode adventure @a")
     builder.add('titleraw @p title {"rawtext":[{"text":"Welcome, candidate"}]}')
     builder.add('titleraw @p subtitle {"rawtext":[{"text":"Cross the Parapet"}]}')
     builder.add(
-        'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. Touch the stone in the Quad. Then run /function basgiath/summon_dragon"}]}'
+        'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. Climb the lit stairs. A fall from the span sends you back here. Touch the stone in the Quad. Then run /function basgiath/summon_dragon"}]}'
     )
-    builder.add("tp @p ~8 ~9 ~20")
+    builder.add("spawnpoint @p ~8 ~0 ~36")
+    builder.add("tp @p ~8 ~0 ~36")
 
 
 def geometry() -> list[str]:
@@ -253,6 +276,7 @@ def geometry() -> list[str]:
     chasm(builder)
     tower(builder, 2, 12, 14, 28)
     west_stairs(builder)
+    approach(builder)
     tower(builder, 78, 12, 90, 28)
     east_stairs(builder)
     parapet(builder)
@@ -306,7 +330,7 @@ execute if score #wind map_state matches 0 as @e[type=armor_stand,name="build_an
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~20 ~10 ~20
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~40 ~10 ~20
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~55 ~10 ~20
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~4,y=~8,z=~14,dx=10,dy=3,dz=14,tag=!cp_west] run spawnpoint @s ~8 ~9 ~20
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~4,y=~8,z=~14,dx=10,dy=3,dz=14,tag=!cp_west] run tellraw @s {"rawtext":[{"text":"The span is one block wide. A fall sends you back to the ground."}]}
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~4,y=~8,z=~14,dx=10,dy=3,dz=14] add cp_west
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~78,y=~8,z=~14,dx=12,dy=3,dz=14,tag=!cp_east] run spawnpoint @s ~84 ~9 ~20
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~78,y=~8,z=~14,dx=12,dy=3,dz=14] add cp_east
@@ -314,7 +338,6 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~124,y=~0,
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~124,y=~0,z=~44,dx=10,dy=3,dz=8] add cp_quad
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~38,y=~-6,z=~112,dx=12,dy=4,dz=12,tag=!cp_valley] run spawnpoint @s ~43 ~-5 ~117
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~38,y=~-6,z=~112,dx=12,dy=4,dz=12] add cp_valley
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tp @a[x=~18,y=~-40,z=~8,dx=56,dy=36,dz=24] ~8 ~9 ~20
 scoreboard players add #storm map_state 1
 execute if score #storm map_state matches 200.. run scoreboard players set #storm map_state 0
 execute if score #storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
@@ -333,7 +356,7 @@ The stand is the origin. Every later command is relative to it. The build places
 
 `/function basgiath/summon_dragon` summons `dragon_rider:dragon` on the valley pad.
 
-`functions/tick.json` runs `basgiath/tick`. After the build, that tick runs `basgiath/live` for wind, checkpoints, chasm rescue, and the storm.
+`functions/tick.json` runs `basgiath/tick`. After the build, that tick runs `basgiath/live` for wind, checkpoints, and the storm. A fall from the span is fatal. You respawn on the ground path until you reach the east tower.
 
 Do not run the old placeholder functions. They are gone. Coordinates live in `scripts/build_map.py`.
 """

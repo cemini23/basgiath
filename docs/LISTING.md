@@ -14,7 +14,7 @@ The thumbnail is an in-game screenshot. Do not use a book cover.
 
 Basgiath is a free Minecraft Bedrock map and add-on. You raise a war college with one command, cross a one-block span in a storm, and ride a dragon you summon yourself.
 
-The Parapet is the clip. It is one block wide, high over a chasm, with wind that pushes you and a two-block gap in the middle. Fall, and the college puts you back on the near tower. Cross, and the far tower saves your respawn point.
+The Parapet is the clip. You start on the ground and climb to a one-block span over a deep chasm. Wind pushes you, and a two-block gap sits in the middle. A fall kills you and sends you back to the start. Cross, and the far tower saves your respawn point.
 
 The Quad holds a Bonding Stone. Touch it and answer three questions. You get one of four original results: Stormcaller, Shadowwalker, Emberwright, or Stoneward. The result stays on your player. The college also keeps a wing roster of the last 24 riders.
 
@@ -40,7 +40,7 @@ Fan-made. Not official. Not affiliated with Rebecca Yarros, Entangled Publishing
 
 Basgiath is a free Bedrock world. One command builds a war college: a storm-lit span, a parade ground, three barracks, and a valley.
 
-Cross the Parapet before you do anything else. The path is a single block wide. Wind pushes you toward the drop, and the middle is a two-block gap. A fall sends you back to the near tower. The far side sets a checkpoint.
+Climb to the Parapet, then cross it. The path is a single block wide. Wind pushes you toward the drop, and the middle is a two-block gap. A fall kills you and sends you back to the ground start. The far side sets a checkpoint.
 
 Touch the lodestone in the Quad for a three-question form. The four results are original: Stormcaller, Shadowwalker, Emberwright, and Stoneward. Your result is saved, and the world remembers who has joined the wing.
 
@@ -84,11 +84,11 @@ End card: `Free download. Fan-made. Not official. Not affiliated with Rebecca Ya
 
 Length: 15 seconds.
 
-Shot: A crossing. The wind shoves the player. They miss the gap and drop. Respawn on the near tower.
+Shot: A crossing. The wind shoves the player. They miss the gap and drop. Respawn on the ground at the start.
 
 On-screen text: `The wind is not fair.`
 
-Spoken line: "I missed it on purpose the first time. The tower takes you back."
+Spoken line: "I missed it on purpose the first time. The fall sends you back to the start."
 
 End card: `Free download. Fan-made. Not official. Not affiliated with Rebecca Yarros, Entangled Publishing, or Red Tower Books.`
 

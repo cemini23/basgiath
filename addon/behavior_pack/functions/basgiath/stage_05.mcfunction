@@ -1,50 +1,50 @@
-setblock ~106 ~ ~91 red_wool
-setblock ~108 ~ ~91 red_wool
-setblock ~110 ~ ~91 red_wool
-setblock ~112 ~ ~91 red_wool
-setblock ~114 ~ ~91 red_wool
-setblock ~116 ~ ~91 red_wool
-setblock ~108 ~ ~96 stone_bricks
-setblock ~108 ~1 ~96 lantern
-fill ~122 ~-1 ~90 ~142 ~-1 ~102 stone_bricks
-fill ~122 ~ ~90 ~142 ~4 ~102 spruce_planks
-fill ~123 ~ ~91 ~141 ~4 ~101 air
-fill ~122 ~5 ~90 ~142 ~5 ~102 spruce_planks
-setblock ~132 ~ ~102 air
-setblock ~132 ~1 ~102 air
-setblock ~133 ~ ~102 air
-setblock ~133 ~1 ~102 air
-setblock ~124 ~ ~91 red_wool
-setblock ~126 ~ ~91 red_wool
-setblock ~128 ~ ~91 red_wool
-setblock ~130 ~ ~91 red_wool
-setblock ~132 ~ ~91 red_wool
-setblock ~134 ~ ~91 red_wool
-setblock ~136 ~ ~91 red_wool
-setblock ~138 ~ ~91 red_wool
-setblock ~140 ~ ~91 red_wool
-setblock ~132 ~ ~96 stone_bricks
-setblock ~132 ~1 ~96 lantern
-fill ~98 ~-1 ~108 ~118 ~-1 ~120 stone_bricks
-fill ~98 ~ ~108 ~118 ~4 ~120 spruce_planks
-fill ~99 ~ ~109 ~117 ~4 ~119 air
-fill ~98 ~5 ~108 ~118 ~5 ~120 spruce_planks
-setblock ~108 ~ ~120 air
-setblock ~108 ~1 ~120 air
-setblock ~109 ~ ~120 air
-setblock ~109 ~1 ~120 air
-setblock ~100 ~ ~109 red_wool
-setblock ~102 ~ ~109 red_wool
-setblock ~104 ~ ~109 red_wool
-setblock ~106 ~ ~109 red_wool
-setblock ~108 ~ ~109 red_wool
-setblock ~110 ~ ~109 red_wool
-setblock ~112 ~ ~109 red_wool
-setblock ~114 ~ ~109 red_wool
-setblock ~116 ~ ~109 red_wool
-setblock ~108 ~ ~114 stone_bricks
-setblock ~108 ~1 ~114 lantern
-fill ~16 ~-6 ~94 ~70 ~-6 ~140 grass_block
-fill ~16 ~-5 ~94 ~70 ~-1 ~140 air
-fill ~18 ~-5 ~96 ~18 ~2 ~96 stone_bricks
-fill ~18 ~-5 ~138 ~18 ~2 ~138 stone_bricks
+setblock ~54 ~8 ~20 stone_bricks
+setblock ~55 ~8 ~20 chiseled_stone_bricks
+setblock ~56 ~8 ~20 stone_bricks
+setblock ~57 ~8 ~20 stone_bricks
+setblock ~58 ~8 ~20 stone_bricks
+setblock ~59 ~8 ~20 chiseled_stone_bricks
+setblock ~60 ~8 ~20 stone_bricks
+setblock ~61 ~8 ~20 stone_bricks
+setblock ~62 ~8 ~20 stone_bricks
+setblock ~63 ~8 ~20 chiseled_stone_bricks
+setblock ~64 ~8 ~20 stone_bricks
+setblock ~65 ~8 ~20 stone_bricks
+setblock ~66 ~8 ~20 stone_bricks
+setblock ~67 ~8 ~20 chiseled_stone_bricks
+setblock ~68 ~8 ~20 stone_bricks
+setblock ~69 ~8 ~20 stone_bricks
+setblock ~70 ~8 ~20 stone_bricks
+setblock ~71 ~8 ~20 chiseled_stone_bricks
+setblock ~72 ~8 ~20 stone_bricks
+setblock ~73 ~8 ~20 stone_bricks
+setblock ~74 ~8 ~20 stone_bricks
+setblock ~75 ~8 ~20 chiseled_stone_bricks
+setblock ~76 ~8 ~20 stone_bricks
+setblock ~77 ~8 ~20 stone_bricks
+fill ~96 ~-1 ~4 ~168 ~-1 ~78 stone_bricks
+fill ~124 ~ ~36 ~132 ~ ~44 stone_bricks
+setblock ~128 ~ ~40 lodestone
+fill ~100 ~ ~4 ~164 ~3 ~4 stone_bricks
+fill ~100 ~ ~78 ~164 ~3 ~78 stone_bricks
+fill ~100 ~ ~5 ~164 ~2 ~5 stone_bricks
+fill ~100 ~ ~77 ~164 ~2 ~77 stone_bricks
+fill ~100 ~ ~6 ~164 ~1 ~6 stone_bricks
+fill ~100 ~ ~76 ~164 ~1 ~76 stone_bricks
+fill ~100 ~ ~7 ~164 ~ ~7 stone_bricks
+fill ~100 ~ ~75 ~164 ~ ~75 stone_bricks
+fill ~122 ~ ~34 ~122 ~4 ~34 cyan_wool
+fill ~134 ~ ~34 ~134 ~4 ~34 purple_wool
+fill ~122 ~ ~46 ~122 ~4 ~46 orange_wool
+fill ~134 ~ ~46 ~134 ~4 ~46 light_gray_wool
+setblock ~104 ~ ~20 stone_bricks
+setblock ~104 ~1 ~20 lantern
+setblock ~104 ~ ~60 stone_bricks
+setblock ~104 ~1 ~60 lantern
+setblock ~116 ~ ~20 stone_bricks
+setblock ~116 ~1 ~20 lantern
+setblock ~116 ~ ~60 stone_bricks
+setblock ~116 ~1 ~60 lantern
+setblock ~140 ~ ~20 stone_bricks
+setblock ~140 ~1 ~20 lantern
+setblock ~140 ~ ~60 stone_bricks

@@ -1,50 +1,50 @@
-setblock ~74 ~8 ~20 stone_bricks
-setblock ~75 ~8 ~20 chiseled_stone_bricks
-setblock ~76 ~8 ~20 stone_bricks
-setblock ~77 ~8 ~20 stone_bricks
-fill ~96 ~-1 ~4 ~168 ~-1 ~78 stone_bricks
-fill ~124 ~ ~36 ~132 ~ ~44 stone_bricks
-setblock ~128 ~ ~40 lodestone
-fill ~100 ~ ~4 ~164 ~3 ~4 stone_bricks
-fill ~100 ~ ~78 ~164 ~3 ~78 stone_bricks
-fill ~100 ~ ~5 ~164 ~2 ~5 stone_bricks
-fill ~100 ~ ~77 ~164 ~2 ~77 stone_bricks
-fill ~100 ~ ~6 ~164 ~1 ~6 stone_bricks
-fill ~100 ~ ~76 ~164 ~1 ~76 stone_bricks
-fill ~100 ~ ~7 ~164 ~ ~7 stone_bricks
-fill ~100 ~ ~75 ~164 ~ ~75 stone_bricks
-fill ~122 ~ ~34 ~122 ~4 ~34 cyan_wool
-fill ~134 ~ ~34 ~134 ~4 ~34 purple_wool
-fill ~122 ~ ~46 ~122 ~4 ~46 orange_wool
-fill ~134 ~ ~46 ~134 ~4 ~46 light_gray_wool
-setblock ~104 ~ ~20 stone_bricks
-setblock ~104 ~1 ~20 lantern
-setblock ~104 ~ ~60 stone_bricks
-setblock ~104 ~1 ~60 lantern
-setblock ~116 ~ ~20 stone_bricks
-setblock ~116 ~1 ~20 lantern
-setblock ~116 ~ ~60 stone_bricks
-setblock ~116 ~1 ~60 lantern
-setblock ~140 ~ ~20 stone_bricks
-setblock ~140 ~1 ~20 lantern
-setblock ~140 ~ ~60 stone_bricks
-setblock ~140 ~1 ~60 lantern
-setblock ~152 ~ ~20 stone_bricks
-setblock ~152 ~1 ~20 lantern
-setblock ~152 ~ ~60 stone_bricks
-setblock ~152 ~1 ~60 lantern
-fill ~158 ~-1 ~8 ~164 ~16 ~14 stone_bricks
-fill ~159 ~ ~9 ~163 ~15 ~13 air
-setblock ~161 ~15 ~11 bell
-setblock ~161 ~16 ~11 sea_lantern
-fill ~98 ~-1 ~90 ~118 ~-1 ~102 stone_bricks
-fill ~98 ~ ~90 ~118 ~4 ~102 spruce_planks
-fill ~99 ~ ~91 ~117 ~4 ~101 air
-fill ~98 ~5 ~90 ~118 ~5 ~102 spruce_planks
-setblock ~108 ~ ~102 air
-setblock ~108 ~1 ~102 air
-setblock ~109 ~ ~102 air
-setblock ~109 ~1 ~102 air
-setblock ~100 ~ ~91 red_wool
-setblock ~102 ~ ~91 red_wool
-setblock ~104 ~ ~91 red_wool
+fill ~78 ~-1 ~12 ~90 ~8 ~28 stone_bricks
+fill ~79 ~ ~13 ~89 ~7 ~27 air
+setblock ~84 ~9 ~14 lantern
+setblock ~91 ~8 ~20 stone_bricks
+setblock ~92 ~7 ~20 stone_bricks
+setblock ~93 ~6 ~20 stone_bricks
+setblock ~94 ~5 ~20 stone_bricks
+setblock ~95 ~4 ~20 stone_bricks
+setblock ~96 ~3 ~20 stone_bricks
+setblock ~97 ~2 ~20 stone_bricks
+setblock ~98 ~1 ~20 stone_bricks
+setblock ~99 ~ ~20 stone_bricks
+setblock ~100 ~-1 ~20 stone_bricks
+setblock ~15 ~8 ~20 chiseled_stone_bricks
+setblock ~16 ~8 ~20 stone_bricks
+setblock ~17 ~8 ~20 stone_bricks
+setblock ~18 ~8 ~20 stone_bricks
+setblock ~19 ~8 ~20 chiseled_stone_bricks
+setblock ~20 ~8 ~20 stone_bricks
+setblock ~21 ~8 ~20 stone_bricks
+setblock ~22 ~8 ~20 stone_bricks
+setblock ~23 ~8 ~20 chiseled_stone_bricks
+setblock ~24 ~8 ~20 stone_bricks
+setblock ~25 ~8 ~20 stone_bricks
+setblock ~26 ~8 ~20 stone_bricks
+setblock ~27 ~8 ~20 chiseled_stone_bricks
+setblock ~28 ~8 ~20 stone_bricks
+setblock ~29 ~8 ~20 stone_bricks
+setblock ~30 ~8 ~20 stone_bricks
+setblock ~31 ~8 ~20 chiseled_stone_bricks
+setblock ~32 ~8 ~20 stone_bricks
+setblock ~33 ~8 ~20 stone_bricks
+setblock ~34 ~8 ~20 stone_bricks
+setblock ~35 ~8 ~20 chiseled_stone_bricks
+setblock ~36 ~8 ~20 stone_bricks
+setblock ~37 ~8 ~20 stone_bricks
+setblock ~38 ~8 ~20 stone_bricks
+setblock ~39 ~8 ~20 chiseled_stone_bricks
+setblock ~40 ~8 ~20 stone_bricks
+setblock ~41 ~8 ~20 stone_bricks
+setblock ~42 ~8 ~20 stone_bricks
+setblock ~43 ~8 ~20 chiseled_stone_bricks
+setblock ~44 ~8 ~20 polished_blackstone
+setblock ~47 ~8 ~20 polished_blackstone
+setblock ~48 ~8 ~20 stone_bricks
+setblock ~49 ~8 ~20 stone_bricks
+setblock ~50 ~8 ~20 stone_bricks
+setblock ~51 ~8 ~20 chiseled_stone_bricks
+setblock ~52 ~8 ~20 stone_bricks
+setblock ~53 ~8 ~20 stone_bricks

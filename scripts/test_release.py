@@ -119,9 +119,16 @@ def check_map() -> None:
         "setblock ~47 ~8 ~20",
         "weather thunder",
         "Cross the Parapet",
+        "spawnpoint @p ~8 ~0 ~36",
+        "tp @p ~8 ~0 ~36",
+        "doimmediaterespawn true",
     ):
         if needle not in blob:
             fail(f"map commands missing {needle}")
+    if " water" in blob or blob.startswith("water"):
+        fail("the span pit still contains water")
+    if 'tp @a[x=~18,y=~-40,z=~8' in live:
+        fail("live function still rescues a fall from the span")
     for line in blob.splitlines():
         match = FILL.match(line.strip())
         if not match:

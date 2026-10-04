@@ -9,6 +9,8 @@ Commit `65c4e18` changed four things after this plan was written:
 - The build places one stone under `build_anchor` and gives that stand resistance.
 - The world writes the `gametest` byte and the `beta_apis` byte. Stable script modules do not need the Beta APIs toggle.
 
+The player starts on the ground south of the west door. The span pit is dry. A fall from the span is fatal. Respawn stays on that ground path until the east tower.
+
 ## Goal
 
 Ship a free fan-made Bedrock map a stranger can install and play.

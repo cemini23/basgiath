@@ -26,7 +26,7 @@ The map is built. Post the clips now. Use this order. The spoken lines and the o
 |---|---|
 | 1 | The empty chasm, before the span exists. |
 | 2 | The span, the wind, and the two-block gap. |
-| 3 | A fall, then the respawn on the near tower. |
+| 3 | A fall, then the respawn on the ground at the start. |
 | 4 | The Quad and the Bonding Stone. Show the signet result. |
 | 5 | The dragon lift from the valley pad. |
 | 6 | The full crossing. End with "Free download in the comments." |
