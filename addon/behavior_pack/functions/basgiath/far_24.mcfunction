@@ -1,3 +1,41 @@
+fill ~68 ~-1 ~112 ~68 ~1 ~112 oak_log
+fill ~67 ~2 ~111 ~69 ~2 ~113 oak_leaves
+fill ~67 ~3 ~112 ~69 ~3 ~112 oak_leaves
+fill ~68 ~3 ~111 ~68 ~3 ~113 oak_leaves
+fill ~66 ~-1 ~120 ~66 ~1 ~120 oak_log
+fill ~65 ~2 ~119 ~67 ~2 ~121 oak_leaves
+fill ~65 ~3 ~120 ~67 ~3 ~120 oak_leaves
+fill ~66 ~3 ~119 ~66 ~3 ~121 oak_leaves
+fill ~69 ~-1 ~129 ~69 ~1 ~129 oak_log
+fill ~68 ~2 ~128 ~70 ~2 ~130 oak_leaves
+fill ~68 ~3 ~129 ~70 ~3 ~129 oak_leaves
+fill ~69 ~3 ~128 ~69 ~3 ~130 oak_leaves
+fill ~67 ~-1 ~137 ~67 ~1 ~137 oak_log
+fill ~66 ~2 ~136 ~68 ~2 ~138 oak_leaves
+fill ~66 ~3 ~137 ~68 ~3 ~137 oak_leaves
+fill ~67 ~3 ~136 ~67 ~3 ~138 oak_leaves
+fill ~24 ~-1 ~133 ~24 ~1 ~133 oak_log
+fill ~23 ~2 ~132 ~25 ~2 ~134 oak_leaves
+fill ~23 ~3 ~133 ~25 ~3 ~133 oak_leaves
+fill ~24 ~3 ~132 ~24 ~3 ~134 oak_leaves
+fill ~31 ~-1 ~136 ~31 ~1 ~136 oak_log
+fill ~30 ~2 ~135 ~32 ~2 ~137 oak_leaves
+fill ~30 ~3 ~136 ~32 ~3 ~136 oak_leaves
+fill ~31 ~3 ~135 ~31 ~3 ~137 oak_leaves
+fill ~38 ~-1 ~134 ~38 ~1 ~134 oak_log
+fill ~37 ~2 ~133 ~39 ~2 ~135 oak_leaves
+fill ~37 ~3 ~134 ~39 ~3 ~134 oak_leaves
+fill ~38 ~3 ~133 ~38 ~3 ~135 oak_leaves
+fill ~45 ~-1 ~137 ~45 ~1 ~137 oak_log
+fill ~44 ~2 ~136 ~46 ~2 ~138 oak_leaves
+fill ~44 ~3 ~137 ~46 ~3 ~137 oak_leaves
+fill ~45 ~3 ~136 ~45 ~3 ~138 oak_leaves
+fill ~58 ~-1 ~133 ~58 ~1 ~133 oak_log
+fill ~57 ~2 ~132 ~59 ~2 ~134 oak_leaves
+fill ~57 ~3 ~133 ~59 ~3 ~133 oak_leaves
+fill ~58 ~3 ~132 ~58 ~3 ~134 oak_leaves
+fill ~65 ~-1 ~137 ~65 ~1 ~137 oak_log
+fill ~64 ~2 ~136 ~66 ~2 ~138 oak_leaves
 fill ~64 ~3 ~137 ~66 ~3 ~137 oak_leaves
 fill ~65 ~3 ~136 ~65 ~3 ~138 oak_leaves
 fill ~28 ~-1 ~139 ~28 ~1 ~139 oak_log
@@ -10,41 +48,3 @@ fill ~41 ~3 ~139 ~43 ~3 ~139 oak_leaves
 fill ~42 ~3 ~138 ~42 ~3 ~140 oak_leaves
 fill ~56 ~-1 ~139 ~56 ~1 ~139 oak_log
 fill ~55 ~2 ~138 ~57 ~2 ~140 oak_leaves
-fill ~55 ~3 ~139 ~57 ~3 ~139 oak_leaves
-fill ~56 ~3 ~138 ~56 ~3 ~140 oak_leaves
-setblock ~17 ~-1 ~114 short_grass
-setblock ~18 ~-1 ~119 azure_bluet
-setblock ~19 ~-1 ~95 poppy
-setblock ~19 ~-1 ~124 dandelion
-setblock ~20 ~-1 ~100 short_grass
-setblock ~20 ~-1 ~129 lily_of_the_valley
-setblock ~21 ~-1 ~105 oxeye_daisy
-setblock ~21 ~-1 ~134 cornflower
-setblock ~22 ~-1 ~110 short_grass
-setblock ~22 ~-1 ~139 short_grass
-setblock ~23 ~-1 ~115 allium
-setblock ~24 ~-1 ~120 poppy
-setblock ~25 ~-1 ~96 short_grass
-setblock ~25 ~-1 ~125 short_grass
-setblock ~26 ~-1 ~101 azure_bluet
-setblock ~26 ~-1 ~130 oxeye_daisy
-setblock ~27 ~-1 ~106 dandelion
-setblock ~27 ~-1 ~135 short_grass
-setblock ~28 ~-1 ~111 lily_of_the_valley
-setblock ~29 ~-1 ~116 cornflower
-setblock ~30 ~-1 ~121 short_grass
-setblock ~31 ~-1 ~97 allium
-setblock ~31 ~-1 ~126 azure_bluet
-setblock ~32 ~-1 ~102 poppy
-setblock ~32 ~-1 ~131 dandelion
-setblock ~33 ~-1 ~107 short_grass
-setblock ~33 ~-1 ~136 lily_of_the_valley
-setblock ~34 ~-1 ~112 oxeye_daisy
-setblock ~37 ~-1 ~98 cornflower
-setblock ~38 ~-1 ~103 short_grass
-setblock ~38 ~-1 ~132 short_grass
-setblock ~39 ~-1 ~108 azure_bluet
-setblock ~39 ~-1 ~137 oxeye_daisy
-setblock ~43 ~-1 ~99 short_grass
-setblock ~43 ~-1 ~128 short_grass
-setblock ~44 ~-1 ~104 allium

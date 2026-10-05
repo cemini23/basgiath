@@ -1,3 +1,41 @@
+setblock ~128 ~ ~131 poppy
+setblock ~128 ~ ~137 short_grass
+setblock ~129 ~ ~135 short_grass
+setblock ~129 ~ ~141 short_grass
+setblock ~130 ~ ~139 short_grass
+setblock ~131 ~ ~126 short_grass
+setblock ~131 ~ ~137 short_grass
+setblock ~131 ~ ~143 short_grass
+setblock ~132 ~ ~141 short_grass
+setblock ~133 ~ ~128 short_grass
+setblock ~133 ~ ~139 cornflower
+setblock ~133 ~ ~145 short_grass
+setblock ~134 ~ ~126 short_grass
+setblock ~134 ~ ~132 short_grass
+setblock ~134 ~ ~143 short_grass
+setblock ~135 ~ ~130 short_grass
+setblock ~136 ~ ~128 short_grass
+setblock ~136 ~ ~134 short_grass
+setblock ~136 ~ ~145 short_grass
+setblock ~137 ~ ~126 allium
+setblock ~137 ~ ~132 short_grass
+setblock ~138 ~ ~130 short_grass
+setblock ~138 ~ ~136 short_grass
+setblock ~139 ~ ~134 short_grass
+setblock ~139 ~ ~140 short_grass
+setblock ~140 ~ ~132 short_grass
+setblock ~141 ~ ~136 short_grass
+setblock ~142 ~ ~140 short_grass
+setblock ~143 ~ ~127 short_grass
+setblock ~143 ~ ~138 short_grass
+setblock ~143 ~ ~144 short_grass
+fill ~16 ~-2 ~94 ~48 ~-2 ~140 grass_block
+fill ~49 ~-2 ~94 ~70 ~-2 ~140 grass_block
+fill ~16 ~-1 ~94 ~48 ~-1 ~140 air
+fill ~49 ~-1 ~94 ~70 ~-1 ~140 air
+fill ~42 ~-2 ~116 ~44 ~-2 ~118 moss_block
+fill ~19 ~-1 ~97 ~19 ~1 ~97 oak_log
+fill ~18 ~2 ~96 ~20 ~2 ~98 oak_leaves
 fill ~18 ~3 ~97 ~20 ~3 ~97 oak_leaves
 fill ~19 ~3 ~96 ~19 ~3 ~98 oak_leaves
 fill ~26 ~-1 ~99 ~26 ~1 ~99 oak_log
@@ -10,41 +48,3 @@ fill ~32 ~3 ~97 ~34 ~3 ~97 oak_leaves
 fill ~33 ~3 ~96 ~33 ~3 ~98 oak_leaves
 fill ~40 ~-1 ~99 ~40 ~1 ~99 oak_log
 fill ~39 ~2 ~98 ~41 ~2 ~100 oak_leaves
-fill ~39 ~3 ~99 ~41 ~3 ~99 oak_leaves
-fill ~40 ~3 ~98 ~40 ~3 ~100 oak_leaves
-fill ~47 ~-1 ~97 ~47 ~1 ~97 oak_log
-fill ~46 ~2 ~96 ~48 ~2 ~98 oak_leaves
-fill ~46 ~3 ~97 ~48 ~3 ~97 oak_leaves
-fill ~47 ~3 ~96 ~47 ~3 ~98 oak_leaves
-fill ~54 ~-1 ~99 ~54 ~1 ~99 oak_log
-fill ~53 ~2 ~98 ~55 ~2 ~100 oak_leaves
-fill ~53 ~3 ~99 ~55 ~3 ~99 oak_leaves
-fill ~54 ~3 ~98 ~54 ~3 ~100 oak_leaves
-fill ~61 ~-1 ~97 ~61 ~1 ~97 oak_log
-fill ~60 ~2 ~96 ~62 ~2 ~98 oak_leaves
-fill ~60 ~3 ~97 ~62 ~3 ~97 oak_leaves
-fill ~61 ~3 ~96 ~61 ~3 ~98 oak_leaves
-fill ~68 ~-1 ~99 ~68 ~1 ~99 oak_log
-fill ~67 ~2 ~98 ~69 ~2 ~100 oak_leaves
-fill ~67 ~3 ~99 ~69 ~3 ~99 oak_leaves
-fill ~68 ~3 ~98 ~68 ~3 ~100 oak_leaves
-fill ~22 ~-1 ~105 ~22 ~1 ~105 oak_log
-fill ~21 ~2 ~104 ~23 ~2 ~106 oak_leaves
-fill ~21 ~3 ~105 ~23 ~3 ~105 oak_leaves
-fill ~22 ~3 ~104 ~22 ~3 ~106 oak_leaves
-fill ~36 ~-1 ~105 ~36 ~1 ~105 oak_log
-fill ~35 ~2 ~104 ~37 ~2 ~106 oak_leaves
-fill ~35 ~3 ~105 ~37 ~3 ~105 oak_leaves
-fill ~36 ~3 ~104 ~36 ~3 ~106 oak_leaves
-fill ~50 ~-1 ~105 ~50 ~1 ~105 oak_log
-fill ~49 ~2 ~104 ~51 ~2 ~106 oak_leaves
-fill ~49 ~3 ~105 ~51 ~3 ~105 oak_leaves
-fill ~50 ~3 ~104 ~50 ~3 ~106 oak_leaves
-fill ~64 ~-1 ~105 ~64 ~1 ~105 oak_log
-fill ~63 ~2 ~104 ~65 ~2 ~106 oak_leaves
-fill ~63 ~3 ~105 ~65 ~3 ~105 oak_leaves
-fill ~64 ~3 ~104 ~64 ~3 ~106 oak_leaves
-fill ~18 ~-1 ~114 ~18 ~1 ~114 oak_log
-fill ~17 ~2 ~113 ~19 ~2 ~115 oak_leaves
-fill ~17 ~3 ~114 ~19 ~3 ~114 oak_leaves
-fill ~18 ~3 ~113 ~18 ~3 ~115 oak_leaves

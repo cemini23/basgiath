@@ -4,8 +4,9 @@ Stage range 13-20 is reserved. This module does not write stage files.
 
 The courtyard wall is 10 blocks thick and 8 blocks tall. It fills the rim of
 x=96..168 by z=4..78. One opening is left on the west face at x=96..105,
-z=18..26, so the ground path from the Parapet can walk in. That opening is the
-only way through the ring.
+z=18..26: the ground route in from the Parapet. The ring is a silhouette, not
+a roof. The east descent flies over the wall at y=18..27 and lands inside, so
+the gate is the ground route, not the only route.
 
 The stone floor stays. The bleachers, the wool poles, and the bell tower stay
 inside the wall line; the bleachers and the tower move inboard so the wall does

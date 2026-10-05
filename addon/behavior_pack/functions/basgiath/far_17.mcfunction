@@ -1,3 +1,40 @@
+fill ~112 ~ ~89 ~112 ~7 ~89 black_wool
+fill ~108 ~ ~107 ~108 ~7 ~107 orange_wool
+fill ~112 ~ ~107 ~112 ~7 ~107 black_wool
+fill ~126 ~-1 ~100 ~140 ~8 ~110 stone_bricks
+fill ~127 ~ ~101 ~139 ~7 ~109 air
+fill ~127 ~-1 ~101 ~139 ~-1 ~109 polished_andesite
+fill ~126 ~-1 ~104 ~126 ~1 ~105 air
+setblock ~126 ~2 ~104 stone_brick_stairs
+setblock ~126 ~2 ~105 stone_brick_stairs
+setblock ~126 ~3 ~104 stone_bricks
+setblock ~126 ~3 ~105 stone_bricks
+setblock ~126 ~2 ~103 stone_bricks
+setblock ~126 ~2 ~106 stone_bricks
+setblock ~126 ~3 ~103 stone_bricks
+setblock ~126 ~3 ~106 stone_bricks
+setblock ~128 ~2 ~102 lantern
+setblock ~138 ~2 ~108 lantern
+execute unless entity @e[type=armor_stand,name="A rider kneels and the dragon decides."] run summon armor_stand "A rider kneels and the dragon decides." 130 0 105
+fill ~126 ~-1 ~84 ~140 ~9 ~92 stone_bricks
+fill ~127 ~ ~85 ~139 ~8 ~91 air
+fill ~127 ~-1 ~85 ~139 ~-1 ~91 polished_andesite
+fill ~127 ~2 ~85 ~139 ~2 ~91 stone_bricks
+fill ~127 ~5 ~85 ~139 ~5 ~91 stone_bricks
+fill ~132 ~-1 ~84 ~133 ~1 ~84 air
+setblock ~131 ~2 ~84 stone_brick_stairs
+setblock ~134 ~2 ~84 stone_brick_stairs
+setblock ~127 ~2 ~85 air
+setblock ~127 ~1 ~85 ladder [facing_direction=2]
+setblock ~127 ~5 ~85 air
+setblock ~127 ~4 ~85 ladder [facing_direction=2]
+setblock ~127 ~-1 ~85 ladder [facing_direction=2]
+fill ~140 ~-1 ~90 ~140 ~1 ~90 air
+setblock ~129 ~-1 ~86 red_wool
+setblock ~131 ~-1 ~86 red_wool
+setblock ~133 ~-1 ~86 red_wool
+setblock ~135 ~-1 ~86 red_wool
+setblock ~137 ~-1 ~86 red_wool
 setblock ~129 ~-1 ~88 red_wool
 setblock ~131 ~-1 ~88 red_wool
 setblock ~133 ~-1 ~88 red_wool
@@ -11,40 +48,3 @@ setblock ~137 ~-1 ~90 red_wool
 setblock ~129 ~-1 ~92 red_wool
 setblock ~131 ~-1 ~92 red_wool
 setblock ~133 ~-1 ~92 red_wool
-setblock ~135 ~-1 ~92 red_wool
-setblock ~137 ~-1 ~92 red_wool
-setblock ~127 ~2 ~87 lantern
-fill ~142 ~-1 ~87 ~144 ~4 ~93 stone_bricks
-fill ~143 ~ ~88 ~143 ~3 ~92 air
-fill ~142 ~-1 ~90 ~142 ~1 ~90 air
-setblock ~143 ~-1 ~88 red_wool
-setblock ~143 ~ ~92 lantern
-fill ~102 ~-1 ~112 ~122 ~5 ~120 stone_bricks
-fill ~103 ~ ~113 ~121 ~4 ~119 air
-fill ~103 ~-1 ~113 ~121 ~-1 ~119 polished_andesite
-fill ~102 ~-1 ~116 ~102 ~1 ~117 air
-setblock ~102 ~2 ~116 stone_brick_stairs
-setblock ~102 ~2 ~117 stone_brick_stairs
-setblock ~106 ~1 ~115 lectern [facing_direction=2]
-setblock ~110 ~1 ~115 lectern [facing_direction=2]
-setblock ~114 ~1 ~115 lectern [facing_direction=2]
-setblock ~108 ~1 ~118 lectern [facing_direction=3]
-setblock ~112 ~1 ~118 lectern [facing_direction=3]
-setblock ~106 ~1 ~118 lectern [facing_direction=4]
-setblock ~116 ~1 ~118 lectern [facing_direction=4]
-setblock ~118 ~1 ~117 lectern [facing_direction=1]
-setblock ~118 ~2 ~114 lantern
-setblock ~104 ~2 ~118 lantern
-fill ~146 ~ ~80 ~168 ~ ~81 stone
-fill ~146 ~ ~82 ~168 ~1 ~84 stone
-fill ~146 ~ ~85 ~168 ~5 ~88 stone
-fill ~146 ~ ~89 ~168 ~9 ~92 stone
-fill ~146 ~ ~93 ~168 ~13 ~96 stone
-fill ~146 ~ ~97 ~168 ~17 ~100 stone
-fill ~146 ~ ~101 ~168 ~21 ~104 stone
-fill ~146 ~ ~105 ~168 ~25 ~140 stone
-fill ~146 ~1 ~82 ~168 ~1 ~82 cobblestone
-fill ~146 ~2 ~85 ~168 ~5 ~85 cobblestone
-fill ~146 ~6 ~89 ~168 ~9 ~89 cobblestone
-fill ~146 ~10 ~93 ~168 ~13 ~93 cobblestone
-fill ~146 ~14 ~97 ~168 ~17 ~97 cobblestone

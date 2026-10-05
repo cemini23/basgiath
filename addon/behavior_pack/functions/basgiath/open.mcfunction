@@ -24,6 +24,7 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgi
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_23
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_24
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_25
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_26
 execute if score #done map_state matches 0 run gamemode adventure @a
 execute if score #done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run titleraw @p title {"rawtext":[{"text":"Welcome, candidate"}]}
 execute if score #done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run titleraw @p subtitle {"rawtext":[{"text":"Cross the Parapet"}]}

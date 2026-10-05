@@ -37,6 +37,9 @@ LODESTONE = (50, -1, 130)
 MAX_SAFE_FLOOR_Y = 9
 
 NON_SOLID = {"air", "lantern", "stone_pressure_plate", "bell"}
+# A ladder is solid but climbable. It does not block the body and it carries a
+# climb up, so the walk check passes through it instead of treating it as a wall.
+CLIMBABLE = {"ladder"}
 # Phone sim distance 4 reaches about 64 blocks, less from the far edge of a
 # chunk. build_map.py uses the same box to split the stage pass from the retry.
 LOADED = 48
@@ -86,6 +89,11 @@ def _box(line: str) -> tuple[int, int, int, int] | None:
         x0, z0 = rel_coord(parts[1]), rel_coord(parts[3])
         x1, z1 = rel_coord(parts[4]), rel_coord(parts[6])
         return (min(x0, x1), min(z0, z1), max(x0, x1), max(z0, z1))
+    if parts[0] == "summon" and len(parts) >= 5:
+        # The name tag is quoted and may hold spaces, so the coordinates are
+        # the last three tokens, not fixed positions.
+        x, z = rel_coord(parts[-3]), rel_coord(parts[-1])
+        return (x, z, x, z)
     return None
 
 
@@ -98,18 +106,59 @@ def is_far(line: str) -> bool:
     return x0 < -LOADED or z0 < -LOADED or x1 > LOADED or z1 > LOADED
 
 
+def _summon_tag(line: str) -> tuple[str, str] | None:
+    """The (entity type, name tag) of a named summon, else None."""
+    parts = line.split(None, 2)
+    if len(parts) < 3 or parts[0] != "summon":
+        return None
+    rest = parts[2]
+    if not rest.startswith('"'):
+        return None
+    end = rest.find('"', 1)
+    if end < 0:
+        return None
+    return parts[1], rest[1:end]
+
+
+def retry_form(line: str) -> str:
+    """The retry form of a far command.
+
+    A fill can run twice safely. A summon cannot: the stage pass may already
+    have spawned the entity, so the retry guards it with ``unless entity``.
+    """
+    tag = _summon_tag(line)
+    if tag is None:
+        return line
+    entity_type, name = tag
+    return f'execute unless entity @e[type={entity_type},name="{name}"] run {line}'
+
+
+def assert_far_retry(stage: list[str], retry: list[str]) -> None:
+    """Every far stage command must appear in the retry.
+
+    The old check compared the retry against the same ``is_far`` filter that
+    built it, so a command class the parser could not see was invisible to
+    both sides. This compares the emitted retry against the far stage commands
+    in their exact retry form, so a dropped spawn fails the bench.
+    """
+    expected = sorted(retry_form(line) for line in stage if is_far(line))
+    if expected != sorted(retry):
+        missing = [line for line in expected if line not in retry]
+        extra = [line for line in retry if line not in expected]
+        detail = missing[0] if missing else extra[0]
+        fail(f"the far retry does not match the far stage pass: {detail}")
+
+
 def phone_lines() -> list[str]:
     """What the phone runs: the loaded stage pass, then the far retry.
 
     A stage command outside the loaded box is dropped by the phone, so the
     retry is the only place it lands. The retry must therefore carry every far
-    command, air fills included.
+    command, air fills included and summons guarded.
     """
     stages = stage_lines()
     retry = far_lines()
-    covered = [line for line in stages if is_far(line)]
-    if sorted(covered) != sorted(retry):
-        fail("the far retry does not match the far commands in the stage pass")
+    assert_far_retry(stages, retry)
     return [line for line in stages if not is_far(line)] + retry
 
 
@@ -183,7 +232,7 @@ def _can_stand(blocks: dict[tuple[int, int, int], str], x: int, y: int, z: int) 
         return False
     for dy in (0, 1):
         body = blocks.get((x, y + dy, z))
-        if body is not None and body not in NON_SOLID:
+        if body is not None and body not in NON_SOLID and body not in CLIMBABLE:
             return False
     return True
 
@@ -302,8 +351,26 @@ def prove(lines: list[str]) -> None:
     )
 
 
+def prove_guard(stage: list[str], retry: list[str]) -> None:
+    """Prove the retry check rejects a dropped far summon.
+
+    A dropped fill is caught by the Parapet proofs. The entity contract needs
+    its own mutation, because it was the class the old checker could not see.
+    """
+    guarded = [line for line in retry if "run summon" in line]
+    if not guarded:
+        fail("no guarded far summon to prove the retry check")
+    try:
+        assert_far_retry(stage, [line for line in retry if line != guarded[0]])
+    except SystemExit:
+        print("proof ok: a summon was dropped from the far retry")
+        return
+    fail("the checker stayed green after a summon was dropped from the far retry")
+
+
 def main() -> None:
     lines = phone_lines()
+    prove_guard(stage_lines(), far_lines())
     blocks = solid_blocks(lines)
     assert_parapet(blocks)
     assert_walk(blocks)

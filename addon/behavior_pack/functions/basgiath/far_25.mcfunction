@@ -1,3 +1,41 @@
+fill ~55 ~3 ~139 ~57 ~3 ~139 oak_leaves
+fill ~56 ~3 ~138 ~56 ~3 ~140 oak_leaves
+setblock ~17 ~-1 ~114 short_grass
+setblock ~18 ~-1 ~119 azure_bluet
+setblock ~19 ~-1 ~95 poppy
+setblock ~19 ~-1 ~124 dandelion
+setblock ~20 ~-1 ~100 short_grass
+setblock ~20 ~-1 ~129 lily_of_the_valley
+setblock ~21 ~-1 ~105 oxeye_daisy
+setblock ~21 ~-1 ~134 cornflower
+setblock ~22 ~-1 ~110 short_grass
+setblock ~22 ~-1 ~139 short_grass
+setblock ~23 ~-1 ~115 allium
+setblock ~24 ~-1 ~120 poppy
+setblock ~25 ~-1 ~96 short_grass
+setblock ~25 ~-1 ~125 short_grass
+setblock ~26 ~-1 ~101 azure_bluet
+setblock ~26 ~-1 ~130 oxeye_daisy
+setblock ~27 ~-1 ~106 dandelion
+setblock ~27 ~-1 ~135 short_grass
+setblock ~28 ~-1 ~111 lily_of_the_valley
+setblock ~29 ~-1 ~116 cornflower
+setblock ~30 ~-1 ~121 short_grass
+setblock ~31 ~-1 ~97 allium
+setblock ~31 ~-1 ~126 azure_bluet
+setblock ~32 ~-1 ~102 poppy
+setblock ~32 ~-1 ~131 dandelion
+setblock ~33 ~-1 ~107 short_grass
+setblock ~33 ~-1 ~136 lily_of_the_valley
+setblock ~34 ~-1 ~112 oxeye_daisy
+setblock ~37 ~-1 ~98 cornflower
+setblock ~38 ~-1 ~103 short_grass
+setblock ~38 ~-1 ~132 short_grass
+setblock ~39 ~-1 ~108 azure_bluet
+setblock ~39 ~-1 ~137 oxeye_daisy
+setblock ~43 ~-1 ~99 short_grass
+setblock ~43 ~-1 ~128 short_grass
+setblock ~44 ~-1 ~104 allium
 setblock ~44 ~-1 ~133 azure_bluet
 setblock ~45 ~-1 ~138 dandelion
 setblock ~48 ~-1 ~95 dandelion
@@ -10,31 +48,3 @@ setblock ~55 ~-1 ~130 cornflower
 setblock ~56 ~-1 ~106 short_grass
 setblock ~56 ~-1 ~135 short_grass
 setblock ~57 ~-1 ~111 allium
-setblock ~58 ~-1 ~116 poppy
-setblock ~59 ~-1 ~121 short_grass
-setblock ~60 ~-1 ~97 azure_bluet
-setblock ~60 ~-1 ~126 oxeye_daisy
-setblock ~61 ~-1 ~102 dandelion
-setblock ~61 ~-1 ~131 short_grass
-setblock ~62 ~-1 ~107 lily_of_the_valley
-setblock ~62 ~-1 ~136 allium
-setblock ~63 ~-1 ~112 cornflower
-setblock ~64 ~-1 ~117 short_grass
-setblock ~65 ~-1 ~122 azure_bluet
-setblock ~66 ~-1 ~98 poppy
-setblock ~66 ~-1 ~127 dandelion
-setblock ~67 ~-1 ~103 short_grass
-setblock ~67 ~-1 ~132 lily_of_the_valley
-setblock ~68 ~-1 ~108 oxeye_daisy
-setblock ~68 ~-1 ~137 cornflower
-setblock ~69 ~-1 ~113 short_grass
-setblock ~50 ~-2 ~124 stone_bricks
-setblock ~50 ~-1 ~130 lodestone
-setblock ~50 ~ ~130 air
-fill ~90 ~-1 ~18 ~96 ~-1 ~22 stone_bricks
-fill ~92 ~-1 ~23 ~95 ~-1 ~48 stone_bricks
-fill ~92 ~-1 ~49 ~95 ~-1 ~79 stone_bricks
-fill ~71 ~-1 ~116 ~98 ~-1 ~120 stone_bricks
-setblock ~86 ~33 ~20 stone_pressure_plate
-setblock ~128 ~ ~46 stone_pressure_plate
-setblock ~43 ~-1 ~115 stone_pressure_plate

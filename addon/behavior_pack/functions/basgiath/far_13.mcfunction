@@ -1,4 +1,40 @@
 setblock ~128 ~1 ~34 lectern
+execute unless entity @e[type=armor_stand,name="wing1_flame_squad1"] run summon armor_stand "wing1_flame_squad1" ~124 ~1 ~36
+execute unless entity @e[type=armor_stand,name="wing1_flame_squad2"] run summon armor_stand "wing1_flame_squad2" ~125 ~1 ~36
+execute unless entity @e[type=armor_stand,name="wing1_flame_squad3"] run summon armor_stand "wing1_flame_squad3" ~126 ~1 ~36
+execute unless entity @e[type=armor_stand,name="wing1_claw_squad1"] run summon armor_stand "wing1_claw_squad1" ~127 ~1 ~36
+execute unless entity @e[type=armor_stand,name="wing1_claw_squad2"] run summon armor_stand "wing1_claw_squad2" ~128 ~1 ~36
+execute unless entity @e[type=armor_stand,name="wing1_claw_squad3"] run summon armor_stand "wing1_claw_squad3" ~129 ~1 ~36
+execute unless entity @e[type=armor_stand,name="wing1_tail_squad1"] run summon armor_stand "wing1_tail_squad1" ~130 ~1 ~36
+execute unless entity @e[type=armor_stand,name="wing1_tail_squad2"] run summon armor_stand "wing1_tail_squad2" ~131 ~1 ~36
+execute unless entity @e[type=armor_stand,name="wing1_tail_squad3"] run summon armor_stand "wing1_tail_squad3" ~132 ~1 ~36
+execute unless entity @e[type=armor_stand,name="wing2_flame_squad1"] run summon armor_stand "wing2_flame_squad1" ~124 ~1 ~38
+execute unless entity @e[type=armor_stand,name="wing2_flame_squad2"] run summon armor_stand "wing2_flame_squad2" ~125 ~1 ~38
+execute unless entity @e[type=armor_stand,name="wing2_flame_squad3"] run summon armor_stand "wing2_flame_squad3" ~126 ~1 ~38
+execute unless entity @e[type=armor_stand,name="wing2_claw_squad1"] run summon armor_stand "wing2_claw_squad1" ~127 ~1 ~38
+execute unless entity @e[type=armor_stand,name="wing2_claw_squad2"] run summon armor_stand "wing2_claw_squad2" ~128 ~1 ~38
+execute unless entity @e[type=armor_stand,name="wing2_claw_squad3"] run summon armor_stand "wing2_claw_squad3" ~129 ~1 ~38
+execute unless entity @e[type=armor_stand,name="wing2_tail_squad1"] run summon armor_stand "wing2_tail_squad1" ~130 ~1 ~38
+execute unless entity @e[type=armor_stand,name="wing2_tail_squad2"] run summon armor_stand "wing2_tail_squad2" ~131 ~1 ~38
+execute unless entity @e[type=armor_stand,name="wing2_tail_squad3"] run summon armor_stand "wing2_tail_squad3" ~132 ~1 ~38
+execute unless entity @e[type=armor_stand,name="wing3_flame_squad1"] run summon armor_stand "wing3_flame_squad1" ~124 ~1 ~40
+execute unless entity @e[type=armor_stand,name="wing3_flame_squad2"] run summon armor_stand "wing3_flame_squad2" ~125 ~1 ~40
+execute unless entity @e[type=armor_stand,name="wing3_flame_squad3"] run summon armor_stand "wing3_flame_squad3" ~126 ~1 ~40
+execute unless entity @e[type=armor_stand,name="wing3_claw_squad1"] run summon armor_stand "wing3_claw_squad1" ~127 ~1 ~40
+execute unless entity @e[type=armor_stand,name="wing3_claw_squad2"] run summon armor_stand "wing3_claw_squad2" ~128 ~1 ~40
+execute unless entity @e[type=armor_stand,name="wing3_claw_squad3"] run summon armor_stand "wing3_claw_squad3" ~129 ~1 ~40
+execute unless entity @e[type=armor_stand,name="wing3_tail_squad1"] run summon armor_stand "wing3_tail_squad1" ~130 ~1 ~40
+execute unless entity @e[type=armor_stand,name="wing3_tail_squad2"] run summon armor_stand "wing3_tail_squad2" ~131 ~1 ~40
+execute unless entity @e[type=armor_stand,name="wing3_tail_squad3"] run summon armor_stand "wing3_tail_squad3" ~132 ~1 ~40
+execute unless entity @e[type=armor_stand,name="wing4_flame_squad1"] run summon armor_stand "wing4_flame_squad1" ~124 ~1 ~42
+execute unless entity @e[type=armor_stand,name="wing4_flame_squad2"] run summon armor_stand "wing4_flame_squad2" ~125 ~1 ~42
+execute unless entity @e[type=armor_stand,name="wing4_flame_squad3"] run summon armor_stand "wing4_flame_squad3" ~126 ~1 ~42
+execute unless entity @e[type=armor_stand,name="wing4_claw_squad1"] run summon armor_stand "wing4_claw_squad1" ~127 ~1 ~42
+execute unless entity @e[type=armor_stand,name="wing4_claw_squad2"] run summon armor_stand "wing4_claw_squad2" ~128 ~1 ~42
+execute unless entity @e[type=armor_stand,name="wing4_claw_squad3"] run summon armor_stand "wing4_claw_squad3" ~129 ~1 ~42
+execute unless entity @e[type=armor_stand,name="wing4_tail_squad1"] run summon armor_stand "wing4_tail_squad1" ~130 ~1 ~42
+execute unless entity @e[type=armor_stand,name="wing4_tail_squad2"] run summon armor_stand "wing4_tail_squad2" ~131 ~1 ~42
+execute unless entity @e[type=armor_stand,name="wing4_tail_squad3"] run summon armor_stand "wing4_tail_squad3" ~132 ~1 ~42
 fill ~96 ~-1 ~80 ~145 ~-1 ~122 stone_bricks
 fill ~100 ~-1 ~88 ~120 ~7 ~108 stone_bricks
 fill ~101 ~ ~89 ~119 ~6 ~107 air
@@ -12,39 +48,3 @@ fill ~118 ~-1 ~97 ~120 ~-1 ~99 smooth_stone
 fill ~118 ~ ~97 ~120 ~1 ~99 air
 fill ~107 ~-1 ~109 ~113 ~-1 ~112 smooth_stone
 fill ~107 ~ ~109 ~113 ~3 ~112 air
-fill ~101 ~2 ~89 ~119 ~2 ~107 polished_andesite
-fill ~109 ~2 ~97 ~111 ~2 ~99 air
-fill ~101 ~5 ~89 ~119 ~5 ~107 polished_andesite
-fill ~109 ~5 ~97 ~111 ~5 ~99 air
-fill ~109 ~-1 ~97 ~111 ~-1 ~99 polished_andesite
-setblock ~110 ~ ~102 lantern
-setblock ~105 ~ ~98 lantern
-setblock ~115 ~ ~98 lantern
-setblock ~101 ~7 ~98 glass
-setblock ~102 ~7 ~94 glass
-setblock ~102 ~7 ~95 glass
-setblock ~102 ~7 ~96 glass
-setblock ~102 ~7 ~97 glass
-setblock ~102 ~7 ~99 glass
-setblock ~102 ~7 ~100 glass
-setblock ~102 ~7 ~101 glass
-setblock ~102 ~7 ~102 glass
-setblock ~103 ~7 ~93 glass
-setblock ~103 ~7 ~103 glass
-setblock ~104 ~7 ~92 glass
-setblock ~104 ~7 ~104 glass
-setblock ~105 ~7 ~91 glass
-setblock ~105 ~7 ~105 glass
-setblock ~106 ~7 ~90 glass
-setblock ~106 ~7 ~106 glass
-setblock ~107 ~7 ~90 glass
-setblock ~107 ~7 ~106 glass
-setblock ~108 ~7 ~90 glass
-setblock ~108 ~7 ~106 glass
-setblock ~109 ~7 ~90 glass
-setblock ~109 ~7 ~106 glass
-setblock ~110 ~7 ~89 glass
-setblock ~110 ~7 ~107 glass
-setblock ~111 ~7 ~90 glass
-setblock ~111 ~7 ~106 glass
-setblock ~112 ~7 ~90 glass

@@ -187,8 +187,9 @@ def _keep(ctx) -> None:
     ctx.setblock(x1 - 2, 2, z1 - 2, "lantern")
 
     # One armor stand. The name is an original line about a rider and a dragon.
+    # It carries no comma: a comma inside a quoted selector name is not safe.
     ctx.add(
-        'summon armor_stand "A rider kneels, and the dragon decides." '
+        'summon armor_stand "A rider kneels and the dragon decides." '
         f"{x0 + 4} 0 {(z0 + z1) // 2}"
     )
 

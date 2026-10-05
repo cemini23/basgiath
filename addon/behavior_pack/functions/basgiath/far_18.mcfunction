@@ -1,3 +1,40 @@
+setblock ~135 ~-1 ~92 red_wool
+setblock ~137 ~-1 ~92 red_wool
+setblock ~127 ~2 ~87 lantern
+fill ~142 ~-1 ~87 ~144 ~4 ~93 stone_bricks
+fill ~143 ~ ~88 ~143 ~3 ~92 air
+fill ~142 ~-1 ~90 ~142 ~1 ~90 air
+setblock ~143 ~-1 ~88 red_wool
+setblock ~143 ~ ~92 lantern
+fill ~102 ~-1 ~112 ~122 ~5 ~120 stone_bricks
+fill ~103 ~ ~113 ~121 ~4 ~119 air
+fill ~103 ~-1 ~113 ~121 ~-1 ~119 polished_andesite
+fill ~102 ~-1 ~116 ~102 ~1 ~117 air
+setblock ~102 ~2 ~116 stone_brick_stairs
+setblock ~102 ~2 ~117 stone_brick_stairs
+setblock ~106 ~1 ~115 lectern [facing_direction=2]
+setblock ~110 ~1 ~115 lectern [facing_direction=2]
+setblock ~114 ~1 ~115 lectern [facing_direction=2]
+setblock ~108 ~1 ~118 lectern [facing_direction=3]
+setblock ~112 ~1 ~118 lectern [facing_direction=3]
+setblock ~106 ~1 ~118 lectern [facing_direction=4]
+setblock ~116 ~1 ~118 lectern [facing_direction=4]
+setblock ~118 ~1 ~117 lectern [facing_direction=1]
+setblock ~118 ~2 ~114 lantern
+setblock ~104 ~2 ~118 lantern
+fill ~146 ~ ~80 ~168 ~ ~81 stone
+fill ~146 ~ ~82 ~168 ~1 ~84 stone
+fill ~146 ~ ~85 ~168 ~5 ~88 stone
+fill ~146 ~ ~89 ~168 ~9 ~92 stone
+fill ~146 ~ ~93 ~168 ~13 ~96 stone
+fill ~146 ~ ~97 ~168 ~17 ~100 stone
+fill ~146 ~ ~101 ~168 ~21 ~104 stone
+fill ~146 ~ ~105 ~168 ~25 ~140 stone
+fill ~146 ~1 ~82 ~168 ~1 ~82 cobblestone
+fill ~146 ~2 ~85 ~168 ~5 ~85 cobblestone
+fill ~146 ~6 ~89 ~168 ~9 ~89 cobblestone
+fill ~146 ~10 ~93 ~168 ~13 ~93 cobblestone
+fill ~146 ~14 ~97 ~168 ~17 ~97 cobblestone
 fill ~146 ~18 ~101 ~168 ~21 ~101 cobblestone
 fill ~146 ~22 ~105 ~168 ~25 ~105 cobblestone
 fill ~147 ~1 ~82 ~166 ~1 ~84 stone_bricks
@@ -11,40 +48,3 @@ fill ~146 ~ ~80 ~168 ~ ~81 stone_bricks
 fill ~146 ~25 ~105 ~150 ~25 ~140 stone_bricks
 fill ~161 ~2 ~82 ~161 ~2 ~84 stone_bricks
 fill ~162 ~2 ~82 ~162 ~3 ~84 stone_bricks
-fill ~163 ~2 ~82 ~163 ~4 ~84 stone_bricks
-fill ~164 ~2 ~82 ~164 ~5 ~84 stone_bricks
-fill ~151 ~6 ~85 ~151 ~6 ~88 stone_bricks
-fill ~150 ~6 ~85 ~150 ~7 ~88 stone_bricks
-fill ~149 ~6 ~85 ~149 ~8 ~88 stone_bricks
-fill ~148 ~6 ~85 ~148 ~9 ~88 stone_bricks
-fill ~161 ~10 ~89 ~161 ~10 ~92 stone_bricks
-fill ~162 ~10 ~89 ~162 ~11 ~92 stone_bricks
-fill ~163 ~10 ~89 ~163 ~12 ~92 stone_bricks
-fill ~164 ~10 ~89 ~164 ~13 ~92 stone_bricks
-fill ~151 ~14 ~93 ~151 ~14 ~96 stone_bricks
-fill ~150 ~14 ~93 ~150 ~15 ~96 stone_bricks
-fill ~149 ~14 ~93 ~149 ~16 ~96 stone_bricks
-fill ~148 ~14 ~93 ~148 ~17 ~96 stone_bricks
-fill ~152 ~2 ~82 ~152 ~2 ~84 oak_wood
-fill ~159 ~6 ~85 ~159 ~6 ~88 granite
-fill ~157 ~6 ~85 ~157 ~7 ~88 granite
-fill ~155 ~6 ~85 ~155 ~8 ~88 granite
-fill ~153 ~6 ~85 ~153 ~9 ~88 granite
-fill ~157 ~10 ~89 ~157 ~10 ~92 stone_bricks
-fill ~157 ~14 ~89 ~157 ~14 ~92 stone_bricks
-fill ~157 ~11 ~89 ~157 ~13 ~89 stone_bricks
-fill ~157 ~11 ~92 ~157 ~13 ~92 stone_bricks
-setblock ~157 ~14 ~91 air
-fill ~160 ~14 ~93 ~161 ~14 ~96 cobblestone
-fill ~157 ~14 ~93 ~158 ~15 ~96 cobblestone
-fill ~154 ~14 ~93 ~155 ~14 ~96 cobblestone
-setblock ~162 ~14 ~94 cobblestone
-setblock ~152 ~14 ~95 cobblestone
-fill ~161 ~18 ~97 ~164 ~21 ~100 stone_bricks
-fill ~162 ~18 ~98 ~162 ~21 ~98 air
-fill ~161 ~18 ~98 ~161 ~19 ~98 air
-setblock ~162 ~18 ~98 ladder
-setblock ~162 ~19 ~98 ladder
-setblock ~162 ~20 ~98 ladder
-setblock ~162 ~21 ~98 ladder
-fill ~151 ~22 ~101 ~151 ~22 ~104 oak_stairs

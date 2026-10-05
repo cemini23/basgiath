@@ -1,3 +1,40 @@
+fill ~163 ~2 ~82 ~163 ~4 ~84 stone_bricks
+fill ~164 ~2 ~82 ~164 ~5 ~84 stone_bricks
+fill ~151 ~6 ~85 ~151 ~6 ~88 stone_bricks
+fill ~150 ~6 ~85 ~150 ~7 ~88 stone_bricks
+fill ~149 ~6 ~85 ~149 ~8 ~88 stone_bricks
+fill ~148 ~6 ~85 ~148 ~9 ~88 stone_bricks
+fill ~161 ~10 ~89 ~161 ~10 ~92 stone_bricks
+fill ~162 ~10 ~89 ~162 ~11 ~92 stone_bricks
+fill ~163 ~10 ~89 ~163 ~12 ~92 stone_bricks
+fill ~164 ~10 ~89 ~164 ~13 ~92 stone_bricks
+fill ~151 ~14 ~93 ~151 ~14 ~96 stone_bricks
+fill ~150 ~14 ~93 ~150 ~15 ~96 stone_bricks
+fill ~149 ~14 ~93 ~149 ~16 ~96 stone_bricks
+fill ~148 ~14 ~93 ~148 ~17 ~96 stone_bricks
+fill ~152 ~2 ~82 ~152 ~2 ~84 oak_wood
+fill ~159 ~6 ~85 ~159 ~6 ~88 granite
+fill ~157 ~6 ~85 ~157 ~7 ~88 granite
+fill ~155 ~6 ~85 ~155 ~8 ~88 granite
+fill ~153 ~6 ~85 ~153 ~9 ~88 granite
+fill ~157 ~10 ~89 ~157 ~10 ~92 stone_bricks
+fill ~157 ~14 ~89 ~157 ~14 ~92 stone_bricks
+fill ~157 ~11 ~89 ~157 ~13 ~89 stone_bricks
+fill ~157 ~11 ~92 ~157 ~13 ~92 stone_bricks
+setblock ~157 ~14 ~91 air
+fill ~160 ~14 ~93 ~161 ~14 ~96 cobblestone
+fill ~157 ~14 ~93 ~158 ~15 ~96 cobblestone
+fill ~154 ~14 ~93 ~155 ~14 ~96 cobblestone
+setblock ~162 ~14 ~94 cobblestone
+setblock ~152 ~14 ~95 cobblestone
+fill ~161 ~18 ~97 ~164 ~21 ~100 stone_bricks
+fill ~162 ~18 ~98 ~162 ~21 ~98 air
+fill ~161 ~18 ~98 ~161 ~19 ~98 air
+setblock ~162 ~18 ~98 ladder
+setblock ~162 ~19 ~98 ladder
+setblock ~162 ~20 ~98 ladder
+setblock ~162 ~21 ~98 ladder
+fill ~151 ~22 ~101 ~151 ~22 ~104 oak_stairs
 fill ~150 ~22 ~101 ~150 ~22 ~104 oak_planks
 fill ~150 ~23 ~101 ~150 ~23 ~104 oak_stairs
 fill ~149 ~22 ~101 ~149 ~23 ~104 oak_planks
@@ -11,40 +48,3 @@ fill ~148 ~4 ~84 ~148 ~8 ~84 chain
 fill ~154 ~4 ~84 ~154 ~8 ~84 chain
 fill ~160 ~4 ~84 ~160 ~8 ~84 chain
 fill ~148 ~8 ~88 ~148 ~12 ~88 chain
-fill ~154 ~8 ~88 ~154 ~12 ~88 chain
-fill ~160 ~8 ~88 ~160 ~12 ~88 chain
-fill ~148 ~12 ~92 ~148 ~16 ~92 chain
-fill ~154 ~12 ~92 ~154 ~16 ~92 chain
-fill ~160 ~12 ~92 ~160 ~16 ~92 chain
-fill ~148 ~16 ~96 ~148 ~20 ~96 chain
-fill ~154 ~16 ~96 ~154 ~20 ~96 chain
-fill ~160 ~16 ~96 ~160 ~20 ~96 chain
-fill ~148 ~20 ~100 ~148 ~24 ~100 chain
-fill ~154 ~20 ~100 ~154 ~24 ~100 chain
-fill ~160 ~20 ~100 ~160 ~24 ~100 chain
-fill ~146 ~26 ~140 ~168 ~26 ~140 stone_bricks
-fill ~168 ~26 ~105 ~168 ~26 ~140 stone_bricks
-fill ~163 ~26 ~108 ~167 ~30 ~112 stone_bricks
-fill ~164 ~27 ~109 ~166 ~29 ~111 air
-setblock ~163 ~27 ~110 air
-setblock ~163 ~28 ~110 air
-setblock ~165 ~31 ~110 lantern
-fill ~100 ~-1 ~124 ~101 ~31 ~148 stone
-fill ~144 ~-1 ~124 ~145 ~31 ~148 stone
-fill ~100 ~-1 ~147 ~145 ~31 ~148 stone
-fill ~100 ~32 ~124 ~101 ~32 ~148 stone_bricks
-fill ~144 ~32 ~124 ~145 ~32 ~148 stone_bricks
-fill ~100 ~32 ~147 ~145 ~32 ~147 stone_bricks
-fill ~101 ~-1 ~124 ~101 ~ ~148 stone_bricks
-fill ~144 ~-1 ~124 ~144 ~ ~148 stone_bricks
-fill ~100 ~-1 ~147 ~145 ~ ~147 stone_bricks
-fill ~117 ~-1 ~124 ~119 ~3 ~126 stone_bricks
-fill ~118 ~ ~125 ~118 ~2 ~125 air
-fill ~125 ~-1 ~124 ~127 ~3 ~126 stone_bricks
-fill ~126 ~ ~125 ~126 ~2 ~125 air
-fill ~117 ~4 ~124 ~127 ~4 ~126 stone_bricks
-fill ~118 ~-1 ~124 ~126 ~-1 ~124 stone_bricks
-fill ~121 ~-1 ~125 ~123 ~-1 ~144 dirt_path
-fill ~102 ~-1 ~126 ~102 ~3 ~144 stone_bricks
-fill ~103 ~-1 ~126 ~103 ~2 ~144 stone_bricks
-fill ~104 ~-1 ~126 ~104 ~1 ~144 stone_bricks

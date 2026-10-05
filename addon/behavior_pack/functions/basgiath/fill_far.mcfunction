@@ -23,3 +23,4 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgi
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_23
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_24
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_25
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_26

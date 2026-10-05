@@ -259,7 +259,40 @@ def _box(line: str) -> tuple[int, int, int, int] | None:
         x0, z0 = _rel(parts[1]), _rel(parts[3])
         x1, z1 = _rel(parts[4]), _rel(parts[6])
         return (min(x0, x1), min(z0, z1), max(x0, x1), max(z0, z1))
+    if parts[0] == "summon" and len(parts) >= 5:
+        # The name tag is quoted and may hold spaces, so the coordinates are
+        # the last three tokens, not fixed positions.
+        x = _rel(parts[-3])
+        z = _rel(parts[-1])
+        return (x, z, x, z)
     return None
+
+
+def _summon_tag(line: str) -> tuple[str, str] | None:
+    """The (entity type, name tag) of a named summon, else None."""
+    parts = line.split(None, 2)
+    if len(parts) < 3 or parts[0] != "summon":
+        return None
+    rest = parts[2]
+    if not rest.startswith('"'):
+        return None
+    end = rest.find('"', 1)
+    if end < 0:
+        return None
+    return parts[1], rest[1:end]
+
+
+def retry_line(line: str) -> str:
+    """The far retry form of one command.
+
+    A fill can run twice safely. A summon cannot: the stage pass may already
+    have spawned the entity, so the retry guards it with ``unless entity``.
+    """
+    tag = _summon_tag(line)
+    if tag is None:
+        return line
+    entity_type, name = tag
+    return f'execute unless entity @e[type={entity_type},name="{name}"] run {line}'
 
 
 def is_far(line: str) -> bool:
@@ -395,6 +428,10 @@ Do not run the old placeholder functions. They are gone. Coordinates live in `sc
 
 
 _NON_SOLID = {"air", "lantern", "stone_pressure_plate", "bell"}
+# A ladder is solid, not air, so it stays in solid_blocks. It is climbable:
+# it does not block the body and it carries a climb up, so the walk check
+# treats it as passable instead of a wall.
+_CLIMBABLE = {"ladder"}
 
 
 def _rel(token: str) -> int:
@@ -441,7 +478,7 @@ def _can_stand(blocks: dict[tuple[int, int, int], str], x: int, y: int, z: int) 
         return False
     for dy in (0, 1):
         body = blocks.get((x, y + dy, z))
-        if body is not None and body not in _NON_SOLID:
+        if body is not None and body not in _NON_SOLID and body not in _CLIMBABLE:
             return False
     return True
 
@@ -490,11 +527,17 @@ def assert_walk(lines: list[str]) -> None:
 def main() -> None:
     commands = geometry()
     assert_walk(commands)
-    far = [line for line in commands if is_far(line)]
+    far = [retry_line(line) for line in commands if is_far(line)]
     if not any(line.startswith("setblock ~91 ") for line in far):
         raise SystemExit("far retry missed the east stairs")
     if not any("lodestone" in line for line in far):
         raise SystemExit("far retry missed the lodestone")
+    far_summons = [line for line in far if "summon" in line]
+    if not far_summons:
+        raise SystemExit("far retry missed the summons")
+    for line in far_summons:
+        if not line.startswith("execute unless entity "):
+            raise SystemExit(f"far retry left a summon unguarded: {line}")
     if any(line.startswith("fill ~ ~-2 ~ ~170 ") for line in far):
         raise SystemExit("far pass still refills the whole ground plane")
     # A far chunk only sees the retry, so the retry must carry the air fills.
