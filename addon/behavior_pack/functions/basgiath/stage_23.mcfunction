@@ -16,7 +16,7 @@ setblock ~126 ~3 ~103 stone_bricks
 setblock ~126 ~3 ~106 stone_bricks
 setblock ~128 ~2 ~102 lantern
 setblock ~138 ~2 ~108 lantern
-summon armor_stand "A rider kneels and the dragon decides." 130 0 105
+summon armor_stand "A rider kneels and the dragon decides." ~130 ~ ~105
 fill ~126 ~-1 ~84 ~140 ~9 ~92 stone_bricks
 fill ~127 ~ ~85 ~139 ~8 ~91 air
 fill ~127 ~-1 ~85 ~139 ~-1 ~91 polished_andesite

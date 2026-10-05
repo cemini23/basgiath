@@ -79,7 +79,16 @@ def far_lines() -> list[str]:
 
 
 def _box(line: str) -> tuple[int, int, int, int] | None:
-    parts = line.split()
+    """The x/z box of a plain or execute-wrapped positional command, else None.
+
+    Three plain forms: ``setblock``, ``fill``, ``summon``. A wrapped command
+    such as ``execute as @e[…] run setblock ~200 ~1 ~200 stone`` names no box
+    until the leading ``execute … run `` is stripped, so the tail is parsed.
+    The last `` run `` wins. ``assert_far_retry`` still verifies the retry by
+    string comparison, so a form this parser cannot see cannot hide here.
+    """
+    head, _, tail = line.rpartition(" run ")
+    parts = (tail if head else line).split()
     if not parts:
         return None
     if parts[0] == "setblock" and len(parts) >= 4:
@@ -368,9 +377,29 @@ def prove_guard(stage: list[str], retry: list[str]) -> None:
     fail("the checker stayed green after a summon was dropped from the far retry")
 
 
+def prove_parser() -> None:
+    """Prove the parser classifies a synthetic wrapped positional command.
+
+    The wrapped form is the known edge: ``_box()`` returned None for it once,
+    so ``is_far()`` could not see the command. The fixture is a build anchor
+    near the origin whose wrapped setblock lands far outside the loaded box.
+    It fails if the parser regresses to the plain three forms only.
+    """
+    wrapped = (
+        'execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run '
+        "setblock ~200 ~1 ~200 stone"
+    )
+    if _box(wrapped) != (200, 200, 200, 200):
+        fail(f"the parser cannot see a wrapped positional command: {wrapped}")
+    if not is_far(wrapped):
+        fail(f"the parser did not classify a far wrapped command: {wrapped}")
+    print("proof ok: a wrapped positional command is classified as far")
+
+
 def main() -> None:
     lines = phone_lines()
     prove_guard(stage_lines(), far_lines())
+    prove_parser()
     blocks = solid_blocks(lines)
     assert_parapet(blocks)
     assert_walk(blocks)

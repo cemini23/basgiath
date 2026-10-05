@@ -1,0 +1,26 @@
+{
+  "models": [
+    {
+      "id": "meta-llama/llama-4-scout",
+      "name": "Meta: Llama 4 Scout",
+      "context_length": 1310720,
+      "family": "meta-llama",
+      "boost": 1
+    },
+    {
+      "id": "xiaomi/mimo-v2.5-pro",
+      "name": "Xiaomi: MiMo-V2.5-Pro",
+      "context_length": 1050000,
+      "family": "xiaomi",
+      "boost": 1
+    },
+    {
+      "id": "openai/gpt-5.6-luna-pro",
+      "name": "OpenAI: GPT-5.6 Luna Pro",
+      "context_length": 1050000,
+      "family": "openai",
+      "boost": 1
+    }
+  ],
+  "count": 3
+}

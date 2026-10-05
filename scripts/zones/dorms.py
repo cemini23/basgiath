@@ -188,9 +188,11 @@ def _keep(ctx) -> None:
 
     # One armor stand. The name is an original line about a rider and a dragon.
     # It carries no comma: a comma inside a quoted selector name is not safe.
+    # Zones do not import build_map, so the tildes are written here. Every
+    # stage function runs at the build_anchor, which is the player's feet.
     ctx.add(
         'summon armor_stand "A rider kneels and the dragon decides." '
-        f"{x0 + 4} 0 {(z0 + z1) // 2}"
+        f"~{x0 + 4} ~ ~{(z0 + z1) // 2}"
     )
 
 

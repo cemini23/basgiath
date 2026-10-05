@@ -250,7 +250,19 @@ def _segments(a0: int, a1: int, limit: int = LOADED) -> list[tuple[int, int]]:
 
 
 def _box(line: str) -> tuple[int, int, int, int] | None:
-    parts = line.split()
+    """The x/z box of a plain or execute-wrapped positional command, else None.
+
+    Three plain forms: ``setblock``, ``fill``, ``summon``. A wrapped command
+    such as ``execute as @e[…] run setblock ~200 ~1 ~200 stone`` names no box
+    until the leading ``execute … run `` is stripped, so the tail is parsed.
+    The last `` run `` wins, because a selector may carry its own run.
+    A form this parser cannot see is still safe: the retry pass is verified by
+    string comparison in ``bench_static.py``, not through this parser.
+    """
+    head, _, tail = line.rpartition(" run ")
+    parts = (tail if head else line).split()
+    if not parts:
+        return None
     if parts[0] == "setblock" and len(parts) >= 4:
         x = _rel(parts[1])
         z = _rel(parts[3])
