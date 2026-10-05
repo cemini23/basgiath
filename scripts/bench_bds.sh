@@ -219,7 +219,7 @@ echo "live pass ran clean: 3 calls, no command error" >&2
   probe LECTERN_ROLL 50 79 123 lectern
 } > "$WORK/probe-results.txt"
 
-python3 - "$LOG" "$RESULT" "$WORK/probe-results.txt" "$WORK/probe-deltas.txt" "$WORK/live-errors.real" <<'PY'
+python3 - "$LOG" "$RESULT" "$WORK/probe-results.txt" "$WORK/probe-deltas.txt" "$LIVE_ERRORS.real" <<'PY'
 import sys
 from pathlib import Path
 
@@ -227,7 +227,13 @@ log = Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
 result = Path(sys.argv[2])
 probes = Path(sys.argv[3]).read_text(encoding="utf-8", errors="replace").splitlines()
 deltas = Path(sys.argv[4]).read_text(encoding="utf-8", errors="replace").splitlines()
-live_errors = Path(sys.argv[5]).read_text(encoding="utf-8", errors="replace").splitlines()
+# A missing file means the shell guard did not run. Treat that as a failure
+# rather than crashing here: a traceback costs a whole bench run to diagnose.
+if not Path(sys.argv[5]).exists():
+    print(f"live error file missing: {sys.argv[5]}", file=sys.stderr)
+    live_errors = ["live error file missing"]
+else:
+    live_errors = Path(sys.argv[5]).read_text(encoding="utf-8", errors="replace").splitlines()
 pack_error = None
 for line in log.splitlines():
     text = line.lower()
