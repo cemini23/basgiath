@@ -85,6 +85,23 @@ def check_names() -> None:
             forbidden_in(path)
 
 
+def assert_lectern(blob: str, x: int, y: int, z: int, label: str) -> None:
+    """The last emitted block at a spot must be a bare lectern.
+
+    A tall grass patch or a tombstone laid over the lectern would still leave
+    the word in the blob, so this reads the final setblock at the exact cell.
+    """
+    last = None
+    prefix = f"setblock ~{x} ~{y} ~{z} "
+    for raw in blob.splitlines():
+        line = raw.strip()
+        if line.startswith(prefix):
+            last = line[len(prefix) :].split()[0]
+    if last != "lectern":
+        fail(f"{label} at ({x}, {y}, {z}) is {last!r}, not a lectern")
+    print(f"{label} lectern ok at ({x}, {y}, {z})")
+
+
 def check_map() -> None:
     functions = ROOT / "addon/behavior_pack/functions"
     tick = json.loads((functions / "tick.json").read_text())
@@ -93,6 +110,22 @@ def check_map() -> None:
     script = (ROOT / "addon/behavior_pack/scripts/main.js").read_text()
     if 'runCommand("function basgiath/tick")' not in script:
         fail("script does not run the map tick")
+    if "beforeEvents.playerInteractWithBlock" not in script:
+        fail("script does not subscribe to playerInteractWithBlock")
+    for needle in (
+        "dragon_rider:rider_name",
+        "dragon_rider:dragon_name",
+        'id: "scroll"',
+        'id: "roll"',
+        "ModalFormData",
+    ):
+        if needle not in script:
+            fail(f"script is missing the keeper marker {needle!r}")
+    # A player-typed name must never reach a command string. The only
+    # runCommand in the script is the fixed map tick.
+    commands = re.findall(r"runCommand\(\s*([^)]*)\)", script)
+    if commands != ['"function basgiath/tick"']:
+        fail(f"script runs a command that is not the fixed map tick: {commands}")
     folder = functions / "basgiath"
     build = (folder / "build.mcfunction").read_text()
     if 'titleraw @s title {"rawtext":[{"text":"Building"}]}' not in build:
@@ -171,6 +204,10 @@ def check_map() -> None:
             fail(f"map commands missing {needle}")
     if " water" in blob or blob.startswith("water"):
         fail("the span pit still contains water")
+    # The two keeper lecterns must stand in the emitted world: the Scroll-keeper
+    # at the roll desk in the Quad, the Roll-keeper one block north of the stand.
+    assert_lectern(blob, 128, 1, 34, "Scroll-keeper")
+    assert_lectern(blob, 50, -1, 123, "Roll-keeper")
     if 'tp @a[x=~18,y=~-40,z=~8' in live:
         fail("live function still rescues a fall from the span")
     air_volume = 0

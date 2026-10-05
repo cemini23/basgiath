@@ -21,6 +21,7 @@ setblock ~68 ~-1 ~137 cornflower
 setblock ~69 ~-1 ~113 short_grass
 setblock ~50 ~-2 ~124 stone_bricks
 summon armor_stand "Roll-keeper" ~50 ~-1 ~124
+setblock ~50 ~-1 ~123 lectern
 setblock ~50 ~-1 ~130 lodestone
 setblock ~50 ~ ~130 air
 fill ~90 ~-1 ~18 ~96 ~-1 ~22 stone_bricks

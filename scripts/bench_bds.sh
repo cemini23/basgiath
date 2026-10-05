@@ -179,6 +179,11 @@ fi
   probe GAP45 45 112 20 air
   probe GAP46 46 112 20 air
   probe COLUMN 20 100 20 air
+  # The two keeper lecterns. The anchor sits at (0, 80, 0), so a lectern at
+  # relative (128, 1, 34) is absolute (128, 81, 34) and relative (50, -1, 123)
+  # is absolute (50, 79, 123).
+  probe LECTERN_SCROLL 128 81 34 lectern
+  probe LECTERN_ROLL 50 79 123 lectern
 } > "$WORK/probe-results.txt"
 
 python3 - "$LOG" "$RESULT" "$WORK/probe-results.txt" "$WORK/probe-deltas.txt" <<'PY'
@@ -200,7 +205,7 @@ for line in probes:
     if "=" in line:
         key, value = line.split("=", 1)
         values[key] = value.strip()
-need_true = ("CTRL_STONE", "SPAN", "GAP45", "GAP46", "COLUMN")
+need_true = ("CTRL_STONE", "SPAN", "GAP45", "GAP46", "COLUMN", "LECTERN_SCROLL", "LECTERN_ROLL")
 lines = ["server_started=yes", f"pack_error={pack_error or 'none'}"]
 lines.extend(probes)
 ok = (not pack_error) and all(values.get(name) == "true" for name in need_true)

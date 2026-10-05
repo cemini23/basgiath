@@ -5,7 +5,9 @@ Stage range 49-60 is reserved. This module does not write stage files.
 The land is a shallow bowl: the floor sits at y=-2 so the dell reads one block
 below the college ground. Squat oaks ring the rim, wildflowers and short grass
 run across the slopes, and the middle stays open. A 3 by 3 moss pad sits at
-x=42..44, z=116..118. The Roll-keeper stands at x=50, y=-1, z=124.
+x=42..44, z=116..118. The Roll-keeper stands at x=50, y=-1, z=124, with the
+roll lectern at x=50, y=-1, z=123. The rider gives the dragon's full name at
+that lectern; the script writes it on the rider, never in a command.
 
 `live_lines()` holds the Threshing event. The integrator appends those lines to
 `basgiath/live.mcfunction`. They are not called from here.
@@ -119,10 +121,16 @@ def _ground_cover(ctx) -> None:
 
 
 def _keeper(ctx) -> None:
-    """The roll-keeper waits on a stone at the south edge of the open ground."""
+    """The roll-keeper waits on a stone at the south edge of the open ground.
+
+    One lectern stands one block north of the stand, on the open dell floor.
+    The keep of the roll is here: the rider gives the dragon's full name and it
+    is written on the rider alone. The armor stand does not move.
+    """
     kx, ky, kz = KEEPER
     ctx.setblock(kx, -2, kz, "stone_bricks")
     ctx.add(f'summon armor_stand "Roll-keeper" ~{kx} ~{ky} ~{kz}')
+    ctx.setblock(kx, ky, kz - 1, "lectern")
 
 
 def _say(text: str) -> str:
