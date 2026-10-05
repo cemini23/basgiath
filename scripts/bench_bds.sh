@@ -55,6 +55,11 @@ unzip -q bedrock-server.zip -d bds
 mkdir -p worlds/Basgiath
 unzip -qo "$WORLD" -d worlds/Basgiath
 
+# Derive the stage count from the extracted pack. A hard-coded count silently
+# stops short when a zone grows.
+STAGES="$(find worlds/Basgiath/behavior_pack/functions/basgiath -name 'stage_*.mcfunction' | wc -l | tr -d ' ')"
+if [ "$STAGES" -lt 1 ]; then echo "no stage functions in the world" >&2; exit 1; fi
+
 cat > bds/server.properties <<'EOF'
 server-name=Basgiath bench
 gamemode=adventure
@@ -141,7 +146,6 @@ probe() {
 # The college is not in the flat world. Summon the same anchor the player
 # function uses. tick.json may not run with zero players.
 send "tickingarea add circle 0 80 0 4 bench"
-send "setblock 0 79 0 stone"
 send "summon armor_stand \"build_anchor\" 0 80 0"
 send "effect @e[type=armor_stand,name=\"build_anchor\"] resistance 999999 255 true"
 send "scoreboard objectives add map_state dummy"
@@ -152,7 +156,7 @@ echo "tick path ${tick_line}" >&2
 
 if [ "$tick_line" != "TICK_SPAN=true" ]; then
   echo "tick path missed the span; calling stage functions" >&2
-  for n in $(seq -w 1 20); do
+  for n in $(seq -w 1 "$STAGES"); do
     send "execute as @e[type=armor_stand,name=\"build_anchor\",c=1] at @s run function basgiath/stage_${n}"
   done
   sleep 2
@@ -160,6 +164,9 @@ fi
 
 {
   echo "$tick_line"
+  # Set the control after the build. _ground() fills y=79 across the whole
+  # footprint, so a control placed before the build is overwritten.
+  send "setblock 0 79 0 stone"
   probe CTRL_STONE 0 79 0 stone
   probe CTRL_NOT_GOLD 0 79 0 gold_block
   probe SPAN 20 112 20 stone_bricks

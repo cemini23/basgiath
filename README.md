@@ -87,7 +87,14 @@ To use the packs in a flat world you already have, import `dist/basgiath.mcaddon
 
 ## How to build the files
 
-From the repo root:
+`package.sh` needs **Python Pillow** (the dragon texture) and the **`zip`** command (the pack bundle). Install them once:
+
+```
+python3 -m pip install Pillow      # or: apt-get install -y python3-pil
+apt-get install -y zip             # or: dnf install -y zip, brew install zip
+```
+
+Then, from the repo root:
 
 ```
 bash scripts/validate.sh
@@ -96,7 +103,7 @@ bash scripts/package.sh
 python3 scripts/test_release.py
 ```
 
-`package.sh` writes `dist/basgiath.mcaddon` and `dist/basgiath.mcworld`.
+`package.sh` writes `dist/basgiath.mcaddon` and `dist/basgiath.mcworld`. It checks for Pillow and `zip` first, and stops with a message naming the missing tool instead of a traceback.
 
 The GitHub repo is `basgiath`. Run the commands from the repo root. The folder name on your computer can be anything.
 
