@@ -56,8 +56,9 @@ mkdir -p worlds/Basgiath
 unzip -qo "$WORLD" -d worlds/Basgiath
 
 # Derive the stage count from the extracted pack. A hard-coded count silently
-# stops short when a zone grows.
-STAGES="$(find worlds/Basgiath/behavior_pack/functions/basgiath -name 'stage_*.mcfunction' | wc -l | tr -d ' ')"
+# stops short when a zone grows. A world holds its packs under behavior_packs/,
+# so match the tail of the path rather than pinning the whole layout.
+STAGES="$(find worlds -path '*/functions/basgiath/stage_*.mcfunction' | wc -l | tr -d ' ')"
 if [ "$STAGES" -lt 1 ]; then echo "no stage functions in the world" >&2; exit 1; fi
 
 cat > bds/server.properties <<'EOF'
