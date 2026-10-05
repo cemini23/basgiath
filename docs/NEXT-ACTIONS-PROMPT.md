@@ -75,6 +75,33 @@ These cut the manual JSON and Molang errors the current chain cannot catch:
 
 This is the real distributor, not the map. Follow `DISTRIBUTION.md` and `docs/LISTING.md`. Post the six clips in the listed order. Every download page and every clip carries the credit line from `docs/LISTING.md`. **Never** the Minecraft Marketplace.
 
+## Routing and audit — use these
+
+**Route the work to free models first. Do not burn a premium session on bulk edits.**
+
+This federation has a `/route` skill that sorts a task into **easy / mid / hard** and outsources it. Use it. The cheap chain is **OpenRouter free (chat) → OpenCode Zen free (tools) → claude-ds Flash (paid fallback)**.
+
+- **Free OpenCode models for easy and mid coding work.** `opencode` is installed. Run the **OpenCode Zen free** sidecar with the prompt in a file (never `$` interpolation in argv):
+  ```bash
+  cd /Users/claudiobarone/Projects/dragon-rider-map
+  opencode run --auto --dir "$PWD" --model free "$(cat /tmp/task.md)"
+  ```
+  `--model free` (or empty) = the **live strongest listed-free coding pick**; do not lock one id. `-f` / `--file` **attaches** files (pass the affected source files that way). The unified wrapper, which picks the lane and walks the fallback chain, is:
+  ```bash
+  route-task -Profile claudio "mid: <the task>"
+  ```
+- **Premium only for the plan and the audit.** For a hard task, write the plan in the premium session, then let Grok CLI / the cheap lanes implement. Hard-lane implement falls to **Flash, then OpenCode** when Grok usage is out.
+- **Never send secrets or protected IP text to a free OpenRouter or OpenCode model.** They may log or train. Keep keys out of every free-lane prompt.
+
+**Audit every large change set. This is required, not optional.**
+
+If a change touches **many files**, or any of the high-risk surfaces — the world generator (`scripts/zones/*`, `build_map.py`), the dragon geometry (`build_dragon_model.py`), the script (`main.js`), the world writer (`build_world.py`), or the pack manifests — run an **independent audit** before you call it done. The auditor must not be the writer.
+
+- **Default:** the `cursor-audit` / `super-audit` lane (V4.1 Flash).
+- **For a high-risk or hard-to-reverse change, audit on the strongest available model.** Use the session premium model (Opus / Sonnet 5.5), **or** a model reached with the API keys in the OSINT `.env` (`OPENROUTER_API_KEY`, `DEEPSEEK_API_KEY` at `/Users/claudiobarone/Projects/OSINT WORKSPACE/.env`). A cheap audit on a change that reshapes the map is false economy.
+- The audit checks the change against the task's **success criteria** and the constraints below — not style. Report findings, fix them, then re-run the gate chain.
+- **Never** route a change that would touch secrets or `.env` through a free lane.
+
 ## Hard constraints (never break)
 
 - **Platform:** Minecraft **Bedrock**, `@minecraft/server` **2.0.0** and `@minecraft/server-ui` **2.0.0**. Do not bump the versions. Do not enable Beta APIs.
