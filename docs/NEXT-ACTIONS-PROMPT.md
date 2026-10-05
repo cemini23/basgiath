@@ -102,6 +102,36 @@ If a change touches **many files**, or any of the high-risk surfaces — the wor
 - The audit checks the change against the task's **success criteria** and the constraints below — not style. Report findings, fix them, then re-run the gate chain.
 - **Never** route a change that would touch secrets or `.env` through a free lane.
 
+## Smoke test — run it on RunPod after any pack or world change
+
+`scripts/bench_bds.sh` boots the **official Bedrock dedicated server** and asks it about the built world. It observes the pack; it does not change the add-on. It is **Linux-only** — on macOS it exits 2 with "needs the Linux Bedrock server". Run it on a clean Linux pod.
+
+**When to run it:** any change to the pack manifests, the script (`main.js`), the world writer (`build_world.py`), the generators (`scripts/zones/*`, `build_map.py`), the dragon model (`build_dragon_model.py`), or `bench_bds.sh` itself. **A green `bench_static.py` is not a substitute** — it checks the shape of the code, not whether Bedrock accepts the packed add-on.
+
+**How:** use the **`runpod` MCP** (configured in `~/.cursor/mcp.json`; available in Cursor and Grok Build) to spin a clean x86_64 CPU container, then from the repo root:
+
+```bash
+bash scripts/package.sh
+bash scripts/bench_bds.sh
+```
+
+`bench_bds.sh` installs its own tooling (`unzip`, `curl`, `python3-pil`, `zip`). Then read `result.txt` and **require**:
+
+```
+server_started=yes
+pack_error=none
+blocks_ok=true
+BENCH_EXIT=0
+```
+
+- **`pack_error=none` is the line that matters** — the behavior pack loaded with no manifest, script, or command error.
+- **`TICK_SPAN=false` is expected on a pod.** There is no player, so the tick-driven build falls back to calling every stage function directly.
+- Expect log lines like `ERROR ... is out of range. / Execute subcommand unless block test failed.` A lectern probe outside the bench ticking area prints a warning then succeeds. **Do not read the warning as a failure.**
+
+**Cost and cleanup.** One CPU pod is enough — about 90 seconds at ~$0.14/hr. **Terminate the pod when the run ends** and confirm the pod list is empty. Do not leave a pod running.
+
+**A green pod run is the proof the add-on still ships.** It is the one check CI cannot do.
+
 ## Hard constraints (never break)
 
 - **Platform:** Minecraft **Bedrock**, `@minecraft/server` **2.0.0** and `@minecraft/server-ui` **2.0.0**. Do not bump the versions. Do not enable Beta APIs.
@@ -131,7 +161,7 @@ python3 scripts/test_release.py
 python3 scripts/bench_static.py
 ```
 
-`bench_bds.sh` cannot run on a Mac. It is verified on RunPod, not locally.
+These run locally. `bench_bds.sh` cannot run on a Mac — run it on a **RunPod pod** (see **Smoke test** above) whenever a change touches the pack, the script, the world writer, the generators, the dragon model, or the bench.
 
 ## Out of scope for this prompt
 
