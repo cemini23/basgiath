@@ -6,8 +6,8 @@ fill ~ ~-1 ~ ~48 ~-1 ~48 grass_block
 fill ~ ~-1 ~49 ~48 ~-1 ~150 grass_block
 fill ~49 ~-1 ~ ~170 ~-1 ~48 grass_block
 fill ~49 ~-1 ~49 ~170 ~-1 ~150 grass_block
-fill ~15 ~-1 ~12 ~48 ~-1 ~28 stone
-fill ~49 ~-1 ~12 ~77 ~-1 ~28 stone
+fill ~15 ~-1 ~12 ~48 ~1 ~28 stone_bricks
+fill ~49 ~-1 ~12 ~77 ~1 ~28 stone_bricks
 fill ~2 ~-1 ~12 ~14 ~32 ~28 stone_bricks
 fill ~3 ~ ~13 ~13 ~31 ~27 air
 setblock ~7 ~ ~61 sea_lantern

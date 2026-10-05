@@ -369,7 +369,7 @@ def welcome_lines() -> list[str]:
         once + 'titleraw @p title {"rawtext":[{"text":"Welcome, candidate"}]}',
         once + 'titleraw @p subtitle {"rawtext":[{"text":"Cross the Parapet"}]}',
         once
-        + 'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. The glowing stairs are in front of you. A fall from the span sends you back here. Touch the stone in the Quad. Then run /function basgiath/summon_dragon"}]}',
+        + 'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. The glowing stairs are in front of you. A fall from the span sends you back here. Cross the Parapet. The signet stone waits in the dell, after a dragon chooses you."}]}',
         once + f"tp @p ~{sx} ~{sy} ~{sz} 180 0",
         "scoreboard players set #done map_state 1",
     ]
@@ -420,8 +420,8 @@ def live_text() -> str:
     lines.extend(build_valley_live())
     return "\n".join(lines) + "\n"
 
-SUMMON = """execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run summon dragon_rider:dragon ~43 ~-1 ~117
-execute as @e[type=armor_stand,name="build_anchor",c=1] run tellraw @a {"rawtext":[{"text":"A dragon waits on the gold pad. Mount it and fly."}]}
+SUMMON = """execute unless entity @e[type=dragon_rider:dragon] as @e[type=armor_stand,name="build_anchor",c=1] at @s run summon dragon_rider:dragon ~43 ~-1 ~117
+execute as @e[type=armor_stand,name="build_anchor",c=1] run tellraw @a {"rawtext":[{"text":"A dragon waits on the moss pad. Mount it and fly."}]}
 execute unless entity @e[type=armor_stand,name="build_anchor"] run tellraw @s {"rawtext":[{"text":"Raise the college first. Run /function basgiath/build"}]}
 """
 
@@ -444,6 +444,10 @@ _NON_SOLID = {"air", "lantern", "stone_pressure_plate", "bell"}
 # it does not block the body and it carries a climb up, so the walk check
 # treats it as passable instead of a wall.
 _CLIMBABLE = {"ladder"}
+# Every command class that places blocks. A class this parser cannot read is a
+# blind spot in the walk and parapet checks, so it fails the build instead of
+# being skipped. A future ``clone`` or ``structure`` cannot slip through.
+_BLOCK_COMMANDS = {"setblock", "fill", "clone", "structure", "place"}
 
 
 def _rel(token: str) -> int:
@@ -458,9 +462,9 @@ def solid_blocks(lines: list[str]) -> dict[tuple[int, int, int], str]:
     blocks: dict[tuple[int, int, int], str] = {}
     for line in lines:
         parts = line.split()
-        if len(parts) < 5:
+        if not parts or parts[0] not in _BLOCK_COMMANDS:
             continue
-        if parts[0] == "setblock":
+        if parts[0] == "setblock" and len(parts) >= 5:
             x, y, z = _rel(parts[1]), _rel(parts[2]), _rel(parts[3])
             block = parts[4]
             cells = [(x, y, z)]
@@ -475,7 +479,7 @@ def solid_blocks(lines: list[str]) -> dict[tuple[int, int, int], str]:
                 for z in range(min(z0, z1), max(z0, z1) + 1)
             ]
         else:
-            continue
+            raise SystemExit(f"solid_blocks cannot read a positional command: {line}")
         for cell in cells:
             if block in _NON_SOLID:
                 blocks.pop(cell, None)
@@ -517,7 +521,12 @@ def _reachable(blocks: dict[tuple[int, int, int], str], start: tuple[int, int, i
 
 
 def assert_walk(lines: list[str]) -> None:
-    """Fail the build when the start cannot walk onto the span."""
+    """Fail the build when the start cannot walk onto the span.
+
+    The inverse is the new contract. The same ground the span crosses must be
+    unreachable at foot height (y <= 1), so a player cannot walk under the span
+    instead of across it.
+    """
     if DECK_Y + 1 < 24:
         raise SystemExit(f"span fall is {DECK_Y + 1} blocks, need at least 24")
     blocks = solid_blocks(lines)
@@ -528,6 +537,12 @@ def assert_walk(lines: list[str]) -> None:
         lambda x, y, z: y == DECK_Y + 1 and z == SPAN_Z and 15 <= x <= 44,
     ):
         raise SystemExit(f"no walk from {start} to the span")
+    if _reachable(
+        blocks,
+        start,
+        lambda x, y, z: y <= 1 and 15 <= x <= 77 and 12 <= z <= 28,
+    ):
+        raise SystemExit(f"a ground-level walk from {start} still crosses the chasm")
     if not _reachable(
         blocks,
         (84, DECK_Y + 1, SPAN_Z),

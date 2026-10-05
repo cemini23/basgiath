@@ -43,6 +43,10 @@ NON_SOLID = {"air", "lantern", "stone_pressure_plate", "bell"}
 # A ladder is solid but climbable. It does not block the body and it carries a
 # climb up, so the walk check passes through it instead of treating it as a wall.
 CLIMBABLE = {"ladder"}
+# Every command class that places blocks. A class this parser cannot read is a
+# blind spot in the walk and parapet checks, so it fails the bench instead of
+# being skipped.
+BLOCK_COMMANDS = {"setblock", "fill", "clone", "structure", "place"}
 # Phone sim distance 4 reaches about 64 blocks, less from the far edge of a
 # chunk. build_map.py uses the same box to split the stage pass from the retry.
 LOADED = 48
@@ -175,13 +179,20 @@ def phone_lines() -> list[str]:
 
 
 def solid_blocks(lines: list[str]) -> dict[tuple[int, int, int], str]:
-    """Replay setblock and fill. Later commands replace earlier ones."""
+    """Replay setblock and fill. Later commands replace earlier ones.
+
+    A block-placing command this parser cannot read would be invisible to the
+    walk and parapet checks, so it fails the bench loudly instead of being
+    skipped.
+    """
     blocks: dict[tuple[int, int, int], str] = {}
     for raw in lines:
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
         parts = line.split()
+        if parts[0] not in BLOCK_COMMANDS:
+            continue
         if parts[0] == "setblock" and len(parts) >= 5:
             cells = [(rel_coord(parts[1]), rel_coord(parts[2]), rel_coord(parts[3]))]
             block = parts[4]
@@ -196,7 +207,7 @@ def solid_blocks(lines: list[str]) -> dict[tuple[int, int, int], str]:
                 for z in range(min(z0, z1), max(z0, z1) + 1)
             ]
         else:
-            continue
+            fail(f"solid_blocks cannot read a positional command: {line}")
         for cell in cells:
             if block in NON_SOLID:
                 blocks.pop(cell, None)
@@ -275,6 +286,14 @@ def assert_walk(blocks: dict[tuple[int, int, int], str]) -> None:
         lambda x, y, z: y == DECK_Y + 1 and z == SPAN_Z and SPAN_X0 <= x <= 44,
     ):
         fail(f"no walk from {START} onto the Parapet")
+    # The inverse: the ground the span crosses must not be walkable at foot
+    # height, or a player walks under the span instead of across it.
+    if _reachable(
+        blocks,
+        START,
+        lambda x, y, z: y <= 1 and 15 <= x <= 77 and 12 <= z <= 28,
+    ):
+        fail("a ground-level walk from the start still crosses the chasm")
     if not _reachable(
         blocks,
         EAST_ROOF,
@@ -360,6 +379,10 @@ def prove(lines: list[str]) -> None:
     expect_fail(
         lines + ["fill ~30 ~20 ~20 ~40 ~20 ~20 stone"],
         "a safety floor was added under the span",
+    )
+    expect_fail(
+        lines + ["fill ~15 ~-1 ~12 ~77 ~1 ~28 air"],
+        "the chasm floor was carved back down to ground level",
     )
 
 
@@ -459,6 +482,7 @@ class FakePlayer {
   constructor(input, name) {
     this.input = input;
     this.name = name;
+    this.id = name;
     this.tags = new Set();
     this.props = new Map();
     this.log = [];
@@ -512,6 +536,10 @@ const world = {
 const system = {
   run: (fn) => { pending.push(fn); },
   runTimeout: (fn, ticks) => { timed.push({ fn, ticks }); return timed.length; },
+  clearRunTimeout: (handle) => {
+    const entry = timed[handle - 1];
+    if (entry) entry.cancelled = true;
+  },
   runInterval: () => 0,
   afterEvents: { scriptEventReceive: { subscribe: () => {} } },
 };
@@ -639,6 +667,22 @@ async function run() {
   const renamed = messages.filter((line) => line.includes("Roll call."));
   check(renamed.length === 1, `the rename produced ${renamed.length} roll-call lines, not 1`);
   check(renamed[0]?.includes("§fRider Two§7"), `the rename roll-call line is wrong: ${renamed[0]}`);
+
+  // Two quick writes inside the beat must leave one live callback. The second
+  // write cancels the first timeout instead of stacking a second read.
+  player.input = "Rider Three";
+  timed.length = 0;
+  await eventAt(scrollAt, player);
+  player.input = "Rider Four";
+  await eventAt(scrollAt, player);
+  const live = timed.filter((entry) => !entry.cancelled);
+  check(timed.length === 2, `two quick writes scheduled ${timed.length} timeouts, not 2`);
+  check(live.length === 1, `two quick writes left ${live.length} live callbacks, not 1`);
+  messages = [];
+  live[0]?.fn();
+  const finalCalls = messages.filter((line) => line.includes("Roll call."));
+  check(finalCalls.length === 1, `the surviving callback produced ${finalCalls.length} roll-call lines`);
+  check(finalCalls[0]?.includes("§fRider Four§7"), `the surviving roll-call line is wrong: ${finalCalls[0]}`);
 
   // No dynamic property, no call. The test bypass opens the path with no name.
   const stranger = new FakePlayer("", "stranger");

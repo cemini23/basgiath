@@ -28,6 +28,20 @@ FORBIDDEN = (
 FILL = re.compile(
     r"^fill (~?-?\d*) (~?-?\d*) (~?-?\d*) (~?-?\d*) (~?-?\d*) (~?-?\d*) \S+"
 )
+# Character and dragon names must not appear in the docs either, not only in
+# the shipped pack. The series titles and the author line are different: the
+# label and listing copy carry them, and docs/IP-RULES.md rule 5 requires the
+# author's name in the disclaimer, so those stay out of this list.
+DOC_DENY = (
+    _phrase("xa", "den"),
+    _phrase("violet", " sorrengail"),
+    _phrase("tair", "n"),
+    _phrase("andar", "na"),
+    _phrase("sgae", "yl"),
+)
+# The two reference docs exist to name what the ban forbids. They are the only
+# files allowed to hold a denylist.
+POLICY_DOCS = {"docs/CANON.md", "docs/IP-RULES.md"}
 REQUIRED_BONES = (
     "body",
     "head",
@@ -83,23 +97,76 @@ def check_names() -> None:
             if path.suffix.lower() in {".png", ".mcaddon", ".mcworld"}:
                 continue
             forbidden_in(path)
+    # A name pasted into the docs shipped unnoticed for five audits. Read the
+    # top-level docs and docs/ too, skipping only the policy files that hold the
+    # denylist on purpose.
+    doc_paths = [
+        ROOT / "README.md",
+        ROOT / "DESIGN.md",
+        ROOT / "BUILD_CHECKLIST.md",
+        ROOT / "DISTRIBUTION.md",
+    ]
+    doc_paths.extend(sorted((ROOT / "docs").rglob("*")))
+    for path in doc_paths:
+        if not path.is_file():
+            continue
+        if path.suffix.lower() in {".png", ".mcaddon", ".mcworld"}:
+            continue
+        if path.relative_to(ROOT).as_posix() in POLICY_DOCS:
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace").lower()
+        for name in DOC_DENY:
+            if name in text:
+                fail(f"forbidden name {name!r} in {path}")
 
 
-def assert_lectern(blob: str, x: int, y: int, z: int, label: str) -> None:
-    """The last emitted block at a spot must be a bare lectern.
+def _signed(token: str) -> int:
+    if token == "~":
+        return 0
+    if token.startswith("~"):
+        return int(token[1:])
+    return int(token)
 
-    A tall grass patch or a tombstone laid over the lectern would still leave
-    the word in the blob, so this reads the final setblock at the exact cell.
+
+def emitted_lecterns(blob: str) -> set[tuple[int, int, int]]:
+    """The cells whose last emitted setblock is a bare lectern.
+
+    A lectern with a block state (the classroom desks) is not a keeper lectern,
+    so only the final bare ``lectern`` at a cell counts. The map side is read
+    from the commands alone; it never sees the keeper table.
     """
-    last = None
-    prefix = f"setblock ~{x} ~{y} ~{z} "
+    final: dict[tuple[int, int, int], str] = {}
     for raw in blob.splitlines():
-        line = raw.strip()
-        if line.startswith(prefix):
-            last = line[len(prefix) :].split()[0]
-    if last != "lectern":
-        fail(f"{label} at ({x}, {y}, {z}) is {last!r}, not a lectern")
-    print(f"{label} lectern ok at ({x}, {y}, {z})")
+        parts = raw.strip().split()
+        if len(parts) < 5 or parts[0] != "setblock":
+            continue
+        cell = (_signed(parts[1]), _signed(parts[2]), _signed(parts[3]))
+        # Keep the block state in the value: a classroom lectern carries
+        # [facing_direction=...] and is not a keeper lectern.
+        final[cell] = " ".join(parts[4:])
+    return {cell for cell, block in final.items() if block == "lectern"}
+
+
+def keeper_blocks() -> set[tuple[int, int, int]]:
+    """The KEEPERS[].block cells read straight out of main.js.
+
+    The script side is parsed from the source, not from the emitted commands,
+    so a drift between the table and the world cannot hide.
+    """
+    script = (ROOT / "addon/behavior_pack/scripts/main.js").read_text(encoding="utf-8")
+    table = re.search(r"const KEEPERS = \[(.*?)\n\];", script, re.S)
+    if not table:
+        fail("main.js has no KEEPERS table")
+    cells = set()
+    for entry in re.finditer(
+        r'id:\s*"(\w+)".*?block:\s*\{\s*x:\s*(-?\d+),\s*y:\s*(-?\d+),\s*z:\s*(-?\d+)\s*\}',
+        table.group(1),
+        re.S,
+    ):
+        cells.add((int(entry.group(2)), int(entry.group(3)), int(entry.group(4))))
+    if not cells:
+        fail("main.js KEEPERS table names no blocks")
+    return cells
 
 
 def check_map() -> None:
@@ -145,10 +212,20 @@ def check_map() -> None:
     if "readRollCall(player)" not in script:
         fail("the scroll keeper never calls readRollCall")
     # A write hears the roll again, and the call is a separate beat. Sixty
-    # ticks is three seconds. The Roll-keeper branch is unchanged.
+    # ticks is three seconds. A pending call is cancelled first, so two quick
+    # writes cannot leave two live callbacks. The Roll-keeper branch is
+    # unchanged and never reads the rider roll.
     if "removeTag(ROLLCALL_TAG)" not in script:
         fail("a name write does not clear the roll-call tag")
-    if "runTimeout(() => readRollCall(player), 60)" not in script:
+    if "scheduleRollCall(player)" not in script:
+        fail("a name write does not schedule the roll call")
+    scheduler = re.search(r"function scheduleRollCall\(player\) \{(.*?)\n\}", script, re.S)
+    if not scheduler:
+        fail("main.js has no scheduleRollCall helper")
+    scheduler_body = scheduler.group(1)
+    if "system.clearRunTimeout(prior)" not in scheduler_body:
+        fail("a new name write does not cancel the pending roll call")
+    if "readRollCall(player)" not in scheduler_body or "}, 60)" not in scheduler_body:
         fail("the roll call is not a three-second beat after the write")
     roll_branch = re.search(
         r'else \{\s*player\.sendMessage\("§7The keeper closes the roll\..*?\n  \}',
@@ -222,9 +299,18 @@ def check_map() -> None:
     for needle in ("spawnpoint", "cp_west", "cp_east", "cp_quad", "cp_valley", "~0.18"):
         if needle not in live:
             fail(f"live function missing {needle}")
+    # The bond must be gated on the crossing. The live pass earns the tag on the
+    # span or the roof, and the bond selector requires it.
+    if "tag @s add crossed" not in live:
+        fail("the live pass never earns the crossed tag")
+    if "tag=crossed,tag=!bonded" not in live:
+        fail("the bond selector does not require the crossed tag")
     summon = (folder / "summon_dragon.mcfunction").read_text()
     if "dragon_rider:dragon" not in summon:
         fail("summon function does not summon dragon_rider:dragon")
+    # The bond already summons a dragon. The manual summon must not add a second.
+    if "execute unless entity @e[type=dragon_rider:dragon]" not in summon:
+        fail("summon_dragon can produce a second dragon")
     blob = "\n".join(path.read_text() for path in sorted(folder.glob("*.mcfunction")))
     for needle in (
         "lodestone",
@@ -242,10 +328,17 @@ def check_map() -> None:
             fail(f"map commands missing {needle}")
     if " water" in blob or blob.startswith("water"):
         fail("the span pit still contains water")
-    # The two keeper lecterns must stand in the emitted world: the Scroll-keeper
-    # at the roll desk in the Quad, the Roll-keeper one block north of the stand.
-    assert_lectern(blob, 128, 1, 34, "Scroll-keeper")
-    assert_lectern(blob, 50, -1, 123, "Roll-keeper")
+    # Cross-validate the keeper table against the world. Each side is read
+    # independently: the cells from the emitted setblock lines, the table from
+    # main.js. A drift between them fails here instead of shipping a keeper
+    # whose lectern is somewhere else and never opens.
+    emitted = emitted_lecterns(blob)
+    keepers = keeper_blocks()
+    for cell in sorted(keepers - emitted):
+        fail(f"main.js KEEPERS names {cell} but no bare lectern stands there")
+    for cell in sorted(emitted - keepers):
+        fail(f"a bare lectern at {cell} is not a keeper in main.js")
+    print(f"keeper lecterns ok: {len(keepers)} cells agree with main.js")
     if 'tp @a[x=~18,y=~-40,z=~8' in live:
         fail("live function still rescues a fall from the span")
     air_volume = 0
@@ -355,6 +448,16 @@ def check_world() -> None:
             fail("command errors are hidden before the build runs")
         if "grass_block" not in str(level.get("FlatWorldLayers")):
             fail("flat layers are missing")
+        # The world header, not the manifest, is what turns the experiments on.
+        # Checking the dependency versions is what let this survive four audits.
+        experiments = level.get("experiments") or {}
+        for key in ("beta_apis", "gametest"):
+            if experiments.get(key) != 0:
+                fail(f"world enables the {key} experiment: {experiments.get(key)!r}")
+        if level.get("GameType") != 2:
+            fail(f"world GameType is {level.get('GameType')!r}, not adventure (2)")
+        if level.get("ForceGameType") != 1:
+            fail("world does not force the game type on join")
         behavior = json.loads(bundle.read("world_behavior_packs.json"))
         manifest = json.loads((ROOT / "addon/behavior_pack/manifest.json").read_text())
         if behavior[0]["pack_id"] != manifest["header"]["uuid"]:

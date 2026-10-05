@@ -49,7 +49,10 @@ def _level_root() -> dict:
         "StorageVersion": 10,
         "LevelName": "Basgiath",
         "Generator": 2,
-        "GameType": 1,
+        # Adventure. Creative lets a player fly over the Parapet and break the
+        # college, and the pack only switches the players who are connected
+        # when the build runs.
+        "GameType": 2,
         "Difficulty": 1,
         "commandsEnabled": Byte(1),
         "SpawnX": 0,
@@ -75,13 +78,18 @@ def _level_root() -> dict:
         "lightningLevel": Float(1.0),
         "experiments": {
             "experiments_ever_loaded": Byte(1),
-            "beta_apis": Byte(1),
-            "gametest": Byte(1),
+            # DESIGN.md and README.md both forbid Beta APIs. The manifest is
+            # not enough: the world header is what turns the experiments on.
+            "beta_apis": Byte(0),
+            "gametest": Byte(0),
         },
         "hasBeenLoadedInCreative": Byte(1),
         "bonusChestEnabled": Byte(0),
         "CenterMapsToOrigin": Byte(1),
-        "ForceGameType": Byte(0),
+        # Force the game mode on every join. Without this a friend who joins
+        # later spawns in the header's GameType, not in the mode the build sets
+        # for the players who are already connected.
+        "ForceGameType": Byte(1),
         "LANBroadcast": Byte(1),
         "MultiplayerGame": Byte(1),
         "NetworkVersion": 827,

@@ -6,7 +6,13 @@ The integrator calls build(ctx) once and appends live_lines() to the tick.
 The strip east of the dorms is a stepped cliff. Each terrace is one
 switchback leg, and every leg sits one turn higher than the one before it.
 The six obstacles sit on the legs in canon order. Chain ropes hang off the
-open north edge, and touching one costs 30 seconds.
+open north edge.
+
+Truth about the scoring, so the pieces stay honest: the ropes add 30 to the
+`#gauntlet map_state` penalty total, but no clock starts or stops around the
+run and no command reads that total. There is no run timer and no time
+display. The "Gauntlet timekeeper" armor stand is scenery, not a stopwatch.
+What the ropes really do is warn the player on every fresh grab.
 
 Canon: docs/CANON.md section 4. Interface: scripts/zones/README.md.
 """
@@ -75,6 +81,10 @@ def live_lines() -> list[str]:
         lines.append(ANCHOR + f"run tag @a[{box}] add rope_touch")
     lines.append(ANCHOR + "run tag @a[tag=rope_touch] add rope_cool")
     lines.append(ANCHOR + "run tag @a[tag=!rope_touch] remove rope_cool")
+    # rope_told used to be added and never cleared, so the warning fired once
+    # ever and never again. Clear it with rope_touch so a fresh grab warns
+    # again; a player who holds the same rope stays quiet.
+    lines.append(ANCHOR + "run tag @a[tag=!rope_touch] remove rope_told")
     lines.append(
         ANCHOR
         + "as @a[tag=rope_touch,tag=!rope_told] run titleraw @s actionbar "
@@ -216,7 +226,10 @@ def _ropes(ctx) -> None:
 
 
 def _summit(ctx) -> None:
-    """The top landing, a low parapet, and the timekeeper post."""
+    """The top landing, a low parapet, and the timekeeper post.
+
+    The stand is a marker for the eye. It holds no timer and reads no score.
+    """
     ctx.fill(X0, 26, 140, X1, 26, 140, "stone_bricks")
     ctx.fill(X1, 26, 105, X1, 26, 140, "stone_bricks")
     ctx.shell(163, 26, 108, 167, 30, 112, "stone_bricks")

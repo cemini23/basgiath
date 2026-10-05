@@ -35,6 +35,17 @@ LODESTONE_Z0, LODESTONE_Z1 = 128, 132
 # The Roll-keeper post.
 KEEPER = (50, -1, 124)
 
+# The Parapet span, anchor-relative. The crossing tag is earned on the span
+# or the tower roof: feet at DECK_Y + 1, inside the span's x range. That is the
+# only place it can be earned, so holding it proves the crossing.
+CROSSED_X0, CROSSED_X1 = 15, 77
+CROSSED_Y = 33
+CROSSED_Z0, CROSSED_Z1 = 12, 28
+CROSSED_BOX = (
+    f"x=~{CROSSED_X0},y=~{CROSSED_Y},z=~{CROSSED_Z0},"
+    f"dx={CROSSED_X1 - CROSSED_X0},dy=8,dz={CROSSED_Z1 - CROSSED_Z0}"
+)
+
 ANCHOR = 'execute as @e[type=armor_stand,name="build_anchor",c=1] at @s '
 
 # Squat oaks. Bands ring the rim and run south; the middle stays open.
@@ -139,8 +150,10 @@ def _say(text: str) -> str:
 
 def live_lines() -> list[str]:
     """Commands that run every tick. Each line already includes execute-at-anchor."""
+    # The bond is gated on the crossing. A player who walks to the dell without
+    # crossing the span never earns the tag, so the bond below cannot fire.
     in_center = (
-        "as @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12,tag=!bonded] "
+        "as @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12,tag=crossed,tag=!bonded] "
     )
     fresh = "as @a[tag=bonded,tag=!bondcall] "
     on_pad = (
@@ -150,6 +163,8 @@ def live_lines() -> list[str]:
         "as @a[x=~48,y=~-2,z=~122,dx=4,dy=3,dz=4,tag=flew,tag=!named] "
     )
     lines = [
+        # 0. The crossing. Earned on the span or the roof, never on the ground.
+        ANCHOR + f"as @a[{CROSSED_BOX}] run tag @s add crossed",
         # 1. A dragon chooses the player. The player does not choose the dragon.
         ANCHOR + in_center + "run tag @s add bonded",
         ANCHOR + fresh + "at @s run summon dragon_rider:dragon ~1 ~ ~",
@@ -175,14 +190,15 @@ def live_lines() -> list[str]:
         ANCHOR
         + on_pad
         + "run "
-        + _say("You held. Walk south to the roll-keeper and give only the colour."),
+        + _say("You held. Walk south to the roll-keeper and give the full name."),
         ANCHOR + on_pad + "run tag @s add flew",
-        # 5. The roll-keeper. The full name stays with the rider and the keeper.
+        # 5. The roll-keeper. The rider gives the dragon's full name, and the
+        # keeper is the only one who hears it. docs/CANON.md says the same.
         ANCHOR
         + at_keeper
         + "run "
         + _say(
-            "Say the colour, nothing more. The full name stays with you and the roll-keeper."
+            "Give the keeper the full name, nothing held back. Only you and the keeper will know it."
         ),
         ANCHOR + at_keeper + "run tag @s add named",
     ]

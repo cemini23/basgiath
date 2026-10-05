@@ -150,6 +150,30 @@ function readRollCall(player) {
   world.sendMessage(`§7Roll call. §f${name}§7 answers and takes their place.`);
 }
 
+// One pending roll call per player. A second name write inside the 60-tick beat
+// cancels the first callback, so two quick writes cannot leave two live reads
+// chasing the same player. system.clearRunTimeout is stable in @minecraft/server
+// 2.0.0. player.id is stable across a rename; player.name is not.
+const rollCallTimeouts = new Map();
+
+function scheduleRollCall(player) {
+  const key = player.id;
+  const prior = rollCallTimeouts.get(key);
+  if (prior !== undefined) {
+    try {
+      system.clearRunTimeout(prior);
+    } catch (e) {
+      // The handle already fired or the engine dropped it. Either way there is
+      // nothing left to cancel.
+    }
+  }
+  const handle = system.runTimeout(() => {
+    rollCallTimeouts.delete(key);
+    readRollCall(player);
+  }, 60);
+  rollCallTimeouts.set(key, handle);
+}
+
 async function runKeeperForm(player, keeper) {
   if (keeper.needTag && !player.hasTag(keeper.needTag)) {
     player.sendMessage(keeper.refusal);
@@ -179,12 +203,28 @@ async function runKeeperForm(player, keeper) {
     } else {
       player.sendMessage(`§7The scribe writes it down: §f${name}§7. Stand in your row.`);
     }
-    // Writing a name reads the roll again, so a rename is heard too.
+    // Writing a name reads the roll again, so a rename is heard too. A pending
+    // call is cancelled first, so two quick writes leave one live callback.
     player.removeTag(ROLLCALL_TAG);
-    system.runTimeout(() => readRollCall(player), 60);
+    scheduleRollCall(player);
   } else {
     player.sendMessage("§7The keeper closes the roll. Only you and the keeper know that name.");
   }
+}
+
+// form.show can reject when the player disconnects or already has a screen
+// open, and system.run discards the promise it is handed. Catch it here so the
+// rejection can never surface as an unhandled one.
+function openKeeperForm(player, keeper) {
+  system.run(() => {
+    runKeeperForm(player, keeper).catch(() => {
+      try {
+        player.sendMessage("§7The keeper cannot open the page right now. Try again.");
+      } catch (e) {
+        // The player is gone. Nothing left to say.
+      }
+    });
+  });
 }
 
 function rememberOnWing(player, signetKey) {
@@ -199,8 +239,10 @@ function rememberOnWing(player, signetKey) {
     wing = [];
   }
 
-  wing = wing.filter((entry) => entry && entry.name !== player.name);
-  wing.push({ name: player.name, signet: signetKey });
+  // Key on the stable player id, not the display name: a rename must not put
+  // the same rider on the wing twice.
+  wing = wing.filter((entry) => entry && entry.id !== player.id);
+  wing.push({ id: player.id, name: player.name, signet: signetKey });
   if (wing.length > 24) wing = wing.slice(-24);
 
   world.setDynamicProperty("dragon_rider:wing", JSON.stringify(wing));
@@ -275,10 +317,16 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
 
   if (type !== LECTERN_BLOCK) return;
 
-  // No anchor means the college was never built here. The signet path matches
-  // on type only and stays as it is.
+  // No anchor means the college was never built here. Cancel the use so the
+  // page screen does not open, and say why instead of failing silently.
   const origin = buildOrigin();
-  if (!origin) return;
+  if (!origin) {
+    event.cancel = true;
+    system.run(() => {
+      player.sendMessage("§7The college is not built here. Run /function basgiath/build first.");
+    });
+    return;
+  }
 
   const loc = event.block.location;
   const keeper = KEEPERS.find(
@@ -290,7 +338,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   if (!keeper) return;
 
   event.cancel = true;
-  system.run(() => runKeeperForm(player, keeper));
+  openKeeperForm(player, keeper);
 });
 
 // Test bypass. It opens the quiz without the bond tag.
@@ -315,7 +363,7 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
   if (entity?.typeId !== "minecraft:player") return;
   const keeper = KEEPERS.find((k) => k.id === keeperId);
   if (!keeper) return;
-  system.run(() => runKeeperForm(entity, keeper));
+  openKeeperForm(entity, keeper);
 });
 
 // A phone does not run tick.json. This runs the same function once per tick.

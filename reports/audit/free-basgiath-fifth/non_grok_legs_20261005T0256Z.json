@@ -1,0 +1,22 @@
+{
+  "ts": "20261005T0256Z",
+  "written": [
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-fifth/auditor-claude-ds.md",
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-fifth/auditor-or-anthropic-claude-opus-5.5.md",
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-fifth/auditor-or-openai-gpt-5.6-luna-pro.md",
+    "/Users/claudiobarone/Projects/dragon-rider-map/reports/audit/free-basgiath-fifth/auditor-or-nvidia-nemotron-3-ultra-550b-a55b-free.md"
+  ],
+  "errors": [
+    "auditor-or-anthropic-claude-opus-5.5/thinkingmachines/inkling-small:free: HTTP Error 403: Forbidden",
+    "auditor-or-anthropic-claude-opus-5.5: degraded tool-stub response"
+  ],
+  "degraded": [
+    "auditor-or-anthropic-claude-opus-5.5"
+  ],
+  "free_models": [
+    "anthropic/claude-opus-5.5",
+    "openai/gpt-5.6-luna-pro"
+  ],
+  "bundle_chars": 170241,
+  "ok_or_count": 2
+}

@@ -25,14 +25,20 @@ def _ground(ctx) -> None:
 
 
 def _chasm(ctx) -> None:
-    """Change the floor under the span from grass to stone.
+    """A stone ravine under the span, solid from the ground to y=1.
 
-    The floor stays at ground level so the fall kills, and the air above it is
-    already open on the flat world. Carving that air again was a no-op that
-    cost 34,272 air fills on every phone. A non-flat world would need the carve;
-    the shipped world is flat.
+    The old floor was one stone layer at y=-1, so the "chasm" read as a walled
+    corridor and a player walked under the span instead of across it. The
+    fill now rises to y=1: a two-block step from the grass at y=-1, which a
+    walker cannot climb. The deck stays at y=32, so a fall onto this floor is
+    31 blocks, past the 23-block kill line.
+
+    The open air above y=1 is not written. The shipped world is flat, so the
+    space above the ground is already air, and re-emitting it was the 34,272
+    fill no-op this module already removed once. The 80,000 air gate is a hard
+    limit; writing it back would put the build over.
     """
-    ctx.fill(15, -1, 12, 77, -1, 28, "stone")
+    ctx.fill(15, -1, 12, 77, 1, 28, "stone_bricks")
 
 
 def _tower(ctx, x0: int, z0: int, x1: int, z1: int) -> None:

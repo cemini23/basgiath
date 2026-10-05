@@ -4,7 +4,7 @@ fill ~49 ~-2 ~49 ~170 ~-2 ~150 stone
 fill ~ ~-1 ~49 ~48 ~-1 ~150 grass_block
 fill ~49 ~-1 ~ ~170 ~-1 ~48 grass_block
 fill ~49 ~-1 ~49 ~170 ~-1 ~150 grass_block
-fill ~49 ~-1 ~12 ~77 ~-1 ~28 stone
+fill ~49 ~-1 ~12 ~77 ~1 ~28 stone_bricks
 setblock ~7 ~ ~61 sea_lantern
 setblock ~7 ~1 ~61 air
 setblock ~7 ~2 ~61 air
