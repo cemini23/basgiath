@@ -31,11 +31,13 @@ Do these in order. Finish a whole numbered task before starting the next. If you
 Add a manifest validator to `scripts/package.sh` (or a new `scripts/validate_manifests.py` the script calls). It must **fail the build** if any of these is false:
 
 - There are exactly **two packs**: `addon/behavior_pack/manifest.json` and `addon/resource_pack/manifest.json`.
-- Every `header.uuid` and every `modules[].uuid` is a valid UUID and **unique across both packs** (four UUIDs, no repeats).
-- Every entry in either pack's `dependencies[].uuid` resolves to the **other** pack's `header.uuid`. A dangling dependency is a build failure.
+- Every `header.uuid` and every `modules[].uuid` is a valid UUID and **unique across both packs** (four UUIDs, no repeats). *State today: all four are unique and valid — this check protects that.*
+- **The packs are linked.** The behavior pack declares a `dependencies` entry on the resource pack's `header.uuid` (with a version range), so a player who enables only the behavior pack still loads the resources. **State today: no cross-pack dependency exists — add it, then validate it resolves.** Every `dependencies[].uuid` must resolve to a pack's `header.uuid`; a dangling dependency is a build failure.
 - Both packs declare the dependency on `@minecraft/server` at `2.0.0` and `@minecraft/server-ui` at `2.0.0`, and the versions are **not bumped**.
 - `min_engine_version` is at most the release the shipped world targets (currently Bedrock **1.21.90**). A too-high minimum silently blocks older clients.
 - The `.mcaddon` contains **both** packs, so it imports in one click on Windows, Android, iOS, and console.
+
+Do **not** change any existing UUID. Adding a dependency is allowed; changing a `header.uuid` is not.
 
 Keep the existing checks. Add a `test_release.py` assertion that the validator ran and passed.
 
