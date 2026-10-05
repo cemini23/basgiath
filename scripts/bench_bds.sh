@@ -189,7 +189,7 @@ done
 # it is an entity, so the command executes, and it takes a title silently. A
 # component Bedrock does not accept logs an error here and fails the run.
 start="$(wc -l < "$LOG" | tr -d " ")"
-send 'titleraw @e[type=armor_stand,name="build_anchor",c=1] {"rawtext":[{"text":"score component probe "},{"score":{"name":"#clock","objective":"map_state"}},{"text":" ticks"}]}'
+send 'titleraw @e[type=armor_stand,name="build_anchor",c=1] title {"rawtext":[{"text":"score component probe "},{"score":{"name":"#clock","objective":"map_state"}},{"text":" ticks"}]}'
 sleep 1
 tail -n +"$((start + 1))" "$LOG" >> "$LIVE_ERRORS" || true
 # Keep only real command errors. The probe mechanism itself logs

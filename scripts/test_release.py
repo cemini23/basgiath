@@ -383,6 +383,11 @@ def check_map() -> None:
         fail("the finish line no longer carries the cadet's time")
     if '"objective":"gate_sec"' not in live:
         fail("the finish line does not show the cadet's time in seconds")
+    # Bedrock's titleraw takes a title location before the JSON. Without it the
+    # command is a syntax error, which is what the bench caught the first time
+    # this shipped. The gate is cheap; the bug reached a live pass once.
+    if "titleraw @s title " not in live:
+        fail("the finish line titleraw has no title location")
     # The bond must be gated on the crossing. The live pass earns the tag on the
     # span or the roof, and the bond selector requires it.
     if "tag @s add crossed" not in live:

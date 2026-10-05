@@ -192,7 +192,7 @@ def live_lines() -> list[str]:
     # this exact shape against the anchor stand on every run, so it ships.
     lines.append(
         ANCHOR
-        + f"{finish} run titleraw @s "
+        + f"{finish} run titleraw @s title "
         + '{"rawtext":[{"text":"Gauntlet complete. Your time: "},'
         + '{"score":{"name":"@s","objective":"gate_sec"}},'
         + '{"text":" seconds."}]}'
