@@ -146,7 +146,10 @@ probe() {
 
 # The college is not in the flat world. Summon the same anchor the player
 # function uses. tick.json may not run with zero players.
+# The stone at (0,79,0) is the anchor's floor. An armor stand has gravity,
+# so without it the anchor drops and every relative coordinate shifts.
 send "tickingarea add circle 0 80 0 4 bench"
+send "setblock 0 79 0 stone"
 send "summon armor_stand \"build_anchor\" 0 80 0"
 send "effect @e[type=armor_stand,name=\"build_anchor\"] resistance 999999 255 true"
 send "scoreboard objectives add map_state dummy"
@@ -165,8 +168,10 @@ fi
 
 {
   echo "$tick_line"
-  # Set the control after the build. _ground() fills y=79 across the whole
-  # footprint, so a control placed before the build is overwritten.
+  # Re-set the control now the build is done. _ground() fills y=79 across the
+  # whole footprint, so the block laid down for the anchor's floor is grass by
+  # now. Setting it again here and probing it straight away proves the probe
+  # reads a block that is really there.
   send "setblock 0 79 0 stone"
   probe CTRL_STONE 0 79 0 stone
   probe CTRL_NOT_GOLD 0 79 0 gold_block
