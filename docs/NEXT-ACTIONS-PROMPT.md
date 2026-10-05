@@ -130,6 +130,8 @@ BENCH_EXIT=0
 
 **Cost and cleanup.** One CPU pod is enough — about 90 seconds at ~$0.14/hr. **Terminate the pod when the run ends** and confirm the pod list is empty. Do not leave a pod running.
 
+**Precedent — follow it, do not reinvent it.** This repo has run the pod bench before. `briefs/2026-10-05_smoke-green.md` records a full green run (commit `0152ae4`): the pod cloned `cemini23/basgiath` over HTTPS, ran `package.sh`, then the bench. `reports/audit/*-bench/` holds the bench prompts. Use the same flow.
+
 **A green pod run is the proof the add-on still ships.** It is the one check CI cannot do.
 
 ## Hard constraints (never break)
