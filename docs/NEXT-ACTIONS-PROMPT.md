@@ -108,7 +108,10 @@ If a change touches **many files**, or any of the high-risk surfaces — the wor
 
 **When to run it:** any change to the pack manifests, the script (`main.js`), the world writer (`build_world.py`), the generators (`scripts/zones/*`, `build_map.py`), the dragon model (`build_dragon_model.py`), or `bench_bds.sh` itself. **A green `bench_static.py` is not a substitute** — it checks the shape of the code, not whether Bedrock accepts the packed add-on.
 
-**How:** use the **`runpod` MCP** (configured in `~/.cursor/mcp.json`; available in Cursor and Grok Build) to spin a clean x86_64 CPU container, then from the repo root:
+**How:** spin a clean x86_64 CPU container, then from the repo root:
+
+- **Preferred: the `runpod` MCP.** It is configured in `~/.cursor/mcp.json` (Cursor / Grok Build) and it has also run from **Claude Code in this workspace** — use whichever is at hand.
+- **Fallback: the RunPod REST API.** If no runpod MCP is present, drive the API directly with **`RUNPOD_API_KEY`** from the OSINT `.env` (`/Users/claudiobarone/Projects/OSINT WORKSPACE/.env`). Do not print the key.
 
 ```bash
 bash scripts/package.sh
