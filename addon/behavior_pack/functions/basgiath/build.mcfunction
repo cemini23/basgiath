@@ -3,10 +3,12 @@ titleraw @s title {"rawtext":[{"text":"Building"}]}
 titleraw @s subtitle {"rawtext":[{"text":"Stay still"}]}
 scoreboard objectives add map_state dummy
 scoreboard objectives add gate_time dummy
+scoreboard objectives add gate_sec dummy
 scoreboard objectives add gate_start dummy
 scoreboard objectives add gate_pen dummy
 scoreboard objectives add gate_best dummy
-scoreboard objectives setdisplay sidebar gate_time
+scoreboard players set #twenty map_state 20
+scoreboard objectives setdisplay sidebar gate_sec
 kill @e[type=armor_stand,name="build_anchor"]
 execute at @s run setblock ~ ~-1 ~ stone
 execute at @s run setblock ~ ~-1 ~-1 sea_lantern

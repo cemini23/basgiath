@@ -174,15 +174,24 @@ fi
 # the build function creates them and the stage loop above skips build.mcfunction.
 LIVE_ERRORS="$WORK/live-errors.txt"
 : > "$LIVE_ERRORS"
-for gate in gate_time gate_start gate_pen gate_best; do
+for gate in gate_time gate_sec gate_start gate_pen gate_best; do
   send "scoreboard objectives add ${gate} dummy"
 done
+send "scoreboard players set #twenty map_state 20"
 for _ in 1 2 3; do
   start="$(wc -l < "$LOG" | tr -d " ")"
   send "function basgiath/live"
   sleep 1
   tail -n +"$((start + 1))" "$LOG" >> "$LIVE_ERRORS" || true
 done
+# The finish line carries a `titleraw` score component, and a selector that
+# matches no player never runs it. Drive the same shape at the anchor stand:
+# it is an entity, so the command executes, and it takes a title silently. A
+# component Bedrock does not accept logs an error here and fails the run.
+start="$(wc -l < "$LOG" | tr -d " ")"
+send 'titleraw @e[type=armor_stand,name="build_anchor",c=1] {"rawtext":[{"text":"score component probe "},{"score":{"name":"#clock","objective":"map_state"}},{"text":" ticks"}]}'
+sleep 1
+tail -n +"$((start + 1))" "$LOG" >> "$LIVE_ERRORS" || true
 # Keep only real command errors. The probe mechanism itself logs
 # "unless block test failed" on every run, and a probe position outside the
 # ticking area logs "Detect position"; neither is a command error.

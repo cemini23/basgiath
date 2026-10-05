@@ -23,12 +23,14 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time = #clock map_state
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time -= @s gate_start
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time += @s gate_pen
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_sec = @s gate_time
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_sec /= #twenty map_state
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] run tag @s remove gate_run
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] run tag @s add gate_done
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] unless score @s gate_best matches 0.. run scoreboard players set @s gate_best 0
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] if score @s gate_best matches 0 run scoreboard players operation @s gate_best = @s gate_time
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] if score @s gate_best matches 1.. run scoreboard players operation @s gate_best < @s gate_time
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] run tellraw @s {"rawtext":[{"text":"Gauntlet complete. Your time is on the sidebar, in ticks."}]}
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] run titleraw @s {"rawtext":[{"text":"Gauntlet complete. Your time: "},{"score":{"name":"@s","objective":"gate_sec"}},{"text":" seconds."}]}
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~3,z=~81,dx=1,dy=2,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~148,y=~3,z=~81,dx=1,dy=2,dz=1] add rope_touch
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~3,z=~81,dx=1,dy=2,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600

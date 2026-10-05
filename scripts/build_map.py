@@ -338,15 +338,19 @@ def build_text(stage_count: int) -> str:
         'titleraw @s subtitle {"rawtext":[{"text":"Stay still"}]}',
         "scoreboard objectives add map_state dummy",
         # The Gauntlet stopwatch. `map_state` carries the build stage and every
-        # other tick counter; these four carry one cadet's run. The rope
-        # penalty is per cadet, so `gate_pen` is on the player, not on a fake
-        # player. The sidebar is the only way Bedrock shows a live number
+        # other tick counter; these carry one cadet's run. The rope penalty is
+        # per cadet, so `gate_pen` is on the player, not on a fake player.
+        # `gate_time` stays in ticks; `gate_sec` is the same number divided by
+        # twenty, and the sidebar shows seconds because that is what a person
+        # reads. The sidebar is the only way Bedrock shows a live number
         # without a client mod.
         "scoreboard objectives add gate_time dummy",
+        "scoreboard objectives add gate_sec dummy",
         "scoreboard objectives add gate_start dummy",
         "scoreboard objectives add gate_pen dummy",
         "scoreboard objectives add gate_best dummy",
-        "scoreboard objectives setdisplay sidebar gate_time",
+        "scoreboard players set #twenty map_state 20",
+        "scoreboard objectives setdisplay sidebar gate_sec",
         'kill @e[type=armor_stand,name="build_anchor"]',
         "execute at @s run setblock ~ ~-1 ~ stone",
         "execute at @s run setblock ~ ~-1 ~-1 sea_lantern",

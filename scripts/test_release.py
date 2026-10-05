@@ -319,16 +319,20 @@ def check_map() -> None:
             fail(f"live function missing {needle}")
     # The Gauntlet scores for real. The objectives are created once at build
     # time, the clock lives in the live pass, and the penalty is per cadet.
-    for objective in ("gate_time", "gate_start", "gate_pen", "gate_best"):
+    for objective in ("gate_time", "gate_sec", "gate_start", "gate_pen", "gate_best"):
         if f"scoreboard objectives add {objective} dummy" not in build:
             fail(f"the build does not create the {objective} objective")
-    if "scoreboard objectives setdisplay sidebar gate_time" not in build:
-        fail("the build does not put gate_time on the sidebar")
+    if "scoreboard players set #twenty map_state 20" not in build:
+        fail("the build never sets the divisor the seconds objective needs")
+    if "scoreboard objectives setdisplay sidebar gate_sec" not in build:
+        fail("the build does not put the cadet's time on the sidebar")
     if "scoreboard players add #clock map_state 1" not in live:
         fail("the live pass has no clock")
-    for needle in ("gate_time", "gate_start", "gate_pen", "gate_best", "gate_run", "gate_done"):
+    for needle in ("gate_time", "gate_sec", "gate_start", "gate_pen", "gate_best", "gate_run", "gate_done"):
         if needle not in live:
             fail(f"the live pass never touches {needle}")
+    if "operation @s gate_sec /= #twenty map_state" not in live:
+        fail("the live pass never turns ticks into seconds")
     # The start and summit zones come from BANDS in the zone module, not from
     # rewritten numbers. This compares the emitted boxes against the module's
     # own geometry, and the bench additionally proves they sit on the cliff.
@@ -368,15 +372,17 @@ def check_map() -> None:
         "scoreboard players operation @s gate_time += @s gate_pen",
     ]:
         fail(f"the live pass computes gate_time as {time_writes}")
-    # The finish line. The `titleraw` score component is the plan's first
-    # choice, but the brief says not to ship a component until a server log
-    # has accepted it. No Bedrock server is reachable from this repo check, so
-    # the documented fallback ships: a plain line, with the number on the
-    # sidebar. The gate below fails if the unverified component appears.
+    # The finish line. The `titleraw` score component was withheld until a
+    # server log accepted it; `bench_bds.sh` now drives this exact shape at the
+    # anchor stand on every bench run, so it ships and this gate requires it.
+    # If that probe ever starts failing, drop the component back to a plain
+    # line and relax this gate together.
     if "Gauntlet complete" not in live:
         fail("the live pass does not announce the finish")
-    if '"score"' in live:
-        fail("the live pass ships an unverified titleraw score component")
+    if '"score"' not in live:
+        fail("the finish line no longer carries the cadet's time")
+    if '"objective":"gate_sec"' not in live:
+        fail("the finish line does not show the cadet's time in seconds")
     # The bond must be gated on the crossing. The live pass earns the tag on the
     # span or the roof, and the bond selector requires it.
     if "tag @s add crossed" not in live:

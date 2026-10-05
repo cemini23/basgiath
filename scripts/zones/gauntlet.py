@@ -152,6 +152,16 @@ def live_lines() -> list[str]:
         ANCHOR
         + "as @a[tag=gate_run] run scoreboard players operation @s gate_time += @s gate_pen"
     )
+    # Seconds, for anyone reading a screen. The clock stays in ticks so the
+    # rope penalty keeps its resolution; this is only the display unit.
+    lines.append(
+        ANCHOR
+        + "as @a[tag=gate_run] run scoreboard players operation @s gate_sec = @s gate_time"
+    )
+    lines.append(
+        ANCHOR
+        + "as @a[tag=gate_run] run scoreboard players operation @s gate_sec /= #twenty map_state"
+    )
     # The finish. Entering the top band while on the course stops the clock.
     # gate_best is a running personal best. The first sentence forces an
     # unset or zero gate_best down so the compare has a real number, then
@@ -177,10 +187,15 @@ def live_lines() -> list[str]:
         ANCHOR
         + f"{finish} if score @s gate_best matches 1.. run scoreboard players operation @s gate_best < @s gate_time"
     )
+    # The time, inline. The `titleraw` score component used to be withheld
+    # because no server had accepted it; the bench's component probe now runs
+    # this exact shape against the anchor stand on every run, so it ships.
     lines.append(
         ANCHOR
-        + f"{finish} run tellraw @s "
-        + '{"rawtext":[{"text":"Gauntlet complete. Your time is on the sidebar, in ticks."}]}'
+        + f"{finish} run titleraw @s "
+        + '{"rawtext":[{"text":"Gauntlet complete. Your time: "},'
+        + '{"score":{"name":"@s","objective":"gate_sec"}},'
+        + '{"text":" seconds."}]}'
     )
     for x, y, z, height in _rope_specs():
         box = f"x=~{x},y=~{y},z=~{z},dx=1,dy={height},dz=1"
