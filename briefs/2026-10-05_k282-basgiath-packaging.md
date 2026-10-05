@@ -35,9 +35,9 @@ A player who cannot import the pack never sees the world. This is the distributi
 
 `rehan-remade/universal-modder` scored `basgiath overlap 0.75`. K281 already took the **layout** (one canonical `skills/` tree with symlinked entry points, a single `AGENTS.md`, a `knowledge/INDEX.md` field-notes base). This wave adds the **fal MCP asset pipeline**: generative textures, sound design, and promo-clip production driven from Claude Code.
 
-**Adopt the layout. Treat the pipeline as a lead, not a decision.** Its asset generation routes through a paid third-party service (fal). That is a new spend line and a new dependency. If we want it, decide the budget first — do not wire it in by default.
+**Decision (2026-10-05): do not adopt the pipeline.** Its asset generation routes through a **paid third-party service** (fal). We will not pay for it, so we do not use it. No paid API, no new spend line.
 
-**The safe, free half to take now:** the *shape* of asset iteration — generate a texture or sound variant, show it in-game, keep or discard. We can do that with Blockbench and the existing world without a paid API.
+**Extract only the free parts.** The *shape* of asset iteration — make a texture or sound variant, show it in-game, keep or discard — costs nothing with Blockbench and the existing world.
 
 ### 3. What was rejected, and why
 
