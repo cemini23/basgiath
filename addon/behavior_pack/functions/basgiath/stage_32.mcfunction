@@ -1,4 +1,3 @@
-setblock ~56 ~-1 ~106 short_grass
 setblock ~56 ~-1 ~135 short_grass
 setblock ~57 ~-1 ~111 allium
 setblock ~58 ~-1 ~116 poppy

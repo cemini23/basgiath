@@ -337,6 +337,16 @@ def build_text(stage_count: int) -> str:
         'titleraw @s title {"rawtext":[{"text":"Building"}]}',
         'titleraw @s subtitle {"rawtext":[{"text":"Stay still"}]}',
         "scoreboard objectives add map_state dummy",
+        # The Gauntlet stopwatch. `map_state` carries the build stage and every
+        # other tick counter; these four carry one cadet's run. The rope
+        # penalty is per cadet, so `gate_pen` is on the player, not on a fake
+        # player. The sidebar is the only way Bedrock shows a live number
+        # without a client mod.
+        "scoreboard objectives add gate_time dummy",
+        "scoreboard objectives add gate_start dummy",
+        "scoreboard objectives add gate_pen dummy",
+        "scoreboard objectives add gate_best dummy",
+        "scoreboard objectives setdisplay sidebar gate_time",
         'kill @e[type=armor_stand,name="build_anchor"]',
         "execute at @s run setblock ~ ~-1 ~ stone",
         "execute at @s run setblock ~ ~-1 ~-1 sea_lantern",
@@ -434,6 +444,8 @@ The stand is the origin. Every later command is relative to it. The build stays 
 `/function basgiath/summon_dragon` summons `dragon_rider:dragon` on the valley pad.
 
 The script runs `basgiath/tick` every tick. After the build, that tick runs `basgiath/live` for wind, checkpoints, and the storm. A fall from the span is fatal. You respawn on the ground path until you reach the east tower.
+
+The Gauntlet is scored. Step onto the base of the cliff to start the clock; the sidebar shows `gate_time` in ticks. Every fresh rope grab adds 600 ticks (30 seconds) to that cadet's own penalty. Reaching the summit stops the clock, announces the finish, and keeps the best run in `gate_best`. The armor stand on the summit is scenery; the scoreboard is the stopwatch.
 
 Do not run the old placeholder functions. They are gone. Coordinates live in `scripts/build_map.py`.
 """

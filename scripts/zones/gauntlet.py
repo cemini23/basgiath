@@ -8,11 +8,16 @@ switchback leg, and every leg sits one turn higher than the one before it.
 The six obstacles sit on the legs in canon order. Chain ropes hang off the
 open north edge.
 
-Truth about the scoring, so the pieces stay honest: the ropes add 30 to the
-`#gauntlet map_state` penalty total, but no clock starts or stops around the
-run and no command reads that total. There is no run timer and no time
-display. The "Gauntlet timekeeper" armor stand is scenery, not a stopwatch.
-What the ropes really do is warn the player on every fresh grab.
+Scoring is real now. The `#clock map_state` counter in live_lines() is the
+stopwatch and it runs every tick. A cadet who steps onto the base of the
+cliff earns the `gate_run` tag, `gate_start` holds the clock at that tick, and
+`gate_time` is recomputed every tick as `clock - gate_start + gate_pen`. A
+cadet who reaches the summit banks the run in `gate_best`. Each fresh rope
+grab adds 600 ticks (30 seconds) to that cadet's own `gate_pen`, so the
+penalty follows the player instead of a fake player. `scoreboard objectives
+setdisplay sidebar gate_time` shows the live number. The "Gauntlet timekeeper"
+armor stand is still scenery; the scoreboard is the stopwatch, and a function
+cannot write a time into an entity nametag.
 
 Canon: docs/CANON.md section 4. Interface: scripts/zones/README.md.
 """
@@ -50,6 +55,47 @@ ROPE_XS = (148, 154, 160)
 # floor, so a walker passes under it and only a faller grabs it.
 ROPE_LIFT = 3
 
+# The two scoring zones. Both are read straight off BANDS, so a change to the
+# cliff moves the zones with it and no coordinate is written by hand twice.
+# A band carries the y of its top solid block, so a body standing on that
+# terrace has its feet one above the floor.
+START_BAND = 0
+SUMMIT_BAND = SUMMIT
+
+
+def start_box() -> tuple[int, int, int, int, int, int]:
+    """The full-width base of the cliff, at body height. BANDS[0]."""
+    z0, z1, floor = BANDS[START_BAND]
+    return (X0, floor + 1, z0, X1, floor + 1, z1)
+
+
+def summit_box() -> tuple[int, int, int, int, int, int]:
+    """The full-width top band, at body height. BANDS[SUMMIT]."""
+    z0, z1, floor = BANDS[SUMMIT_BAND]
+    return (X0, floor + 1, z0, X1, floor + 1, z1)
+
+
+def cliff_footprint() -> set[tuple[int, int]]:
+    """Every (x, z) cell the cliff terraces stand on.
+
+    The scoring zones must sit inside this. The bench proves it and proves a
+    mutation that slides a zone off the cliff fails.
+    """
+    return {
+        (x, z)
+        for z0, z1, _ in BANDS
+        for z in range(z0, z1 + 1)
+        for x in range(X0, X1 + 1)
+    }
+
+
+def _box_selector(box: tuple[int, int, int, int, int, int]) -> str:
+    x0, y0, z0, x1, y1, z1 = box
+    return (
+        f"x=~{x0},y=~{y0},z=~{z0},"
+        f"dx={x1 - x0 + 1},dy={y1 - y0 + 1},dz={z1 - z0 + 1}"
+    )
+
 
 def build(ctx) -> list[str]:
     """Return the Gauntlet commands. The cliff rises one terrace at a time."""
@@ -65,18 +111,84 @@ def build(ctx) -> list[str]:
     _ramp(ctx)
     _ropes(ctx)
     _summit(ctx)
-    ctx.add("scoreboard players set #gauntlet map_state 0")
     return ctx.take()
 
 
 def live_lines() -> list[str]:
-    """Tick commands. Each line includes execute-at-anchor. The integrator appends them later."""
-    lines = [ANCHOR + "run tag @a remove rope_touch"]
+    """Tick commands. Each line includes execute-at-anchor. The integrator appends them later.
+
+    The `#clock map_state` line is the stopwatch. It runs first, so a tick of
+    the live function advances it by exactly one. Every gate_* line below reads
+    that clock. None of them places a block, so `solid_blocks()` never sees
+    them.
+    """
+    lines = [ANCHOR + "run scoreboard players add #clock map_state 1"]
+    # The start. A cadet who steps onto the base of the cliff and is not
+    # already on the course starts the clock: gate_start is the clock now, the
+    # rope penalty is wiped, and gate_done is cleared so a second run can beat
+    # the first. The tag line must come first so the box that follows can see
+    # gate_run on a cadet who just earned it in this same tick.
+    start = _box_selector(start_box())
+    lines.append(ANCHOR + f"as @a[{start},tag=!gate_run] run tag @s add gate_run")
+    lines.append(ANCHOR + f"as @a[{start},tag=!gate_run] run tag @s remove gate_done")
+    lines.append(
+        ANCHOR
+        + f"as @a[{start}] run scoreboard players operation @s gate_start = #clock map_state"
+    )
+    lines.append(
+        ANCHOR + f"as @a[{start}] run scoreboard players set @s gate_pen 0"
+    )
+    # The run. Three operations per cadet on the course, then the rope penalty
+    # for a fresh grab. There is normally one cadet.
+    lines.append(
+        ANCHOR
+        + "as @a[tag=gate_run] run scoreboard players operation @s gate_time = #clock map_state"
+    )
+    lines.append(
+        ANCHOR
+        + "as @a[tag=gate_run] run scoreboard players operation @s gate_time -= @s gate_start"
+    )
+    lines.append(
+        ANCHOR
+        + "as @a[tag=gate_run] run scoreboard players operation @s gate_time += @s gate_pen"
+    )
+    # The finish. Entering the top band while on the course stops the clock.
+    # gate_best is a running personal best. The first sentence forces an
+    # unset or zero gate_best down so the compare has a real number, then
+    # `operation ... <` keeps the smaller of the two. gate_pen was folded
+    # into gate_time on the lines above, so the banked run carries its rope
+    # penalty. Every guard is an `if score`/`unless score`, never a nested
+    # execute, so one bad line cannot take the whole tick down.
+    summit = _box_selector(summit_box())
+    finish = f"as @a[{summit},tag=gate_run]"
+    lines.append(ANCHOR + f"{finish} run tag @s remove gate_run")
+    lines.append(ANCHOR + f"{finish} run tag @s add gate_done")
+    # A missing score is 0 to `operation` and to an `if score`, but not to a
+    # selector `matches 0..`, so normalise first.
+    lines.append(
+        ANCHOR
+        + f"{finish} unless score @s gate_best matches 0.. run scoreboard players set @s gate_best 0"
+    )
+    lines.append(
+        ANCHOR
+        + f"{finish} if score @s gate_best matches 0 run scoreboard players operation @s gate_best = @s gate_time"
+    )
+    lines.append(
+        ANCHOR
+        + f"{finish} if score @s gate_best matches 1.. run scoreboard players operation @s gate_best < @s gate_time"
+    )
+    lines.append(
+        ANCHOR
+        + f"{finish} run tellraw @s "
+        + '{"rawtext":[{"text":"Gauntlet complete. Your time is on the sidebar, in ticks."}]}'
+    )
     for x, y, z, height in _rope_specs():
         box = f"x=~{x},y=~{y},z=~{z},dx=1,dy={height},dz=1"
+        # The penalty lands on the cadet who grabbed the rope, not on a fake
+        # player: 600 ticks is the 30 seconds the warning line already says.
         lines.append(
             ANCHOR
-            + f"as @a[{box},tag=!rope_cool] run scoreboard players add #gauntlet map_state 30"
+            + f"as @a[{box},tag=!rope_cool] run scoreboard players add @s gate_pen 600"
         )
         lines.append(ANCHOR + f"run tag @a[{box}] add rope_touch")
     lines.append(ANCHOR + "run tag @a[tag=rope_touch] add rope_cool")
@@ -228,7 +340,9 @@ def _ropes(ctx) -> None:
 def _summit(ctx) -> None:
     """The top landing, a low parapet, and the timekeeper post.
 
-    The stand is a marker for the eye. It holds no timer and reads no score.
+    The stand is a marker for the eye. It holds no timer and reads no score:
+    the stopwatch is the `#clock`/`gate_*` scoreboard in live_lines(). A
+    function cannot write a time into an entity's nametag.
     """
     ctx.fill(X0, 26, 140, X1, 26, 140, "stone_bricks")
     ctx.fill(X1, 26, 105, X1, 26, 140, "stone_bricks")

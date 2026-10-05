@@ -1,4 +1,3 @@
-fill ~33 ~3 ~96 ~33 ~3 ~98 oak_leaves
 fill ~40 ~-1 ~99 ~40 ~1 ~99 oak_log
 fill ~39 ~2 ~98 ~41 ~2 ~100 oak_leaves
 fill ~39 ~3 ~99 ~41 ~3 ~99 oak_leaves
@@ -48,3 +47,4 @@ fill ~17 ~2 ~129 ~19 ~2 ~131 oak_leaves
 fill ~17 ~3 ~130 ~19 ~3 ~130 oak_leaves
 fill ~18 ~3 ~129 ~18 ~3 ~131 oak_leaves
 fill ~21 ~-1 ~138 ~21 ~1 ~138 oak_log
+fill ~20 ~2 ~137 ~22 ~2 ~139 oak_leaves

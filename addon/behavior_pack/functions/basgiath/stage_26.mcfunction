@@ -18,7 +18,6 @@ setblock ~163 ~27 ~110 air
 setblock ~163 ~28 ~110 air
 setblock ~165 ~31 ~110 lantern
 summon armor_stand "Gauntlet timekeeper" ~165 ~27 ~110
-scoreboard players set #gauntlet map_state 0
 fill ~100 ~-1 ~124 ~101 ~31 ~148 stone
 fill ~144 ~-1 ~124 ~145 ~31 ~148 stone
 fill ~100 ~-1 ~147 ~145 ~31 ~148 stone
@@ -48,3 +47,4 @@ setblock ~141 ~-1 ~126 stone_bricks
 fill ~141 ~ ~126 ~141 ~2 ~126 white_wool
 setblock ~141 ~-1 ~130 stone_bricks
 fill ~141 ~ ~130 ~141 ~2 ~130 orange_wool
+setblock ~141 ~-1 ~134 stone_bricks

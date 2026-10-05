@@ -128,6 +128,24 @@ def _signed(token: str) -> int:
     return int(token)
 
 
+def gauntlet_box(name: str) -> tuple[int, int, int, int, int, int]:
+    """Read a scoring-zone box straight out of the shipped zone module.
+
+    The release check must not hard-code the numbers it verifies, or it would
+    agree with any wrong copy. ``scripts`` is added temporarily because the
+    generator runs with its own directory as the import root.
+    """
+    scripts = str(ROOT / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    try:
+        from zones import gauntlet
+        return getattr(gauntlet, name)()
+    finally:
+        if scripts in sys.path:
+            sys.path.remove(scripts)
+
+
 def emitted_lecterns(blob: str) -> set[tuple[int, int, int]]:
     """The cells whose last emitted setblock is a bare lectern.
 
@@ -299,6 +317,66 @@ def check_map() -> None:
     for needle in ("spawnpoint", "cp_west", "cp_east", "cp_quad", "cp_valley", "~0.18"):
         if needle not in live:
             fail(f"live function missing {needle}")
+    # The Gauntlet scores for real. The objectives are created once at build
+    # time, the clock lives in the live pass, and the penalty is per cadet.
+    for objective in ("gate_time", "gate_start", "gate_pen", "gate_best"):
+        if f"scoreboard objectives add {objective} dummy" not in build:
+            fail(f"the build does not create the {objective} objective")
+    if "scoreboard objectives setdisplay sidebar gate_time" not in build:
+        fail("the build does not put gate_time on the sidebar")
+    if "scoreboard players add #clock map_state 1" not in live:
+        fail("the live pass has no clock")
+    for needle in ("gate_time", "gate_start", "gate_pen", "gate_best", "gate_run", "gate_done"):
+        if needle not in live:
+            fail(f"the live pass never touches {needle}")
+    # The start and summit zones come from BANDS in the zone module, not from
+    # rewritten numbers. This compares the emitted boxes against the module's
+    # own geometry, and the bench additionally proves they sit on the cliff.
+    def box_text(box: tuple[int, int, int, int, int, int]) -> str:
+        x0, y0, z0, x1, y1, z1 = box
+        return (
+            f"x=~{x0},y=~{y0},z=~{z0},"
+            f"dx={x1 - x0 + 1},dy={y1 - y0 + 1},dz={z1 - z0 + 1}"
+        )
+    for name, box in (("start", gauntlet_box("start_box")), ("summit", gauntlet_box("summit_box"))):
+        if box_text(box) not in live:
+            fail(f"the live pass does not gate on the derived {name} box {box_text(box)}")
+    # The penalty must land on the cadet, and it must be 30 seconds of ticks.
+    penalties = re.findall(r"run scoreboard players add (@\w+|#\w+) gate_pen (\d+)", live)
+    if not penalties:
+        fail("the live pass never adds to gate_pen")
+    for target, amount in penalties:
+        if amount != "600":
+            fail(f"the rope penalty is {amount} ticks, not 600")
+        if not target.startswith("@"):
+            fail(f"the rope penalty lands on {target}, not on the cadet")
+    if "#gauntlet" in live or "#gauntlet" in build:
+        fail("the old global #gauntlet counter is still there")
+    # The time is computed, never guessed: exactly three operations write
+    # gate_time, and the last one adds the cadet's own penalty. The pattern
+    # matches gate_time only as the destination, so the gate_best lines that
+    # read it are not counted.
+    time_write = re.compile(r"scoreboard players (?:operation|set|add|remove) \S+ gate_time\b")
+    time_writes = [
+        line.split(" run ", 1)[1]
+        for line in live.splitlines()
+        if time_write.search(line)
+    ]
+    if time_writes != [
+        "scoreboard players operation @s gate_time = #clock map_state",
+        "scoreboard players operation @s gate_time -= @s gate_start",
+        "scoreboard players operation @s gate_time += @s gate_pen",
+    ]:
+        fail(f"the live pass computes gate_time as {time_writes}")
+    # The finish line. The `titleraw` score component is the plan's first
+    # choice, but the brief says not to ship a component until a server log
+    # has accepted it. No Bedrock server is reachable from this repo check, so
+    # the documented fallback ships: a plain line, with the number on the
+    # sidebar. The gate below fails if the unverified component appears.
+    if "Gauntlet complete" not in live:
+        fail("the live pass does not announce the finish")
+    if '"score"' in live:
+        fail("the live pass ships an unverified titleraw score component")
     # The bond must be gated on the crossing. The live pass earns the tag on the
     # span or the roof, and the bond selector requires it.
     if "tag @s add crossed" not in live:

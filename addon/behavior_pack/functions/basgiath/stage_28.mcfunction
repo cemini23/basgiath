@@ -1,4 +1,3 @@
-setblock ~127 ~ ~133 short_grass
 setblock ~127 ~ ~139 short_grass
 setblock ~128 ~ ~131 poppy
 setblock ~128 ~ ~137 short_grass
@@ -48,3 +47,4 @@ fill ~26 ~3 ~98 ~26 ~3 ~100 oak_leaves
 fill ~33 ~-1 ~97 ~33 ~1 ~97 oak_log
 fill ~32 ~2 ~96 ~34 ~2 ~98 oak_leaves
 fill ~32 ~3 ~97 ~34 ~3 ~97 oak_leaves
+fill ~33 ~3 ~96 ~33 ~3 ~98 oak_leaves

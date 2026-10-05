@@ -166,6 +166,39 @@ if [ "$tick_line" != "TICK_SPAN=true" ]; then
   sleep 2
 fi
 
+# The live pass. Nothing above this line runs it, which is why a malformed
+# command inside basgiath/live has never surfaced here: the stage path places
+# blocks and the live path scores, and a bad scoreboard or titleraw line only
+# logs an error when the command is actually executed. Call it a few times and
+# capture the log delta. Every gate_* objective has to exist first, because
+# the build function creates them and the stage loop above skips build.mcfunction.
+LIVE_ERRORS="$WORK/live-errors.txt"
+: > "$LIVE_ERRORS"
+for gate in gate_time gate_start gate_pen gate_best; do
+  send "scoreboard objectives add ${gate} dummy"
+done
+for _ in 1 2 3; do
+  start="$(wc -l < "$LOG" | tr -d " ")"
+  send "function basgiath/live"
+  sleep 1
+  tail -n +"$((start + 1))" "$LOG" >> "$LIVE_ERRORS" || true
+done
+# Keep only real command errors. The probe mechanism itself logs
+# "unless block test failed" on every run, and a probe position outside the
+# ticking area logs "Detect position"; neither is a command error.
+grep -iE 'syntax error|unknown command|failed to execute|malformed' "$LIVE_ERRORS" \
+  | grep -viE 'unless block test failed|detect position' > "$LIVE_ERRORS.real" || true
+# The pipe is true even when the first grep finds nothing, so the file may not
+# exist yet. Create it rather than let the result step fail to read it.
+: >> "$LIVE_ERRORS.real"
+LIVE_ERROR_COUNT="$(wc -l < "$LIVE_ERRORS.real" | tr -d ' ')"
+if [ "$LIVE_ERROR_COUNT" != "0" ]; then
+  echo "the live pass logged command errors:" >&2
+  cat "$LIVE_ERRORS.real" >&2
+  exit 1
+fi
+echo "live pass ran clean: 3 calls, no command error" >&2
+
 {
   echo "$tick_line"
   # Re-set the control now the build is done. _ground() fills y=79 across the
@@ -186,7 +219,7 @@ fi
   probe LECTERN_ROLL 50 79 123 lectern
 } > "$WORK/probe-results.txt"
 
-python3 - "$LOG" "$RESULT" "$WORK/probe-results.txt" "$WORK/probe-deltas.txt" <<'PY'
+python3 - "$LOG" "$RESULT" "$WORK/probe-results.txt" "$WORK/probe-deltas.txt" "$WORK/live-errors.real" <<'PY'
 import sys
 from pathlib import Path
 
@@ -194,6 +227,7 @@ log = Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
 result = Path(sys.argv[2])
 probes = Path(sys.argv[3]).read_text(encoding="utf-8", errors="replace").splitlines()
 deltas = Path(sys.argv[4]).read_text(encoding="utf-8", errors="replace").splitlines()
+live_errors = Path(sys.argv[5]).read_text(encoding="utf-8", errors="replace").splitlines()
 pack_error = None
 for line in log.splitlines():
     text = line.lower()
@@ -210,6 +244,10 @@ lines = ["server_started=yes", f"pack_error={pack_error or 'none'}"]
 lines.extend(probes)
 ok = (not pack_error) and all(values.get(name) == "true" for name in need_true)
 ok = ok and values.get("CTRL_NOT_GOLD") == "false"
+live_ok = not live_errors
+ok = ok and live_ok
+lines.append(f"live_pass_clean={str(live_ok).lower()}")
+lines.append(f"live_pass_errors={len(live_errors)}")
 lines.append(f"blocks_ok={str(ok).lower()}")
 lines.append("probe_deltas_begin")
 lines.extend(deltas[-80:])

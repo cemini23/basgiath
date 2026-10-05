@@ -16,6 +16,7 @@ import math
 import re
 import subprocess
 import sys
+import types
 import zipfile
 from collections import deque
 from pathlib import Path
@@ -311,6 +312,128 @@ def assert_markers(blocks: dict[tuple[int, int, int], str], text: str) -> None:
     ):
         if needle not in text:
             fail(f"missing spawn command {needle}")
+
+
+def gauntlet_module():
+    """The shipped zone module, imported from its own directory.
+
+    The Gauntlet boxes are the module's, not this bench's. Importing the real
+    one keeps one source of truth; ``sys.path`` is restored right after.
+    """
+    scripts = str(ROOT / "scripts")
+    added = scripts not in sys.path
+    if added:
+        sys.path.insert(0, scripts)
+    try:
+        from zones import gauntlet
+        return gauntlet
+    finally:
+        if added:
+            sys.path.remove(scripts)
+
+
+def box_cells(box: tuple[int, int, int, int, int, int]) -> set[tuple[int, int, int]]:
+    x0, y0, z0, x1, y1, z1 = box
+    return {
+        (x, y, z)
+        for x in range(min(x0, x1), max(x0, x1) + 1)
+        for y in range(min(y0, y1), max(y0, y1) + 1)
+        for z in range(min(z0, z1), max(z0, z1) + 1)
+    }
+
+
+def box_selector(box: tuple[int, int, int, int, int, int]) -> str:
+    x0, y0, z0, x1, y1, z1 = box
+    return (
+        f"x=~{x0},y=~{y0},z=~{z0},"
+        f"dx={x1 - x0 + 1},dy={y1 - y0 + 1},dz={z1 - z0 + 1}"
+    )
+
+
+def assert_zones(gauntlet, blocks: dict[tuple[int, int, int], str], text: str) -> None:
+    """The Gauntlet scoring zones must lie inside the cliff footprint.
+
+    The footprint is read from the same module that emits the cliff, so a zone
+    moved off the terraces fails here instead of shipping a gate a cadet can
+    never stand in. Each column of the box also has to stand on something: the
+    block one below it is solid in the replayed world. The live pass must gate
+    on the box the module derives.
+    """
+    footprint = gauntlet.cliff_footprint()
+    for name in ("start_box", "summit_box"):
+        box = getattr(gauntlet, name)()
+        outside = sorted(
+            {(x, z) for x, _, z in box_cells(box) if (x, z) not in footprint}
+        )
+        if outside:
+            fail(f"the Gauntlet {name} sits off the cliff at {outside[:6]}")
+        if box_selector(box) not in text:
+            fail(f"the live pass does not gate on the derived {name}: {box_selector(box)}")
+        # A body inside the box has to stand on something: the block one below
+        # every column of the box must be solid.
+        floor = {
+            (x, y - 1, z) for x, y, z in box_cells(box)
+        }
+        empty = sorted(
+            cell for cell in floor if blocks.get(cell) in (None,) + tuple(NON_SOLID)
+        )
+        if empty:
+            fail(f"the Gauntlet {name} has no floor at {empty[:6]}")
+
+
+def _zone_module(start, summit):
+    """A stand-in zone module carrying the real footprint and chosen boxes."""
+    module = types.SimpleNamespace()
+    module.cliff_footprint = gauntlet_module().cliff_footprint
+    module.start_box = start
+    module.summit_box = summit
+    return module
+
+
+def assert_zone_mutations(
+    blocks: dict[tuple[int, int, int], str], text: str
+) -> None:
+    """Prove the footprint check fails when a zone slides off the cliff.
+
+    Two mutations: the start zone translated east past the cliff edge, and the
+    summit zone dragged south off the footprint. The real blocks and the real
+    live text are passed in, so the only thing wrong with the mutant is where
+    its box sits. A checker that stayed green for either would not be a
+    checker.
+    """
+    gauntlet = gauntlet_module()
+    real_start = gauntlet.start_box()
+    real_summit = gauntlet.summit_box()
+
+    moved = (
+        real_start[0] + 40,
+        real_start[1],
+        real_start[2],
+        real_start[3] + 40,
+        real_start[4],
+        real_start[5],
+    )
+    try:
+        assert_zones(_zone_module(lambda: moved, gauntlet.summit_box), blocks, text)
+    except SystemExit:
+        print("proof ok: a Gauntlet start zone off the cliff fails the footprint check")
+    else:
+        fail("the footprint check stayed green after the start zone left the cliff")
+
+    dragged = (
+        real_summit[0],
+        real_summit[1],
+        real_summit[2] + 40,
+        real_summit[3],
+        real_summit[4],
+        real_summit[5] + 40,
+    )
+    try:
+        assert_zones(_zone_module(gauntlet.start_box, lambda: dragged), blocks, text)
+    except SystemExit:
+        print("proof ok: a Gauntlet summit zone off the cliff fails the footprint check")
+    else:
+        fail("the footprint check stayed green after the summit zone left the cliff")
 
 
 def assert_dragon() -> None:
@@ -792,6 +915,8 @@ def main() -> None:
     assert_dragon()
     assert_world()
     prove(lines)
+    assert_zones(gauntlet_module(), blocks, function_text())
+    assert_zone_mutations(blocks, function_text())
     span = len(_span_xs())
     print(f"static bench ok: {span} Parapet blocks, gap at x={GAP_X[0]} and x={GAP_X[1]}")
 

@@ -1,4 +1,3 @@
-fill ~42 ~3 ~138 ~42 ~3 ~140 oak_leaves
 fill ~56 ~-1 ~139 ~56 ~1 ~139 oak_log
 fill ~55 ~2 ~138 ~57 ~2 ~140 oak_leaves
 fill ~55 ~3 ~139 ~57 ~3 ~139 oak_leaves
@@ -48,3 +47,4 @@ setblock ~51 ~-1 ~139 short_grass
 setblock ~54 ~-1 ~96 short_grass
 setblock ~55 ~-1 ~101 oxeye_daisy
 setblock ~55 ~-1 ~130 cornflower
+setblock ~56 ~-1 ~106 short_grass

@@ -15,42 +15,55 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~38,y
 scoreboard players add #storm map_state 1
 execute if score #storm map_state matches 200.. run scoreboard players set #storm map_state 0
 execute if score #storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a remove rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~3,z=~81,dx=1,dy=2,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run scoreboard players add #clock map_state 1
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,z=~80,dx=23,dy=1,dz=2,tag=!gate_run] run tag @s add gate_run
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,z=~80,dx=23,dy=1,dz=2,tag=!gate_run] run tag @s remove gate_done
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,z=~80,dx=23,dy=1,dz=2] run scoreboard players operation @s gate_start = #clock map_state
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,z=~80,dx=23,dy=1,dz=2] run scoreboard players set @s gate_pen 0
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time = #clock map_state
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time -= @s gate_start
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time += @s gate_pen
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] run tag @s remove gate_run
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] run tag @s add gate_done
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] unless score @s gate_best matches 0.. run scoreboard players set @s gate_best 0
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] if score @s gate_best matches 0 run scoreboard players operation @s gate_best = @s gate_time
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] if score @s gate_best matches 1.. run scoreboard players operation @s gate_best < @s gate_time
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] run tellraw @s {"rawtext":[{"text":"Gauntlet complete. Your time is on the sidebar, in ticks."}]}
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~3,z=~81,dx=1,dy=2,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~148,y=~3,z=~81,dx=1,dy=2,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~3,z=~81,dx=1,dy=2,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~3,z=~81,dx=1,dy=2,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~154,y=~3,z=~81,dx=1,dy=2,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~3,z=~81,dx=1,dy=2,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~3,z=~81,dx=1,dy=2,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~160,y=~3,z=~81,dx=1,dy=2,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~4,z=~84,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~4,z=~84,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~148,y=~4,z=~84,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~4,z=~84,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~4,z=~84,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~154,y=~4,z=~84,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~4,z=~84,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~4,z=~84,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~160,y=~4,z=~84,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~8,z=~88,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~8,z=~88,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~148,y=~8,z=~88,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~8,z=~88,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~8,z=~88,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~154,y=~8,z=~88,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~8,z=~88,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~8,z=~88,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~160,y=~8,z=~88,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~12,z=~92,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~12,z=~92,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~148,y=~12,z=~92,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~12,z=~92,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~12,z=~92,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~154,y=~12,z=~92,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~12,z=~92,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~12,z=~92,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~160,y=~12,z=~92,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~16,z=~96,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~16,z=~96,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~148,y=~16,z=~96,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~16,z=~96,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~16,z=~96,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~154,y=~16,z=~96,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~16,z=~96,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~16,z=~96,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~160,y=~16,z=~96,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~20,z=~100,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~148,y=~20,z=~100,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~148,y=~20,z=~100,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~20,z=~100,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~154,y=~20,z=~100,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~154,y=~20,z=~100,dx=1,dy=5,dz=1] add rope_touch
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~20,z=~100,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add #gauntlet map_state 30
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~160,y=~20,z=~100,dx=1,dy=5,dz=1,tag=!rope_cool] run scoreboard players add @s gate_pen 600
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~160,y=~20,z=~100,dx=1,dy=5,dz=1] add rope_touch
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[tag=rope_touch] add rope_cool
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[tag=!rope_touch] remove rope_cool
