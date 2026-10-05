@@ -29,6 +29,8 @@ const NO_BOND_LINE = "§7A signet comes after a dragon chooses you.";
 const LECTERN_BLOCK = "minecraft:lectern";
 const RIDER_PROPERTY = "dragon_rider:rider_name";
 const DRAGON_PROPERTY = "dragon_rider:dragon_name";
+const ROLLCALL_TAG = "rollcall_done";
+const BUILD_ANCHOR = "build_anchor";
 
 const QUESTIONS = [
   {
@@ -74,6 +76,10 @@ function blankScores() {
 // The Scroll-keeper holds the roll desk lectern in the Quad courtyard. The
 // Roll-keeper holds the lectern one block north of the armor stand in the
 // dell. The block is the key: it names the keeper and the property to write.
+// The coordinates are the build's own: the generator wraps every stage in
+// `execute as @e[type=armor_stand,name="build_anchor",c=1] at @s`, so a
+// setblock lands at anchor + relative. The absolute block location is therefore
+// floor(anchor) + relative, which is what buildOrigin() resolves.
 const KEEPERS = [
   {
     id: "scroll",
@@ -95,6 +101,28 @@ const KEEPERS = [
   },
 ];
 
+// The generator stamps the college around an armor stand named "build_anchor"
+// at the player's feet, and every stage command is anchor-relative. The anchor
+// is killed and re-summoned by `build_text` when the build runs again, so the
+// origin is resolved fresh on every interact rather than cached: an event
+// handler runs on a click, where one getEntities call is cheap, and a stale
+// cached origin would point at the previous build. Math.floor is required
+// because a block command floors its position: an anchor at x = 8.5 puts ~128
+// at block 136, not 136.5.
+function buildOrigin() {
+  const dim = world.getDimension("overworld");
+  for (const e of dim.getEntities({ type: "minecraft:armor_stand" })) {
+    if (e.nameTag === BUILD_ANCHOR) {
+      return {
+        x: Math.floor(e.location.x),
+        y: Math.floor(e.location.y),
+        z: Math.floor(e.location.z),
+      };
+    }
+  }
+  return null;
+}
+
 function cleanName(raw) {
   if (typeof raw !== "string") return "";
   let s = raw
@@ -104,6 +132,22 @@ function cleanName(raw) {
     .trim();
   if (s.length > 16) s = s.slice(0, 16);
   return s;
+}
+
+// The roll call is the rider's own name, read from a dynamic property. A
+// command cannot read a dynamic property, so the read lives here. The name is
+// player input, so it reaches the world through world.sendMessage, which does
+// not parse: it can never become a command injection. cleanName already
+// stripped colour codes and control characters before the name was stored.
+// A rider who leaves inside the three-second beat misses the call. Talking to
+// the keeper again clears the tag and reads the roll again, so it self-heals;
+// a catch-up loop would only add a reason for the tag to go stale.
+function readRollCall(player) {
+  const name = player.getDynamicProperty(RIDER_PROPERTY);
+  if (typeof name !== "string" || !name) return;
+  if (player.hasTag(ROLLCALL_TAG)) return;
+  player.addTag(ROLLCALL_TAG);
+  world.sendMessage(`§7Roll call. §f${name}§7 answers and takes their place.`);
 }
 
 async function runKeeperForm(player, keeper) {
@@ -126,10 +170,18 @@ async function runKeeperForm(player, keeper) {
     return;
   }
 
+  const previous = player.getDynamicProperty(keeper.property);
   player.setDynamicProperty(keeper.property, name);
 
   if (keeper.id === "scroll") {
-    player.sendMessage(`§7The scribe writes it down: §f${name}§7. You will answer to it at roll call.`);
+    if (typeof previous === "string" && previous) {
+      player.sendMessage(`§7The scribe strikes the old name and writes §f${name}§7.`);
+    } else {
+      player.sendMessage(`§7The scribe writes it down: §f${name}§7. Stand in your row.`);
+    }
+    // Writing a name reads the roll again, so a rename is heard too.
+    player.removeTag(ROLLCALL_TAG);
+    system.runTimeout(() => readRollCall(player), 60);
   } else {
     player.sendMessage("§7The keeper closes the roll. Only you and the keeper know that name.");
   }
@@ -223,9 +275,17 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
 
   if (type !== LECTERN_BLOCK) return;
 
+  // No anchor means the college was never built here. The signet path matches
+  // on type only and stays as it is.
+  const origin = buildOrigin();
+  if (!origin) return;
+
   const loc = event.block.location;
   const keeper = KEEPERS.find(
-    (k) => loc.x === k.block.x && loc.y === k.block.y && loc.z === k.block.z
+    (k) =>
+      loc.x === origin.x + k.block.x &&
+      loc.y === origin.y + k.block.y &&
+      loc.z === origin.z + k.block.z
   );
   if (!keeper) return;
 

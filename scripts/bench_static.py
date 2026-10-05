@@ -12,6 +12,9 @@ span, a filled gap, and a safety floor.
 from __future__ import annotations
 
 import json
+import math
+import re
+import subprocess
 import sys
 import zipfile
 from collections import deque
@@ -396,10 +399,348 @@ def prove_parser() -> None:
     print("proof ok: a wrapped positional command is classified as far")
 
 
+# The keeper lookup lives in main.js. This harness loads the real script with
+# the two @minecraft modules stubbed, so the shipped interact handler runs
+# against synthetic entities. It proves the anchor is resolved with Math.floor
+# and that a keeper coordinate is compared as origin + relative, not bare. A
+# substring check cannot prove the second part: a script that still compares
+# bare coordinates would pass it.
+KEEPER_PROOF = r"""
+import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
+
+const MAIN = "__MAIN__";
+const OFFSET = __OFFSET__;
+const KEEPER_BLOCKS = __KEEPERS__;
+const ANCHOR = { x: 12.75, y: 70.25, z: -4.5 };
+const MOVED = { x: 40.5, y: 80.9, z: 7.25 };
+const require = createRequire(import.meta.url);
+const errors = [];
+const pending = [];
+const timed = [];
+let interact = null;
+const anchor = {
+  entity: { nameTag: "build_anchor", location: ANCHOR },
+};
+let messages = [];
+
+const check = (ok, detail) => {
+  if (!ok) errors.push(detail);
+};
+
+const isReal = (spec) => {
+  try {
+    require(spec);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
+function buildModule() {
+  return new vm.SourceTextModule(readFileSync(MAIN, "utf8"), { identifier: MAIN });
+}
+
+function stubModule() {
+  return new vm.SyntheticModule(
+    ["world", "system", "ActionFormData", "MessageFormData", "ModalFormData"],
+    function () {
+      this.setExport("world", world);
+      this.setExport("system", system);
+      this.setExport("ActionFormData", forms.ActionFormData);
+      this.setExport("MessageFormData", forms.MessageFormData);
+      this.setExport("ModalFormData", forms.ModalFormData);
+    }
+  );
+}
+
+class FakePlayer {
+  constructor(input, name) {
+    this.input = input;
+    this.name = name;
+    this.tags = new Set();
+    this.props = new Map();
+    this.log = [];
+    this.onScreenDisplay = { setTitle: () => {} };
+  }
+  sendMessage(text) { this.log.push(String(text)); }
+  getDynamicProperty(key) { return this.props.get(key); }
+  setDynamicProperty(key, value) { this.props.set(key, value); }
+  hasTag(tag) { return this.tags.has(tag); }
+  addTag(tag) { this.tags.add(tag); }
+  removeTag(tag) { this.tags.delete(tag); }
+}
+
+const forms = {
+  ModalFormData: class {
+    constructor() { this.fields = []; }
+    title(text) { this.formTitle = text; return this; }
+    textField(label, placeholder) { this.fields.push([label, placeholder]); return this; }
+    show(player) {
+      forms.seen.push({ title: this.formTitle, fields: this.fields, player });
+      return Promise.resolve({ canceled: false, formValues: [player.input] });
+    }
+  },
+  ActionFormData: class {
+    title() { return this; }
+    body() { return this; }
+    button() { return this; }
+    show() { return Promise.resolve({ canceled: true }); }
+  },
+  MessageFormData: class {
+    title() { return this; }
+    body() { return this; }
+    button1() { return this; }
+    button2() { return this; }
+    show() { return Promise.resolve({ canceled: true }); }
+  },
+};
+forms.seen = [];
+
+const world = {
+  beforeEvents: { playerInteractWithBlock: { subscribe: (fn) => { interact = fn; } } },
+  afterEvents: { scriptEventReceive: { subscribe: () => {} } },
+  sendMessage: (text) => { messages.push(String(text)); },
+  getDynamicProperty: () => undefined,
+  setDynamicProperty: () => {},
+  getDimension: () => ({ getEntities: () => (anchor.entity ? [anchor.entity] : []) }),
+  getPlayers: () => [],
+  runCommand: () => {},
+};
+
+const system = {
+  run: (fn) => { pending.push(fn); },
+  runTimeout: (fn, ticks) => { timed.push({ fn, ticks }); return timed.length; },
+  runInterval: () => 0,
+  afterEvents: { scriptEventReceive: { subscribe: () => {} } },
+};
+
+const settle = () => new Promise((resolve) => setImmediate(resolve));
+
+const flush = async () => {
+  const queued = pending.splice(0);
+  await Promise.all(queued.map((fn) => Promise.resolve().then(fn)));
+  await settle();
+};
+
+const eventAt = async (block, player) => {
+  const event = {
+    isFirstEvent: true,
+    player,
+    block: { typeId: "minecraft:lectern", location: block },
+    cancel: false,
+  };
+  interact(event);
+  await flush();
+  return event;
+};
+
+const absolute = (block, origin) => ({
+  x: origin.x + block.x,
+  y: origin.y + block.y,
+  z: origin.z + block.z,
+});
+
+const main = buildModule();
+await main.link((spec) => (isReal(spec) ? require(spec) : stubModule()));
+await main.evaluate();
+
+async function run() {
+  check(typeof interact === "function", "main.js did not subscribe to playerInteractWithBlock");
+  if (typeof interact !== "function") return;
+
+  check(
+    OFFSET.x === 12 && OFFSET.y === 70 && OFFSET.z === -5,
+    `the origin is floored to ${JSON.stringify(OFFSET)}, not (12, 70, -5)`
+  );
+
+  const player = new FakePlayer("Rider", "rider");
+  // The roll keeper gates on the bond tag. The fixture carries it so both
+  // keeper forms open; the gate itself is not what this proof tests.
+  player.addTag("bonded");
+  for (const [id, block] of Object.entries(KEEPER_BLOCKS)) {
+    const at = absolute(block, OFFSET);
+    forms.seen.length = 0;
+    const event = await eventAt(at, player);
+    check(event.cancel, `${id} lectern at ${JSON.stringify(at)} was not cancelled`);
+    check(forms.seen.length === 1, `${id} lectern at ${JSON.stringify(at)} opened ${forms.seen.length} forms`);
+    const title = forms.seen[0]?.title;
+    const want = id === "scroll" ? "The scroll" : "The roll";
+    check(title === want, `${id} lectern opened ${JSON.stringify(title)}, not ${JSON.stringify(want)}`);
+  }
+
+  // The pre-fix comparison. A bare keeper coordinate is not the keeper once
+  // the build anchor sits off the origin, so the click must fall through.
+  const bare = KEEPER_BLOCKS.scroll;
+  forms.seen.length = 0;
+  const stale = await eventAt(bare, player);
+  check(!stale.cancel, "a bare keeper coordinate opened a form at a non-origin anchor");
+  check(forms.seen.length === 0, `the bare keeper coordinate opened ${forms.seen.length} forms`);
+
+  // A moved anchor must move the keeper with it. A cached origin fails here.
+  anchor.entity = { nameTag: "build_anchor", location: MOVED };
+  const moved = absolute(KEEPER_BLOCKS.scroll, {
+    x: Math.floor(MOVED.x),
+    y: Math.floor(MOVED.y),
+    z: Math.floor(MOVED.z),
+  });
+  forms.seen.length = 0;
+  const shifted = await eventAt(moved, player);
+  check(shifted.cancel && forms.seen.length === 1, `the keeper did not follow the moved anchor to ${JSON.stringify(moved)}`);
+  forms.seen.length = 0;
+  const old = await eventAt(bare, player);
+  check(!old.cancel, "the keeper stayed at the previous anchor position");
+  anchor.entity = { nameTag: "build_anchor", location: ANCHOR };
+
+  // The roll keeper takes the dragon name, so it must not read the rider roll.
+  const rollAt = absolute(KEEPER_BLOCKS.roll, OFFSET);
+  timed.length = 0;
+  await eventAt(rollAt, player);
+  check(timed.length === 0, "the roll keeper scheduled a rider roll call");
+  check(!player.hasTag("rollcall_done"), "the roll keeper stamped the rider roll-call tag");
+
+  // Naming at the scroll desk. One naming, one roll line, carrying the name.
+  const scrollAt = absolute(KEEPER_BLOCKS.scroll, OFFSET);
+  messages = [];
+  timed.length = 0;
+  await eventAt(scrollAt, player);
+  const writeLine = player.log.filter((line) => line.includes("The scribe writes it down"));
+  check(writeLine.length === 1, `the write message did not fire exactly once: ${writeLine.length}`);
+  check(writeLine[0]?.includes("Stand in your row."), `the first write message is wrong: ${writeLine[0]}`);
+  check(!messages.some((line) => line.includes("Roll call.")), "the roll call fired before the three-second beat");
+  check(timed.length === 1, `the scroll keeper scheduled ${timed.length} timeouts, not 1`);
+  const beat = timed.splice(0)[0];
+  check(beat?.ticks === 60, `the roll call was scheduled for ${beat?.ticks} ticks, not 60`);
+  beat?.fn();
+  const calls = messages.filter((line) => line.includes("Roll call."));
+  check(calls.length === 1, `one naming produced ${calls.length} roll-call lines, not 1`);
+  check(calls[0]?.includes("Roll call. §fRider§7"), `the roll-call line does not carry the name: ${calls[0]}`);
+  check(player.hasTag("rollcall_done"), "the roll call did not stamp the once-per-life tag");
+
+  // The tag gates the read: the same beat run again must stay silent.
+  messages = [];
+  beat?.fn();
+  check(messages.length === 0, `a repeat read repeated the roll call: ${messages[0]}`);
+
+  // The rename path: the old name is struck, the tag is cleared, and the new
+  // name is read at the next call.
+  player.input = "Rider Two";
+  messages = [];
+  timed.length = 0;
+  player.log = [];
+  await eventAt(scrollAt, player);
+  const strike = player.log.filter((line) => line.includes("strikes the old name"));
+  check(strike.length === 1, `the rename message did not fire exactly once: ${strike.length}`);
+  check(!player.hasTag("rollcall_done"), "a rename left the roll-call tag set");
+  const second = timed.splice(0)[0];
+  check(second?.ticks === 60, `the rename scheduled ${second?.ticks} ticks, not 60`);
+  second?.fn();
+  const renamed = messages.filter((line) => line.includes("Roll call."));
+  check(renamed.length === 1, `the rename produced ${renamed.length} roll-call lines, not 1`);
+  check(renamed[0]?.includes("§fRider Two§7"), `the rename roll-call line is wrong: ${renamed[0]}`);
+
+  // No dynamic property, no call. The test bypass opens the path with no name.
+  const stranger = new FakePlayer("", "stranger");
+  messages = [];
+  timed.length = 0;
+  await eventAt(scrollAt, stranger);
+  check(!stranger.hasTag("rollcall_done"), "an empty name stamped the roll-call tag");
+  check(timed.length === 0, "an empty name scheduled a roll call");
+
+  if (errors.length) {
+    for (const line of errors) console.error(`keeper proof failed: ${line}`);
+    process.exit(1);
+  }
+  console.log("proof ok: the keeper lookup floors the anchor and adds the relative block");
+  console.log("proof ok: naming at the scroll desk yields one roll-call line with the name");
+}
+
+await run();
+"""
+
+
+def keeper_source() -> tuple[dict[str, dict[str, int]], dict[str, int]]:
+    """Read the keeper blocks and the floored origin out of main.js.
+
+    The harness must not hard-code the numbers under test, or it would agree
+    with any wrong table. The coordinates come from the shipped script; the
+    harness only supplies an off-origin anchor and asserts the floor.
+    """
+    script = (ROOT / "addon/behavior_pack/scripts/main.js").read_text(encoding="utf-8")
+    table = re.search(r"const KEEPERS = \[(.*?)\n\];", script, re.S)
+    if not table:
+        fail("main.js has no KEEPERS table to prove")
+    keepers: dict[str, dict[str, int]] = {}
+    for entry in re.finditer(
+        r'id:\s*"(\w+)".*?block:\s*\{\s*x:\s*(-?\d+),\s*y:\s*(-?\d+),\s*z:\s*(-?\d+)\s*\}',
+        table.group(1),
+        re.S,
+    ):
+        keepers[entry.group(1)] = {
+            "x": int(entry.group(2)),
+            "y": int(entry.group(3)),
+            "z": int(entry.group(4)),
+        }
+    if sorted(keepers) != ["roll", "scroll"]:
+        fail(f"main.js keeper table is {sorted(keepers)}, not the two keepers")
+    if not re.search(
+        r"function buildOrigin\(\)\s*\{.*?Math\.floor\(\s*e\.location\.x\s*\)",
+        script,
+        re.S,
+    ):
+        fail("main.js has no buildOrigin() that floors the anchor location")
+    # The probe anchor (12.75, 70.25, -4.5) floors to (12, 70, -5). floor, not
+    # int(): a negative coordinate truncates toward zero there.
+    return keepers, {
+        "x": math.floor(12.75),
+        "y": math.floor(70.25),
+        "z": math.floor(-4.5),
+    }
+
+
+def prove_keeper_origin() -> None:
+    """Run the shipped keeper handler against a synthetic, off-origin anchor.
+
+    The generator writes anchor-relative commands, so a keeper comparison that
+    ignores the anchor agrees with the world only when the player stood on the
+    origin. The Bedrock bench summons its anchor at (0, 80, 0) and probes
+    blocks, so it cannot see that. This loads the real main.js with the two
+    @minecraft modules stubbed and drives the real interact subscription.
+    """
+    keepers, offset = keeper_source()
+    script = ROOT / "addon/behavior_pack/scripts/main.js"
+    source = (
+        KEEPER_PROOF.replace("__OFFSET__", json.dumps(offset))
+        .replace("__KEEPERS__", json.dumps(keepers))
+        .replace("__MAIN__", str(script))
+    )
+    result = subprocess.run(
+        ["node", "--experimental-vm-modules", "--input-type=module", "-e", source],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        # Node prints an ExperimentalWarning for vm modules on stderr. Keep the
+        # first line that is not that warning, so the failure names the check.
+        detail = [
+            line
+            for line in (result.stderr or result.stdout).splitlines()
+            if line.strip()
+            and "ExperimentalWarning" not in line
+            and "trace-warnings" not in line
+        ]
+        fail(f"keeper origin proof failed: {detail[0] if detail else 'no output'}")
+    for line in result.stdout.strip().splitlines():
+        print(line)
+
+
 def main() -> None:
     lines = phone_lines()
     prove_guard(stage_lines(), far_lines())
     prove_parser()
+    prove_keeper_origin()
     blocks = solid_blocks(lines)
     assert_parapet(blocks)
     assert_walk(blocks)

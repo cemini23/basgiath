@@ -121,6 +121,44 @@ def check_map() -> None:
     ):
         if needle not in script:
             fail(f"script is missing the keeper marker {needle!r}")
+    # The generator writes anchor-relative commands, so a keeper comparison
+    # that uses the bare table entry agrees with the world only when the build
+    # anchor stands on the origin. The lookup must resolve the anchor and floor
+    # it before it adds the relative block. scripts/bench_static.py runs the
+    # handler against an off-origin anchor; this is the cheap source guard.
+    if "build_anchor" not in script:
+        fail("the keeper lookup does not resolve the build_anchor entity")
+    if "function buildOrigin()" not in script or "Math.floor(" not in script:
+        fail("the keeper lookup does not floor the anchor location")
+    lookup = re.search(
+        r"const keeper = KEEPERS\.find\((.*?)\n  \);", script, re.S
+    )
+    if not lookup or "origin." not in lookup.group(1):
+        fail("the keeper lookup compares a block location without the origin")
+    # The roll call reads the rider's own name and sends it with
+    # world.sendMessage. A command string would parse the name.
+    if 'const ROLLCALL_TAG = "rollcall_done"' not in script:
+        fail("the roll call tag is missing or renamed")
+    for needle in ("function readRollCall(", "world.sendMessage("):
+        if needle not in script:
+            fail(f"the roll call is missing {needle!r}")
+    if "readRollCall(player)" not in script:
+        fail("the scroll keeper never calls readRollCall")
+    # A write hears the roll again, and the call is a separate beat. Sixty
+    # ticks is three seconds. The Roll-keeper branch is unchanged.
+    if "removeTag(ROLLCALL_TAG)" not in script:
+        fail("a name write does not clear the roll-call tag")
+    if "runTimeout(() => readRollCall(player), 60)" not in script:
+        fail("the roll call is not a three-second beat after the write")
+    roll_branch = re.search(
+        r'else \{\s*player\.sendMessage\("§7The keeper closes the roll\..*?\n  \}',
+        script,
+        re.S,
+    )
+    if not roll_branch:
+        fail("the Roll-keeper branch is missing")
+    if "readRollCall" in roll_branch.group(0):
+        fail("the Roll-keeper branch reads the rider roll")
     # A player-typed name must never reach a command string. The only
     # runCommand in the script is the fixed map tick.
     commands = re.findall(r"runCommand\(\s*([^)]*)\)", script)
