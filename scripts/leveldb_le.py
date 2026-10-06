@@ -362,6 +362,13 @@ def write_record(dbdir: Path, key: str, value: bytes, sequence: int) -> Path:
     return path
 
 
+def escape_key(key: str) -> str:
+    """Render a key readably. Locational keys are binary, not text."""
+    return "".join(
+        ch if 32 <= ord(ch) < 127 and ch != "\\" else f"\\x{ord(ch):02x}" for ch in key
+    )
+
+
 def main() -> None:
     import argparse
 
@@ -369,16 +376,27 @@ def main() -> None:
     parser.add_argument("dbdir", type=Path)
     parser.add_argument("--keys", action="store_true", help="list keys instead of dumping")
     parser.add_argument("--grep", help="only show keys containing this text")
+    parser.add_argument("--hex", metavar="KEY", help="dump one key's value as hex")
     args = parser.parse_args()
 
     data = read_db(args.dbdir)
+
+    if args.hex:
+        value = data.get(args.hex)
+        if value is None:
+            raise SystemExit(f"key not found: {args.hex!r}")
+        print(f"{args.hex} ({len(value)} bytes, zlib header {value[:2]!r})")
+        print(value.hex())
+        return
+
     for key in sorted(data):
         if args.grep and args.grep not in key:
             continue
+        shown = escape_key(key)
         if args.keys:
-            print(f"{key}  ({len(data[key])} bytes)")
+            print(f"{shown}  ({len(data[key])} bytes)")
         else:
-            print(f"{key} = {data[key][:80]!r}")
+            print(f"{shown} = {data[key][:60].hex()}")
 
 
 if __name__ == "__main__":
