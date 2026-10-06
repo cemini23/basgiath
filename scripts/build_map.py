@@ -474,6 +474,16 @@ def _rel(token: str) -> int:
     return int(token)
 
 
+def _block_id(token: str) -> str:
+    """A block id without its state suffix.
+
+    The emitters write a stated block as ``id["state"=value]``. ``_NON_SOLID``
+    and ``_CLIMBABLE`` match on the bare id, so strip the bracket before the
+    lookup. Without this a stated ladder reads as a wall.
+    """
+    return token.split("[", 1)[0]
+
+
 def solid_blocks(lines: list[str]) -> dict[tuple[int, int, int], str]:
     blocks: dict[tuple[int, int, int], str] = {}
     for line in lines:
@@ -482,12 +492,12 @@ def solid_blocks(lines: list[str]) -> dict[tuple[int, int, int], str]:
             continue
         if parts[0] == "setblock" and len(parts) >= 5:
             x, y, z = _rel(parts[1]), _rel(parts[2]), _rel(parts[3])
-            block = parts[4]
+            block = _block_id(parts[4])
             cells = [(x, y, z)]
         elif parts[0] == "fill" and len(parts) >= 8:
             x0, y0, z0 = _rel(parts[1]), _rel(parts[2]), _rel(parts[3])
             x1, y1, z1 = _rel(parts[4]), _rel(parts[5]), _rel(parts[6])
-            block = parts[7]
+            block = _block_id(parts[7])
             cells = [
                 (x, y, z)
                 for x in range(min(x0, x1), max(x0, x1) + 1)

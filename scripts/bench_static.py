@@ -65,6 +65,16 @@ def rel_coord(token: str) -> int:
     return int(token)
 
 
+def block_id(token: str) -> str:
+    """A block id without its state suffix.
+
+    The emitters write a stated block as ``id["state"=value]``. ``NON_SOLID``
+    and ``CLIMBABLE`` match on the bare id, so strip the bracket before the
+    lookup. Without this a stated ladder reads as a wall.
+    """
+    return token.split("[", 1)[0]
+
+
 def stage_lines() -> list[str]:
     stages = sorted(FUNCTIONS.glob("stage_*.mcfunction"))
     if not stages:
@@ -196,11 +206,11 @@ def solid_blocks(lines: list[str]) -> dict[tuple[int, int, int], str]:
             continue
         if parts[0] == "setblock" and len(parts) >= 5:
             cells = [(rel_coord(parts[1]), rel_coord(parts[2]), rel_coord(parts[3]))]
-            block = parts[4]
+            block = block_id(parts[4])
         elif parts[0] == "fill" and len(parts) >= 8:
             x0, y0, z0 = rel_coord(parts[1]), rel_coord(parts[2]), rel_coord(parts[3])
             x1, y1, z1 = rel_coord(parts[4]), rel_coord(parts[5]), rel_coord(parts[6])
-            block = parts[7]
+            block = block_id(parts[7])
             cells = [
                 (x, y, z)
                 for x in range(min(x0, x1), max(x0, x1) + 1)

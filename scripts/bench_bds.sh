@@ -228,6 +228,16 @@ echo "live pass ran clean: 3 calls, no command error" >&2
   # is absolute (50, 79, 123).
   probe LECTERN_SCROLL 128 81 34 lectern
   probe LECTERN_ROLL 50 79 123 lectern
+  # TEMPORARY PROBE (lectern state name + range). Remove after task 0.
+  send 'setblock 0 100 0 lectern["direction"=2]'
+  probe P_DIR2 0 100 0 'lectern["direction"=2]'
+  probe P_DIR3 0 100 0 'lectern["direction"=3]'
+  probe P_DIR4 0 100 0 'lectern["direction"=4]'
+  send 'setblock 0 101 0 lectern["minecraft:cardinal_direction"="south"]'
+  probe P_CARDS 0 101 0 'lectern["minecraft:cardinal_direction"="south"]'
+  probe P_CARDN 0 101 0 'lectern["minecraft:cardinal_direction"="north"]'
+  send 'setblock 0 102 0 lectern["facing_direction"=2]'
+  probe P_FACE2 0 102 0 'lectern["facing_direction"=2]'
 } > "$WORK/probe-results.txt"
 
 python3 - "$LOG" "$RESULT" "$WORK/probe-results.txt" "$WORK/probe-deltas.txt" "$LIVE_ERRORS.real" <<'PY'
@@ -275,6 +285,9 @@ content_errors = [
         "failed to parse" in line
         or "Syntax error" in line
         or "failed to load correctly" in line
+        or "is not a valid block state" in line
+        or "Unknown block state" in line
+        or "Invalid block state" in line
     )
     and "unless block test failed" not in line
     and "Detect position" not in line

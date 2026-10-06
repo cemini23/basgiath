@@ -267,6 +267,8 @@ def _classroom(ctx) -> None:
         (x0 + 16, z0 + 5, 1),
     )
     for x, z, facing in lecterns:
-        ctx.setblock(x, 1, z, f'lectern["direction"={facing}]')
+        # A lectern faces with "direction", 0-3. The table above is 1-based,
+        # so shift it. direction 4 would be out of range.
+        ctx.setblock(x, 1, z, f'lectern["direction"={facing - 1}]')
     ctx.setblock(x0 + 16, 2, z0 + 2, "lantern")
     ctx.setblock(x0 + 2, 2, z1 - 2, "lantern")
