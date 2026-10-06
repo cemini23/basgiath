@@ -591,6 +591,17 @@ def check_manifests() -> None:
     print("pack manifests ok")
 
 
+def check_hud() -> None:
+    """Check the flight readout's easing curve and stamina bar.
+
+    check_hud.mjs lifts the shipped functions out of main.js, so it tests the
+    code that ships, not a copy. It cannot check the picture on a screen --
+    only a client can -- but it checks the maths the display depends on.
+    """
+    run(["node", "scripts/check_hud.mjs"])
+    print("flight readout ok")
+
+
 def main() -> None:
     run([sys.executable, "scripts/build_map.py"])
     run([sys.executable, "scripts/build_dragon_model.py"])
@@ -600,6 +611,7 @@ def main() -> None:
     check_dragon()
     check_uuids()
     check_manifests()
+    check_hud()
     check_world()
     print("release checks ok")
 

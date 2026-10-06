@@ -25,8 +25,10 @@ jobs:
       - name: Validate pack JSON and UUIDs
         run: bash scripts/validate.sh
 
-      - name: Syntax-check the signet script
-        run: node --check addon/behavior_pack/scripts/main.js
+      - name: Syntax-check the signet script and the flight readout
+        run: |
+          node --check addon/behavior_pack/scripts/main.js
+          node scripts/check_hud.mjs
 
       - name: Syntax-check the shell scripts
         run: bash -n scripts/*.sh

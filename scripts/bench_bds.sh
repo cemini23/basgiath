@@ -286,6 +286,13 @@ CONTENT_ERROR_PHRASES = (
     # An entity JSON field the schema rejects, e.g. deals_damage given a
     # boolean where a string is required.
     "unknown child schema option type",
+    # A fault inside a behavior-pack script. The flight readout runs on a tick
+    # interval, so a mistake there would otherwise be silent on a host with no
+    # player to ride a dragon.
+    "typeerror",
+    "referenceerror",
+    "syntaxerror",
+    "unhandled",
 )
 # Expected noise, not a shipped defect:
 # - the bench's own probe reports this on every run,
@@ -297,12 +304,21 @@ BENIGN_LOG_PHRASES = (
     "detect position",
     "selector must be player-type",
 )
-content_errors = [
-    line
-    for line in log.splitlines()
-    if any(phrase in line.lower() for phrase in CONTENT_ERROR_PHRASES)
-    and not any(noise in line.lower() for noise in BENIGN_LOG_PHRASES)
-]
+
+
+def is_content_error(line):
+    low = line.lower()
+    if any(noise in low for noise in BENIGN_LOG_PHRASES):
+        return False
+    if any(phrase in low for phrase in CONTENT_ERROR_PHRASES):
+        return True
+    # A plain fault inside a behavior-pack script: "[Scripting] ... Error: ...".
+    # The flight readout runs on a tick interval, so on a host with no player
+    # its mistake would otherwise never show.
+    return "[scripting]" in low and ("error:" in low or "exception" in low)
+
+
+content_errors = [line for line in log.splitlines() if is_content_error(line)]
 content_ok = not content_errors
 ok = ok and content_ok
 lines.append(f"live_pass_clean={str(live_ok).lower()}")

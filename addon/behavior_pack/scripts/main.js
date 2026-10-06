@@ -374,3 +374,178 @@ system.runInterval(() => {
     // The world can tick before the function files are ready.
   }
 }, 1);
+
+// ---------------------------------------------------------------------------
+// Flight readout
+//
+// The rider's dragon readout on the action bar: speed, altitude and stamina.
+// The whole point is the easing. A reading taken every tick changes constantly
+// and reads as noise, so each number tweens toward its new value on an
+// ease-in-out curve: the display settles, and a change is visible as a change
+// rather than a flicker.
+//
+// This is deliberately not JSON UI. A ui/ file is client-side, so the bench
+// and the content log cannot check it, and a malformed one breaks a player's
+// HUD. Nothing here can do that. The custom panel goes in once a client can
+// confirm it.
+//
+// Speed is read from the dragon's own movement, not from a velocity API, so it
+// needs nothing the script API does not already expose.
+
+const DRAGON_TYPE = "dragon_rider:dragon";
+const HUD_INTERVAL = 4; // ticks between redraws, so 5 Hz
+const HUD_TWEEN_DRAWS = 5; // redraws an eased change takes
+const HUD_BAR_CELLS = 10;
+const HUD_FAST = 20; // blocks per second that counts as full work
+const STAMINA_MAX = 100;
+const STAMINA_DRAIN = 3.0; // per draw, at full work
+const STAMINA_RECOVER = 1.2; // per draw, below the work threshold
+const STAMINA_WORK = 0.35;
+const HUD_TEST_EVENT = "dragon_rider:hud";
+
+// Slow at both ends, fast through the middle. A linear walk reads as a slide;
+// this reads as a settle.
+function easeInOutCubic(t) {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function clamp(value, low, high) {
+  return value < low ? low : value > high ? high : value;
+}
+
+// A number that slides to a new target instead of jumping to it. Re-aiming
+// restarts the curve from wherever the value has reached, so a target that
+// moves mid-tween does not snap back.
+class Eased {
+  constructor(value) {
+    this.value = value;
+    this.from = value;
+    this.to = value;
+    this.step = HUD_TWEEN_DRAWS;
+  }
+
+  aim(target) {
+    if (target !== this.to) {
+      this.from = this.value;
+      this.to = target;
+      this.step = 0;
+    }
+  }
+
+  advance() {
+    if (this.step < HUD_TWEEN_DRAWS) this.step += 1;
+    const t = this.step / HUD_TWEEN_DRAWS;
+    this.value = this.from + (this.to - this.from) * easeInOutCubic(t);
+    return this.value;
+  }
+}
+
+// Colour carries the fill, so any font renders the bar. A block glyph would
+// depend on the font having it.
+function staminaBar(value) {
+  const filled = Math.round(clamp(value / STAMINA_MAX, 0, 1) * HUD_BAR_CELLS);
+  return "§a" + "|".repeat(filled) + "§8" + "|".repeat(HUD_BAR_CELLS - filled);
+}
+
+const flightReadouts = new Map();
+
+// The live reading, or null when the player is not on a dragon. Speed is the
+// distance the dragon moved since the last draw, over the elapsed time, which
+// needs no velocity API.
+function readFlight(player, state) {
+  let mount = null;
+  try {
+    mount = player.getComponent("minecraft:riding")?.entityRidingOn ?? null;
+  } catch (e) {
+    mount = null;
+  }
+  if (!mount || mount.typeId !== DRAGON_TYPE) {
+    state.last = null;
+    return null;
+  }
+
+  const here = mount.location;
+  let speed = 0;
+  if (state.last) {
+    const dx = here.x - state.last.x;
+    const dy = here.y - state.last.y;
+    const dz = here.z - state.last.z;
+    speed = Math.sqrt(dx * dx + dy * dy + dz * dz) / (HUD_INTERVAL / 20);
+  }
+  state.last = { x: here.x, y: here.y, z: here.z };
+  return { speed, altitude: here.y };
+}
+
+function drawFlightHud(player, forced) {
+  let state = flightReadouts.get(player.id);
+  if (!state) {
+    state = {
+      speed: new Eased(0),
+      altitude: new Eased(0),
+      stamina: new Eased(STAMINA_MAX),
+      bar: STAMINA_MAX,
+      last: null,
+      shown: false,
+    };
+    flightReadouts.set(player.id, state);
+  }
+
+  const reading = forced ?? readFlight(player, state);
+  if (!reading) {
+    if (state.shown) {
+      player.onScreenDisplay.setActionBar("§7");
+      state.shown = false;
+    }
+    return;
+  }
+
+  state.shown = true;
+  state.speed.aim(reading.speed);
+  state.altitude.aim(reading.altitude);
+
+  const work = clamp(reading.speed / HUD_FAST, 0, 1);
+  state.bar = clamp(
+    state.bar + (work > STAMINA_WORK ? -STAMINA_DRAIN * work : STAMINA_RECOVER),
+    0,
+    STAMINA_MAX
+  );
+  state.stamina.aim(state.bar);
+
+  const speed = state.speed.advance();
+  const altitude = state.altitude.advance();
+  const stamina = state.stamina.advance();
+
+  player.onScreenDisplay.setActionBar(
+    `§bSpeed §f${speed.toFixed(1)}§7 b/s  ` +
+      `§bAlt §f${Math.round(altitude)}  ` +
+      `§bStamina §r${staminaBar(stamina)}`
+  );
+}
+
+system.runInterval(() => {
+  for (const player of world.getAllPlayers()) {
+    try {
+      drawFlightHud(player);
+    } catch (e) {
+      // One player's readout must never take the tick loop down.
+    }
+  }
+}, HUD_INTERVAL);
+
+// Test bypass, in the style of the other events here: draw the readout for the
+// caller with values that climb on every call, so the easing is visible on a
+// client without a dragon to ride. Not shipped behaviour: it needs the caller
+// to run the scriptevent.
+let hudDemoStep = 0;
+system.afterEvents.scriptEventReceive.subscribe((event) => {
+  if (event.id !== HUD_TEST_EVENT) return;
+  const entity = event.sourceEntity;
+  if (entity?.typeId !== "minecraft:player") return;
+  hudDemoStep = (hudDemoStep + 1) % 4;
+  const speeds = [0, 8, 22, 3];
+  system.run(() =>
+    drawFlightHud(entity, { speed: speeds[hudDemoStep], altitude: 96 + hudDemoStep * 4 })
+  );
+});
