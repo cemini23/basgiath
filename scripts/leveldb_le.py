@@ -21,6 +21,11 @@ import struct
 import zlib
 from pathlib import Path
 
+try:  # the NBT payloads are parsed by the sibling module
+    from nbt_le import TAG_COMPOUND, _decode_compound_body, _read_string
+except ImportError:  # pragma: no cover - only when imported from elsewhere
+    TAG_COMPOUND = None
+
 # ------------------------------------------------------------------ varints
 
 
@@ -362,6 +367,20 @@ def write_record(dbdir: Path, key: str, value: bytes, sequence: int) -> Path:
     return path
 
 
+def decode_value(value: bytes) -> tuple[str, dict]:
+    """A stored value to (root name, NBT). The value is zlib-compressed NBT."""
+    raw = value
+    if value[:1] == b"\x78":  # zlib header (0x78 0x01 / 0x9c / 0xda)
+        raw = zlib.decompress(value)
+    if TAG_COMPOUND is None:
+        raise RuntimeError("nbt_le is not importable from here")
+    if raw[0] != TAG_COMPOUND:
+        raise ValueError(f"stored value is not a compound (tag {raw[0]})")
+    name, offset = _read_string(raw, 1)
+    body, _ = _decode_compound_body(raw, offset)
+    return name, body
+
+
 def escape_key(key: str) -> str:
     """Render a key readably. Locational keys are binary, not text."""
     return "".join(
@@ -377,9 +396,21 @@ def main() -> None:
     parser.add_argument("--keys", action="store_true", help="list keys instead of dumping")
     parser.add_argument("--grep", help="only show keys containing this text")
     parser.add_argument("--hex", metavar="KEY", help="dump one key's value as hex")
+    parser.add_argument("--decode", metavar="KEY", help="zlib+NBT decode one key's value")
     args = parser.parse_args()
 
     data = read_db(args.dbdir)
+
+    if args.decode:
+        value = data.get(args.decode)
+        if value is None:
+            raise SystemExit(f"key not found: {args.decode!r}")
+        name, body = decode_value(value)
+        print(f"{args.decode!r}  root={name!r}  ({len(value)} compressed bytes)")
+        import pprint
+
+        pprint.pprint(body, width=110, depth=5)
+        return
 
     if args.hex:
         value = data.get(args.hex)
