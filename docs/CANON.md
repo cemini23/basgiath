@@ -62,7 +62,7 @@ The crossing that starts everything. This is the clip for the project.
 
 - The current span is 32 blocks up. Canon is about 61 blocks. **NEEDS CHECK** on the exact height in blocks.
 - One block wide is a fair stand-in for 18 inches. One block reads wider than canon, but it is playable.
-- The current build has a two-block gap in the span. Canon has no gap. Keep the gap only if the clip needs a jump. Mark it as a deliberate game device.
+- The span keeps a two-block gap. Canon has no gap. The gap is the clip's jump, kept as a deliberate game device.
 - Canon has the span highest at the midpoint. A gentle arch matches the book better than a flat deck.
 
 ## 2. Formation — the same day
@@ -80,9 +80,9 @@ The crossing that starts everything. This is the clip for the project.
 
 ### Build note
 
-- The current build has a flat "Quad" platform. Canon is an enclosed courtyard, not an open plaza.
-- Add the wall ring: 10 blocks thick, 8 blocks tall, one opening toward the Parapet.
-- Add a roll-call beat. It is the cheapest way to teach the wing, section, and squad structure.
+- The courtyard is built as an enclosed walled ring (`scripts/zones/quad.py`), not an open plaza.
+- The ring is 10 blocks thick and 8 blocks tall, with one opening toward the Parapet.
+- The roll-call square and the death-roll lines are built. They teach the wing, section, and squad structure.
 
 ## 3. College — about two months
 
@@ -101,9 +101,9 @@ The crossing that starts everything. This is the clip for the project.
 
 ### Build note
 
-- The build has no college building at all. This is the biggest gap. The Citadel is the heart of the map.
-- Suggested first structures: the courtyard wall ring, the rotunda shell with four doors, the keep with its arched door, and the dorm block.
-- The build has three spruce barracks. Canon calls for one large dorm block, plus classrooms.
+- The Citadel group is built (`scripts/zones/dorms.py`): the Dragon Rotunda with four doors, the keep with its arched door, the dorm block, and a classroom shell.
+- The three spruce huts are gone. One dorm block stands in their place, with a private room for a bonded rider.
+- The arched door carries an original rider-and-dragon line, not the book line.
 
 ## 4. Gauntlet — timed run on September 29
 
@@ -127,9 +127,9 @@ The crossing that starts everything. This is the clip for the project.
 
 ### Build note
 
-- The Gauntlet is absent from the current build. Add the cliff and the five switchbacks.
-- In Minecraft, the "obstacles" become parkour: a rotating log, rising pillars, a wheel with one hole, hanging blocks, and a climbable chimney.
-- The safety ropes can be vines or chains. Add a time penalty if the player touches one.
+- The cliff and the five switchbacks are built (`scripts/zones/gauntlet.py`).
+- In Minecraft, the "obstacles" become parkour: a log, rising pillars, a stone ring with one gap, cobble clusters, a ladder chimney, and an oak ramp.
+- The safety ropes are chains. The map adds 30 seconds when a cadet grabs one.
 
 ## 5. Presentation — September 29, after the Gauntlet
 
@@ -144,7 +144,7 @@ The crossing that starts everything. This is the clip for the project.
 
 ### Build note
 
-- The flight field is absent. Add the box canyon, the footpath, and the dragon line.
+- The flight field is built (`scripts/zones/flight.py`): the box canyon, the footpath, the dais, the bleachers, and the dragon line.
 - The walk is a strong second clip. A short, tense corridor is enough.
 
 ## 6. Threshing — October 1
@@ -170,8 +170,8 @@ The bond. The dragon chooses. The cadet does not.
 
 ### Build note
 
-- Threshing is absent as an event. This is the beat Grok proposed to build first. It is the right first choice.
-- The Vale must stop reading as a summoning pad. Make it a forested dell with open ground.
+- The Threshing dell is built (`scripts/zones/valley.py`), with the bond flag and the Roll-keeper.
+- The Vale now reads as a forested dell with open ground. The old summon still places the rideable dragon on the moss pad.
 - The dragon must walk to the player, or choose the player. The player must not pick the dragon. This is the core rule of the scene.
 
 ## 7. Signet — weeks to months after the bond
@@ -186,8 +186,7 @@ The bond. The dragon chooses. The cadet does not.
 
 ### Build note
 
-- The current build gives the power at the plaza stone, on day one. Canon puts it weeks after the bond. Move it.
-- The stone can still open the form. Move the form to the post-bond state, in the valley, after the dragon chooses the player.
+- The form now opens only at the dell stone, and only after the bond (`scripts/zones/signet.py`, `addon/behavior_pack/scripts/main.js`). Canon puts it weeks after the bond, so the plaza marker is no longer a lodestone.
 - The archetypes are the map's own. The rules ban character names, book text and official art; they do not limit which powers the map may have, so the set can grow. See `DESIGN.md` and the naming policy below.
 
 ---
@@ -233,16 +232,16 @@ This updates `docs/IP-RULES.md` rule 3. Confirm the change before the build reli
 | Item | Build now | Canon | Action |
 |------|-----------|-------|--------|
 | Parapet height | 32 blocks | About 61 blocks | Raise, or accept |
-| Parapet gap | 2-block gap | No gap | Keep only as a game device |
-| Courtyard | Open platform | Wall ring, 10 thick, 8 tall, one opening | Add walls |
-| Formation | None | Wings, sections, squads, death roll | Add a roll-call beat |
-| Citadel | None | Rotunda, keep, dorms, classrooms | Add the buildings |
-| Gauntlet | None | Cliff, 5 switchbacks, 6 obstacles | Add the cliff |
-| Flight field | None | Box canyon, dais, bleachers | Add the field |
-| Threshing | None | Dragon choice, relic, flight trial, roll-keeper | Build first |
-| Vale | Sunken bowl, pillar ring, gold pad | Forested dell | Rework the terrain |
-| Signet | Day one, at the stone | Weeks after the bond | Move the trigger |
-| Story order | Parapet, Quad, valley | See the table at the top | Update README and DESIGN |
+| Parapet gap | 2-block gap | No gap | Kept as a game device |
+| Courtyard | Wall ring, 10 thick, 8 tall, one opening | Same | Done |
+| Formation | Roll-call square and death-roll lines | Wings, sections, squads, death roll | Done |
+| Citadel | Rotunda, keep, dorm block, classrooms | Same | Done |
+| Gauntlet | Cliff, 5 switchbacks, 6 obstacles, live scoring | Same | Done |
+| Flight field | Box canyon, footpath, dais, bleachers, dragon line | Same | Done |
+| Threshing | Dell, dragon choice, bond flag, Roll-keeper | Dragon choice, relic, flight trial, roll-keeper | Done |
+| Vale | Forested dell and moss pad | Forested dell | Done |
+| Signet | Post-bond, at the dell stone, four questions, eight archetypes | Weeks after the bond | Done |
+| Story order | Seven beats, canon order | See the table at the top | Done |
 
 ---
 

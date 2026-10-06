@@ -31,22 +31,51 @@ From the repo root:
 - [ ] Fall in on purpose. Confirm you die and return to the lit path.
 - [ ] Cross again. Confirm the east tower sets a new respawn point.
 
-## 4. The Quad and the dorms (about 10 min)
+## 4. Formation — the Quad (about 5 min)
 
-- [ ] Walk to the plaza and the bell tower.
-- [ ] Touch the lodestone. Answer the three questions.
-- [ ] Confirm a signet title appears, and a line tells you the wing size.
+- [ ] Cross the span into the walled courtyard. Confirm the ring is 10 blocks thick and 8 blocks tall, with one opening toward the Parapet.
+- [ ] Walk to the plaza and the bell tower. Count four wing standards.
+- [ ] Read the roll call. Confirm the squad square shows four wings, three sections, three squads.
+- [ ] Confirm the death roll line appears and names no person.
+- [ ] Interact with the Scroll-keeper lectern. Confirm it asks for your rider name and saves it.
+
+## 5. The College — the Citadel (about 10 min)
+
+- [ ] Take the west gate south to the Citadel group.
+- [ ] Walk the Dragon Rotunda: three stories, a polished floor, a glass dome, and four doors between orange and black pillars.
+- [ ] Find the keep. Read the arched door line. Confirm it is an original line, not the book line.
+- [ ] Walk the dorm block: three stories, four rows of beds, and one private room for a bonded rider.
+
+## 6. The Gauntlet (about 10 min)
+
+- [ ] East of the dorms, step onto the base of the cliff. The stopwatch starts.
+- [ ] Climb the six terraces. Confirm each leg sits one turn higher than the last, and that five turns separate them.
+- [ ] Touch a chain rope. Confirm the sidebar time jumps by 30 seconds.
+- [ ] Reach the summit. Confirm the "Gauntlet complete" title shows your time.
+
+## 7. Presentation — the flight field (about 5 min)
+
+- [ ] South of the college, walk the footpath through the box canyon.
+- [ ] Confirm the dais, the bleachers, and the six wool posts of the dragon line.
+- [ ] Confirm the walk offers no choice and summons no dragon.
+
+## 8. Threshing — the dell (about 10 min)
+
+- [ ] Southwest of the courtyard, in the dell, stand in the open ground. Confirm a dragon chooses you; you cannot choose it.
+- [ ] Before the bond, touch the dell signet stone. Confirm the form refuses.
+- [ ] At the Roll-keeper lectern, give the dragon's full name. Confirm it saves on you.
+- [ ] Run `/function basgiath/summon_dragon` on the moss pad. Ride the dragon. Confirm it flies and that the wings and the tail move.
+
+## 9. The Signet (about 5 min)
+
+- [ ] After the bond, touch the dell lodestone at 50, -1, 130 with an empty hand.
+- [ ] Confirm a form of four questions opens. Answer it.
+- [ ] Confirm one of the eight archetypes appears, with its line and your wing size.
 - [ ] Touch the stone again. Confirm the same player does not take two wing slots.
-- [ ] Walk through the three barracks.
+- [ ] Touch a lodestone anywhere else. Confirm the form does not open.
+- [ ] Confirm the texture on the dragon is the generated dragon, not a missing-texture checker.
 
-## 5. The dragon (about 10 min)
-
-- [ ] Go to the valley pad.
-- [ ] Run `/function basgiath/summon_dragon`.
-- [ ] Ride the dragon. Confirm it flies and that the wings and the tail move.
-- [ ] Confirm the texture is the generated dragon, not a missing-texture checker.
-
-## 6. Ship check (about 15 min)
+## 10. Ship check (about 15 min)
 
 - [ ] Repeat the Parapet once on a phone or a tablet, not only on a desktop.
 - [ ] Read `docs/LISTING.md` before you post. Every clip and every download page carries the credit line in that file.

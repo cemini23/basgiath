@@ -18,7 +18,7 @@ The Parapet is the clip. You start on the ground and climb to a one-block span o
 
 A dragon has to choose you first: the dell gives the bond, and only then does the signet stone open. Answer four questions and you get one of eight original results, from Stormcaller to Tidekeeper. The result stays on your player. The college also keeps a wing roster of the last 24 riders.
 
-South of the Quad are three barracks. Further on, a sunken valley has a gold pad. Run `/function basgiath/summon_dragon`, mount, and fly.
+South of the Quad is the Citadel group, then the flight field. Southwest, a forested dell gives the bond. Run `/function basgiath/summon_dragon`, mount, and fly.
 
 You need Minecraft Bedrock 1.21.90 or newer. A phone, a tablet, or Windows can open the file. A Nintendo Switch can play it after a Realm download from a phone or from Windows, with the same Microsoft account. Minecraft on a Mac cannot open this file. The free trial turns commands off, so it cannot run the build.
 
@@ -28,7 +28,7 @@ How to install:
 2. Open it with Minecraft. On a phone, tap the file and choose Minecraft.
 3. Run `/function basgiath/build`.
 4. Wait for the title "Welcome, candidate".
-5. Cross the Parapet, touch the stone, then summon the dragon in the valley.
+5. Cross the Parapet, then play the seven beats through to the dell and the signet stone.
 
 Cheats are already on. The build sets adventure mode, locks the night, and starts a storm. The file is free. It stays free.
 
@@ -38,13 +38,13 @@ Fan-made. Not official. Not affiliated with Rebecca Yarros, Entangled Publishing
 
 ## CurseForge
 
-Basgiath is a free Bedrock world. One command builds a war college: a storm-lit span, a parade ground, three barracks, and a valley.
+Basgiath is a free Bedrock world. One command builds a war college: a storm-lit span, a walled courtyard, the Citadel, the Gauntlet cliff, the flight field, and a forested dell.
 
 Climb to the Parapet, then cross it. The path is a single block wide. Wind pushes you toward the drop, and the middle is a two-block gap. A fall kills you and sends you back to the ground start. The far side sets a checkpoint.
 
 After a dragon chooses you in the dell, touch the signet stone for a four-question form. The eight results are original, from Stormcaller to Tidekeeper. Your result is saved, and the world remembers who has joined the wing.
 
-In the valley, `/function basgiath/summon_dragon` puts a rideable dragon on the pad. You steer it in the air.
+In the dell, `/function basgiath/summon_dragon` puts a rideable dragon on the pad. You steer it in the air.
 
 Install: open `basgiath.mcworld` in Minecraft Bedrock 1.21.90 or newer, then run `/function basgiath/build`. A phone, a tablet, or Windows can open the file. A Switch needs a Realm download from one of those, with the same Microsoft account. Minecraft on a Mac cannot open the file. The free trial cannot run the function. Cheats are on in the download. Do not enable Beta APIs. This map is free and it is not a Marketplace pack.
 
@@ -108,11 +108,11 @@ End card: `Free download. Fan-made. Not official. Not affiliated with Rebecca Ya
 
 Length: 18 seconds.
 
-Shot: The valley pad. Run the summon. Mount. Climb until the college is small below.
+Shot: The dell pad. Run the summon. Mount. Climb until the college is small below.
 
-On-screen text: `The valley answers.`
+On-screen text: `The dell answers.`
 
-Spoken line: "The pad is gold so you can see it from the air. Then you just fly."
+Spoken line: "The pad sits in the open, so you can see it from the air. Then you just fly."
 
 End card: `Free download. Fan-made. Not official. Not affiliated with Rebecca Yarros, Entangled Publishing, or Red Tower Books.`
 

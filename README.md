@@ -39,10 +39,10 @@ One command raises the college. Then you play seven beats, in order.
 1. **The Parapet** — a one-block stone span over a chasm, in a storm, with wind that pushes you. A two-block gap sits in the middle. This is the clip.
 2. **Formation** — the walled courtyard past the span. Four wings, three sections, three squads. Roll call reads the death roll. Learn the square, then find your row.
 3. **The College** — the Citadel group: the Dragon Rotunda, the keep, the dorm block, the private room, and the classrooms. This is where the first year passes.
-4. **The Gauntlet** — the stepped cliff east of the dorms. Six switchbacks, six obstacles, and chain ropes that add 30 seconds if you touch one.
+4. **The Gauntlet** — the stepped cliff east of the dorms. Five switchbacks between six terraces, six obstacles, and chain ropes that add 30 seconds if you touch one.
 5. **Presentation** — the box canyon south of the college. Squads walk the footpath; the dragons form up and watch. This is not the choosing.
 6. **Threshing** — the forested dell southwest of the courtyard. Stand in the open and a dragon chooses you. You do not choose it.
-7. **The Signet** — after the bond, the form stone in the dell reads the bond and offers one of four original signets.
+7. **The Signet** — after the bond, the form stone in the dell reads the bond and offers one of eight original signets.
 
 ## Why Bedrock
 
