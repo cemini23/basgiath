@@ -68,6 +68,9 @@ difficulty=easy
 allow-cheats=true
 level-name=Basgiath
 online-mode=true
+# This server build supports only NetherNet transport and logs an ERROR
+# without it. The bench has no players, but the error is noise in the log.
+transport=nethernet
 server-port=19132
 max-players=5
 view-distance=6
@@ -282,9 +285,16 @@ content_errors = [
         # state or an out-of-range value. Observed on 1.26.52.3.
         or "Invalid value for Block State" in line
         or "is invalid on Block" in line
+        # An entity JSON field the schema rejects, e.g. deals_damage given a
+        # boolean where a string is required.
+        or "unknown child schema option type" in line
     )
     and "unless block test failed" not in line
     and "Detect position" not in line
+    # The titleraw shape probe aims at the anchor stand on purpose. titleraw
+    # takes only players, so the server also logs "Selector must be
+    # player-type"; that line is the probe working, not a shipped defect.
+    and "Selector must be player-type" not in line
 ]
 content_ok = not content_errors
 ok = ok and content_ok
