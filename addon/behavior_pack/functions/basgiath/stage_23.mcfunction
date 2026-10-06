@@ -26,10 +26,10 @@ fill ~132 ~-1 ~84 ~133 ~1 ~84 air
 setblock ~131 ~2 ~84 stone_brick_stairs
 setblock ~134 ~2 ~84 stone_brick_stairs
 setblock ~127 ~2 ~85 air
-setblock ~127 ~1 ~85 ladder [facing_direction=2]
+setblock ~127 ~1 ~85 ladder["facing_direction"=2]
 setblock ~127 ~5 ~85 air
-setblock ~127 ~4 ~85 ladder [facing_direction=2]
-setblock ~127 ~-1 ~85 ladder [facing_direction=2]
+setblock ~127 ~4 ~85 ladder["facing_direction"=2]
+setblock ~127 ~-1 ~85 ladder["facing_direction"=2]
 fill ~140 ~-1 ~90 ~140 ~1 ~90 air
 setblock ~129 ~-1 ~86 red_wool
 setblock ~131 ~-1 ~86 red_wool

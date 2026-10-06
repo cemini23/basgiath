@@ -75,7 +75,7 @@ Canon play order is Parapet, Formation, College, Gauntlet, Presentation, Threshi
 
 Threshing sets the bond. The signet reads it. Neither agent edits the other file.
 
-- Score name: `#bond map_state`
+- Score name: `bg_bond map_state`
 - `0` means no bond yet.
 - `1` means a dragon has chosen the player.
 - The signet quiz must not open from the plaza lodestone.

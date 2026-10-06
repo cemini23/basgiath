@@ -4,7 +4,7 @@
 // Trigger: interact with a lodestone (the "Bonding Stone") after the bond.
 //          Canon puts the signet weeks after a dragon chooses the rider,
 //          so the form opens only for a player with the "bonded" tag.
-//          Threshing sets that tag (and the #bond score) when a dragon
+//          Threshing sets that tag (and the bg_bond score) when a dragon
 //          chooses the player. This script only reads the tag.
 //          Interact with either keeper lectern and the keeper opens a form:
 //          the Scroll-keeper takes the rider's name, the Roll-keeper takes the

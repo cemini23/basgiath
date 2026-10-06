@@ -1,0 +1,33 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Basgiath GameTest (dev only)",
+    "description": "Dev-only GameTest pack: proves the dragon spawns, is rideable, and is flyable.",
+    "uuid": "32468250-41e8-4bd0-9f44-6c094d6c183e",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 90]
+  },
+  "modules": [
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "7b50ca13-ac6a-4138-a3e0-ab55e0d5fcaf",
+      "entry": "scripts/dragon_test.js",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "7a3f9c2e-1b4d-4e8a-9f21-0c5d6e7a8b90",
+      "version": [0, 1, 6]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.11.0-beta"
+    },
+    {
+      "module_name": "@minecraft/server-gametest",
+      "version": "1.0.0-beta"
+    }
+  ]
+}

@@ -13,14 +13,14 @@ fill ~103 ~-1 ~113 ~121 ~-1 ~119 polished_andesite
 fill ~102 ~-1 ~116 ~102 ~1 ~117 air
 setblock ~102 ~2 ~116 stone_brick_stairs
 setblock ~102 ~2 ~117 stone_brick_stairs
-setblock ~106 ~1 ~115 lectern [facing_direction=2]
-setblock ~110 ~1 ~115 lectern [facing_direction=2]
-setblock ~114 ~1 ~115 lectern [facing_direction=2]
-setblock ~108 ~1 ~118 lectern [facing_direction=3]
-setblock ~112 ~1 ~118 lectern [facing_direction=3]
-setblock ~106 ~1 ~118 lectern [facing_direction=4]
-setblock ~116 ~1 ~118 lectern [facing_direction=4]
-setblock ~118 ~1 ~117 lectern [facing_direction=1]
+setblock ~106 ~1 ~115 lectern["direction"=2]
+setblock ~110 ~1 ~115 lectern["direction"=2]
+setblock ~114 ~1 ~115 lectern["direction"=2]
+setblock ~108 ~1 ~118 lectern["direction"=3]
+setblock ~112 ~1 ~118 lectern["direction"=3]
+setblock ~106 ~1 ~118 lectern["direction"=4]
+setblock ~116 ~1 ~118 lectern["direction"=4]
+setblock ~118 ~1 ~117 lectern["direction"=1]
 setblock ~118 ~2 ~114 lantern
 setblock ~104 ~2 ~118 lantern
 fill ~146 ~ ~80 ~168 ~ ~81 stone

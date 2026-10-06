@@ -29,7 +29,7 @@ FLOOR_Y = -1                        # the college ground
 WALL_BLOCK = "stone"
 BRICK = "stone_bricks"
 DAIS_BLOCK = "smooth_stone"
-WALK_BLOCK = "dirt_path"
+WALK_BLOCK = "grass_path"
 GLASS = "light_blue_stained_glass"
 
 # The footpath. It runs the middle of the field for ctx.SPAN_Z blocks.

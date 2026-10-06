@@ -19,6 +19,11 @@ if ! python3 -c "import PIL" >/dev/null 2>&1; then
   exit 1
 fi
 
+# The manifests are checked before the zip is written, so a duplicate,
+# dangling, or version-skewed UUID never reaches dist/. A player who cannot
+# import the pack never sees the world, so this must fail the build.
+python3 "$ROOT/scripts/validate_manifests.py"
+
 python3 "$ROOT/scripts/build_dragon_model.py"
 python3 "$ROOT/scripts/build_map.py"
 
@@ -29,6 +34,9 @@ rm -f "$OUT"
   cd "$ROOT/addon"
   zip -r -X "$OUT" behavior_pack resource_pack -x "*.DS_Store" -x "__MACOSX/*" -x "*/__pycache__/*"
 )
+
+# Prove the shipped zip holds both packs and matches the manifests just read.
+python3 "$ROOT/scripts/validate_manifests.py" --mcaddon "$OUT"
 
 python3 "$ROOT/scripts/build_world.py"
 echo "wrote $OUT"

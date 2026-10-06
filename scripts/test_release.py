@@ -273,7 +273,7 @@ def check_map() -> None:
         fail("build function does not place a stone under the player")
     if "resistance 999999 255" not in build:
         fail("build function does not give the anchor resistance")
-    if "scoreboard players set #stage map_state 0" not in build:
+    if "scoreboard players set bg_stage map_state 0" not in build:
         fail("build function leaves the stage running")
     if "#wait" in build:
         fail("build function waits for a tick the phone does not run")
@@ -290,7 +290,7 @@ def check_map() -> None:
         fail("build function does not fill the valley when those chunks load")
     if "schedule delay add basgiath/raise 300" not in build:
         fail("build function has no timed second pass")
-    if "scoreboard players set #done map_state 0" not in build:
+    if "scoreboard players set bg_done map_state 0" not in build:
         fail("build function does not arm the welcome")
     tick_fn = (folder / "tick.mcfunction").read_text()
     if "#wait" in tick_fn:
@@ -306,7 +306,7 @@ def check_map() -> None:
     open_fn = (folder / "open.mcfunction").read_text()
     if "function basgiath/far_01" not in open_fn:
         fail("open function does not place the far college")
-    if "Welcome, candidate" not in open_fn or "scoreboard players set #done map_state 1" not in open_fn:
+    if "Welcome, candidate" not in open_fn or "scoreboard players set bg_done map_state 1" not in open_fn:
         fail("open function does not welcome the player")
     if "run execute " in open_fn:
         fail("open function nests execute")
@@ -322,16 +322,16 @@ def check_map() -> None:
     for objective in ("gate_time", "gate_sec", "gate_start", "gate_pen", "gate_best"):
         if f"scoreboard objectives add {objective} dummy" not in build:
             fail(f"the build does not create the {objective} objective")
-    if "scoreboard players set #twenty map_state 20" not in build:
+    if "scoreboard players set bg_twenty map_state 20" not in build:
         fail("the build never sets the divisor the seconds objective needs")
     if "scoreboard objectives setdisplay sidebar gate_sec" not in build:
         fail("the build does not put the cadet's time on the sidebar")
-    if "scoreboard players add #clock map_state 1" not in live:
+    if "scoreboard players add bg_clock map_state 1" not in live:
         fail("the live pass has no clock")
     for needle in ("gate_time", "gate_sec", "gate_start", "gate_pen", "gate_best", "gate_run", "gate_done"):
         if needle not in live:
             fail(f"the live pass never touches {needle}")
-    if "operation @s gate_sec /= #twenty map_state" not in live:
+    if "operation @s gate_sec /= bg_twenty map_state" not in live:
         fail("the live pass never turns ticks into seconds")
     # The start and summit zones come from BANDS in the zone module, not from
     # rewritten numbers. This compares the emitted boxes against the module's
@@ -367,7 +367,7 @@ def check_map() -> None:
         if time_write.search(line)
     ]
     if time_writes != [
-        "scoreboard players operation @s gate_time = #clock map_state",
+        "scoreboard players operation @s gate_time = bg_clock map_state",
         "scoreboard players operation @s gate_time -= @s gate_start",
         "scoreboard players operation @s gate_time += @s gate_pen",
     ]:
@@ -579,6 +579,18 @@ def check_uuids() -> None:
         fail(f"pack UUIDs are not unique: {uuids}")
 
 
+def check_manifests() -> None:
+    """The release gate runs the manifest validator and requires it to pass.
+
+    validate_manifests.py is the single source of the manifest contract the
+    Bedrock import dialog reads. This asserts it ran here, not only inside
+    package.sh, so a broken manifest fails the gate even on a build path that
+    skips the packaging step.
+    """
+    run([sys.executable, "scripts/validate_manifests.py"])
+    print("pack manifests ok")
+
+
 def main() -> None:
     run([sys.executable, "scripts/build_map.py"])
     run([sys.executable, "scripts/build_dragon_model.py"])
@@ -587,6 +599,7 @@ def main() -> None:
     check_signet()
     check_dragon()
     check_uuids()
+    check_manifests()
     check_world()
     print("release checks ok")
 

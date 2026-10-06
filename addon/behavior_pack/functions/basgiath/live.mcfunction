@@ -1,6 +1,6 @@
-scoreboard players add #wind map_state 1
-execute if score #wind map_state matches 4.. run scoreboard players set #wind map_state 0
-execute if score #wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~15 ~33 ~19 as @a[dx=63,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
+scoreboard players add bg_wind map_state 1
+execute if score bg_wind map_state matches 4.. run scoreboard players set bg_wind map_state 0
+execute if score bg_wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~15 ~33 ~19 as @a[dx=63,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~20 ~34 ~20
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~40 ~34 ~20
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~55 ~34 ~20
@@ -12,19 +12,19 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~124,y=~0,
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~124,y=~0,z=~44,dx=10,dy=3,dz=8] add cp_quad
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12,tag=!cp_valley] run spawnpoint @s ~43 ~-1 ~117
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12] add cp_valley
-scoreboard players add #storm map_state 1
-execute if score #storm map_state matches 200.. run scoreboard players set #storm map_state 0
-execute if score #storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run scoreboard players add #clock map_state 1
+scoreboard players add bg_storm map_state 1
+execute if score bg_storm map_state matches 200.. run scoreboard players set bg_storm map_state 0
+execute if score bg_storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run scoreboard players add bg_clock map_state 1
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,z=~80,dx=23,dy=1,dz=2,tag=!gate_run] run tag @s add gate_run
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,z=~80,dx=23,dy=1,dz=2,tag=!gate_run] run tag @s remove gate_done
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,z=~80,dx=23,dy=1,dz=2] run scoreboard players operation @s gate_start = #clock map_state
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,z=~80,dx=23,dy=1,dz=2] run scoreboard players operation @s gate_start = bg_clock map_state
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~1,z=~80,dx=23,dy=1,dz=2] run scoreboard players set @s gate_pen 0
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time = #clock map_state
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time = bg_clock map_state
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time -= @s gate_start
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_time += @s gate_pen
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_sec = @s gate_time
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_sec /= #twenty map_state
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=gate_run] run scoreboard players operation @s gate_sec /= bg_twenty map_state
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] run tag @s remove gate_run
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] run tag @s add gate_done
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~146,y=~26,z=~105,dx=23,dy=1,dz=36,tag=gate_run] unless score @s gate_best matches 0.. run scoreboard players set @s gate_best 0
@@ -72,14 +72,14 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[tag=!ro
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[tag=!rope_touch] remove rope_told
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=rope_touch,tag=!rope_told] run titleraw @s actionbar {"rawtext":[{"text":"You grabbed a rope. The run adds 30 seconds."}]}
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[tag=rope_touch] add rope_told
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run scoreboard players add #spinline map_state 1
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s if score #spinline map_state matches 10.. run scoreboard players set #spinline map_state 0
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run scoreboard players add bg_spinline map_state 1
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s if score bg_spinline map_state matches 10.. run scoreboard players set bg_spinline map_state 0
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~152 ~3 ~83
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s if score #spinline map_state matches 5 run particle minecraft:basic_smoke_particle ~152 ~3 ~82
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s if score bg_spinline map_state matches 5 run particle minecraft:basic_smoke_particle ~152 ~3 ~82
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~15,y=~33,z=~12,dx=62,dy=8,dz=16] run tag @s add crossed
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12,tag=crossed,tag=!bonded] run tag @s add bonded
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=bonded,tag=!bondcall] at @s run summon dragon_rider:dragon ~1 ~ ~
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=bonded,tag=!bondcall] run scoreboard players set #bond map_state 1
+execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=bonded,tag=!bondcall] run scoreboard players set bg_bond map_state 1
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=bonded,tag=!bondcall] run tellraw @s {"rawtext":[{"text":"A dragon has chosen you. You did not choose it. Stand still and let it look."}]}
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=bonded,tag=!bondcall] run tag @s add bondcall
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[tag=bondcall,tag=!relic] run tellraw @s {"rawtext":[{"text":"A relic mark burns onto your arm, shaped like the one that chose you."}]}

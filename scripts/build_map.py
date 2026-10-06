@@ -207,17 +207,17 @@ def write_named_stages(prefix: str, commands: list[str]) -> int:
 
 def write_functions(commands: list[str]) -> int:
     count = write_named_stages("stage", commands)
-    tick_lines = ["scoreboard players operation #now map_state = #stage map_state"]
+    tick_lines = ["scoreboard players operation bg_now map_state = bg_stage map_state"]
     for index in range(1, count + 1):
         nxt = index + 1 if index < count else 0
         name = f"stage_{index:02d}"
         tick_lines.append(
-            f'execute if score #now map_state matches {index} as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/{name}'
+            f'execute if score bg_now map_state matches {index} as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/{name}'
         )
         tick_lines.append(
-            f"execute if score #now map_state matches {index} run scoreboard players set #stage map_state {nxt}"
+            f"execute if score bg_now map_state matches {index} run scoreboard players set bg_stage map_state {nxt}"
         )
-    tick_lines.append('execute if score #now map_state matches 0 run function basgiath/live')
+    tick_lines.append('execute if score bg_now map_state matches 0 run function basgiath/live')
     (BASGIATH / "tick.mcfunction").write_text("\n".join(tick_lines) + "\n", encoding="utf-8")
     return count
 
@@ -349,7 +349,7 @@ def build_text(stage_count: int) -> str:
         "scoreboard objectives add gate_start dummy",
         "scoreboard objectives add gate_pen dummy",
         "scoreboard objectives add gate_best dummy",
-        "scoreboard players set #twenty map_state 20",
+        "scoreboard players set bg_twenty map_state 20",
         "scoreboard objectives setdisplay sidebar gate_sec",
         'kill @e[type=armor_stand,name="build_anchor"]',
         "execute at @s run setblock ~ ~-1 ~ stone",
@@ -362,13 +362,13 @@ def build_text(stage_count: int) -> str:
         "gamerule sendcommandfeedback false",
         "gamemode adventure @a",
         *area_lines,
-        "scoreboard players set #done map_state 0",
-        "scoreboard players set #pass map_state 1",
+        "scoreboard players set bg_done map_state 0",
+        "scoreboard players set bg_pass map_state 1",
         "schedule on_area_loaded add tickingarea college_b basgiath/fill_far",
         "schedule on_area_loaded add tickingarea college_d basgiath/fill_far",
         "schedule delay add basgiath/raise 300",
         *stage_calls("stage", stage_count),
-        "scoreboard players set #stage map_state 0",
+        "scoreboard players set bg_stage map_state 0",
         'tellraw @s {"rawtext":[{"text":"The college is rising. Stay still for 15 seconds. Fan-made. Not official. Not affiliated with any publisher."}]}',
     ]
     return "\n".join(lines) + "\n"
@@ -377,15 +377,15 @@ def build_text(stage_count: int) -> str:
 def welcome_lines() -> list[str]:
     """Run once, after the player is standing in the loaded plaza."""
     sx, sy, sz = START
-    once = "execute if score #done map_state matches 0 as @e[type=armor_stand,name=\"build_anchor\",c=1] at @s run "
+    once = "execute if score bg_done map_state matches 0 as @e[type=armor_stand,name=\"build_anchor\",c=1] at @s run "
     return [
-        'execute if score #done map_state matches 0 run gamemode adventure @a',
+        'execute if score bg_done map_state matches 0 run gamemode adventure @a',
         once + 'titleraw @p title {"rawtext":[{"text":"Welcome, candidate"}]}',
         once + 'titleraw @p subtitle {"rawtext":[{"text":"Cross the Parapet"}]}',
         once
         + 'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. The glowing stairs are in front of you. A fall from the span sends you back here. Cross the Parapet. The signet stone waits in the dell, after a dragon chooses you."}]}',
         once + f"tp @p ~{sx} ~{sy} ~{sz} 180 0",
-        "scoreboard players set #done map_state 1",
+        "scoreboard players set bg_done map_state 1",
     ]
 
 
@@ -403,9 +403,9 @@ def raise_text() -> str:
     ]
     return "\n".join(lines) + "\n"
 
-LIVE = """scoreboard players add #wind map_state 1
-execute if score #wind map_state matches 4.. run scoreboard players set #wind map_state 0
-execute if score #wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~15 ~33 ~19 as @a[dx=63,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
+LIVE = """scoreboard players add bg_wind map_state 1
+execute if score bg_wind map_state matches 4.. run scoreboard players set bg_wind map_state 0
+execute if score bg_wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~15 ~33 ~19 as @a[dx=63,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~20 ~34 ~20
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~40 ~34 ~20
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~55 ~34 ~20
@@ -417,9 +417,9 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~124,y=~0,
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~124,y=~0,z=~44,dx=10,dy=3,dz=8] add cp_quad
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12,tag=!cp_valley] run spawnpoint @s ~43 ~-1 ~117
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12] add cp_valley
-scoreboard players add #storm map_state 1
-execute if score #storm map_state matches 200.. run scoreboard players set #storm map_state 0
-execute if score #storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
+scoreboard players add bg_storm map_state 1
+execute if score bg_storm map_state matches 200.. run scoreboard players set bg_storm map_state 0
+execute if score bg_storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
 """
 
 
@@ -598,7 +598,7 @@ def main() -> None:
     (BASGIATH / "fill_far.mcfunction").write_text("\n".join(far_calls) + "\n", encoding="utf-8")
     (BASGIATH / "raise.mcfunction").write_text(raise_text(), encoding="utf-8")
     (BASGIATH / "open.mcfunction").write_text(
-        "\n".join(["scoreboard players set #pass map_state 2", *far_calls, *welcome_lines()]) + "\n",
+        "\n".join(["scoreboard players set bg_pass map_state 2", *far_calls, *welcome_lines()]) + "\n",
         encoding="utf-8",
     )
     (BASGIATH / "live.mcfunction").write_text(live_text(), encoding="utf-8")

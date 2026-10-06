@@ -168,7 +168,7 @@ def live_lines() -> list[str]:
         # 1. A dragon chooses the player. The player does not choose the dragon.
         ANCHOR + in_center + "run tag @s add bonded",
         ANCHOR + fresh + "at @s run summon dragon_rider:dragon ~1 ~ ~",
-        ANCHOR + fresh + "run scoreboard players set #bond map_state 1",
+        ANCHOR + fresh + "run scoreboard players set bg_bond map_state 1",
         ANCHOR
         + fresh
         + "run "

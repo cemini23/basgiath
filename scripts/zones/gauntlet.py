@@ -8,7 +8,7 @@ switchback leg, and every leg sits one turn higher than the one before it.
 The six obstacles sit on the legs in canon order. Chain ropes hang off the
 open north edge.
 
-Scoring is real now. The `#clock map_state` counter in live_lines() is the
+Scoring is real now. The `bg_clock map_state` counter in live_lines() is the
 stopwatch and it runs every tick. A cadet who steps onto the base of the
 cliff earns the `gate_run` tag, `gate_start` holds the clock at that tick, and
 `gate_time` is recomputed every tick as `clock - gate_start + gate_pen`. A
@@ -117,12 +117,12 @@ def build(ctx) -> list[str]:
 def live_lines() -> list[str]:
     """Tick commands. Each line includes execute-at-anchor. The integrator appends them later.
 
-    The `#clock map_state` line is the stopwatch. It runs first, so a tick of
+    The `bg_clock map_state` line is the stopwatch. It runs first, so a tick of
     the live function advances it by exactly one. Every gate_* line below reads
     that clock. None of them places a block, so `solid_blocks()` never sees
     them.
     """
-    lines = [ANCHOR + "run scoreboard players add #clock map_state 1"]
+    lines = [ANCHOR + "run scoreboard players add bg_clock map_state 1"]
     # The start. A cadet who steps onto the base of the cliff and is not
     # already on the course starts the clock: gate_start is the clock now, the
     # rope penalty is wiped, and gate_done is cleared so a second run can beat
@@ -133,7 +133,7 @@ def live_lines() -> list[str]:
     lines.append(ANCHOR + f"as @a[{start},tag=!gate_run] run tag @s remove gate_done")
     lines.append(
         ANCHOR
-        + f"as @a[{start}] run scoreboard players operation @s gate_start = #clock map_state"
+        + f"as @a[{start}] run scoreboard players operation @s gate_start = bg_clock map_state"
     )
     lines.append(
         ANCHOR + f"as @a[{start}] run scoreboard players set @s gate_pen 0"
@@ -142,7 +142,7 @@ def live_lines() -> list[str]:
     # for a fresh grab. There is normally one cadet.
     lines.append(
         ANCHOR
-        + "as @a[tag=gate_run] run scoreboard players operation @s gate_time = #clock map_state"
+        + "as @a[tag=gate_run] run scoreboard players operation @s gate_time = bg_clock map_state"
     )
     lines.append(
         ANCHOR
@@ -160,7 +160,7 @@ def live_lines() -> list[str]:
     )
     lines.append(
         ANCHOR
-        + "as @a[tag=gate_run] run scoreboard players operation @s gate_sec /= #twenty map_state"
+        + "as @a[tag=gate_run] run scoreboard players operation @s gate_sec /= bg_twenty map_state"
     )
     # The finish. Entering the top band while on the course stops the clock.
     # gate_best is a running personal best. The first sentence forces an
@@ -220,17 +220,17 @@ def live_lines() -> list[str]:
     lines.append(ANCHOR + "run tag @a[tag=rope_touch] add rope_told")
     # The log at ~152 is static because a real spin needs an entity. A two
     # frame puff at each end of the bar suggests the roll instead.
-    lines.append(ANCHOR + "run scoreboard players add #spinline map_state 1")
+    lines.append(ANCHOR + "run scoreboard players add bg_spinline map_state 1")
     lines.append(
         ANCHOR
-        + "if score #spinline map_state matches 10.. run scoreboard players set #spinline map_state 0"
+        + "if score bg_spinline map_state matches 10.. run scoreboard players set bg_spinline map_state 0"
     )
     lines.append(
         ANCHOR + "run particle minecraft:basic_smoke_particle ~152 ~3 ~83"
     )
     lines.append(
         ANCHOR
-        + "if score #spinline map_state matches 5 run particle minecraft:basic_smoke_particle ~152 ~3 ~82"
+        + "if score bg_spinline map_state matches 5 run particle minecraft:basic_smoke_particle ~152 ~3 ~82"
     )
     return lines
 
@@ -356,7 +356,7 @@ def _summit(ctx) -> None:
     """The top landing, a low parapet, and the timekeeper post.
 
     The stand is a marker for the eye. It holds no timer and reads no score:
-    the stopwatch is the `#clock`/`gate_*` scoreboard in live_lines(). A
+    the stopwatch is the `bg_clock`/`gate_*` scoreboard in live_lines(). A
     function cannot write a time into an entity's nametag.
     """
     ctx.fill(X0, 26, 140, X1, 26, 140, "stone_bricks")

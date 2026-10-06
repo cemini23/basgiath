@@ -73,7 +73,9 @@ max-players=5
 view-distance=6
 tick-distance=4
 content-log-file-enabled=true
-content-log-console-output-enabled=false
+# Content logging must stay ON. Off, the server swallowed the shipped map's
+# command parse errors and the bench reported green on a broken map.
+content-log-console-output-enabled=true
 EOF
 
 # The dedicated server reads worlds relative to its working directory.
@@ -153,7 +155,7 @@ send "setblock 0 79 0 stone"
 send "summon armor_stand \"build_anchor\" 0 80 0"
 send "effect @e[type=armor_stand,name=\"build_anchor\"] resistance 999999 255 true"
 send "scoreboard objectives add map_state dummy"
-send "scoreboard players set #stage map_state 1"
+send "scoreboard players set bg_stage map_state 1"
 sleep 3
 tick_line="$(probe TICK_SPAN 20 112 20 stone_bricks)"
 echo "tick path ${tick_line}" >&2
@@ -177,7 +179,7 @@ LIVE_ERRORS="$WORK/live-errors.txt"
 for gate in gate_time gate_sec gate_start gate_pen gate_best; do
   send "scoreboard objectives add ${gate} dummy"
 done
-send "scoreboard players set #twenty map_state 20"
+send "scoreboard players set bg_twenty map_state 20"
 for _ in 1 2 3; do
   start="$(wc -l < "$LOG" | tr -d " ")"
   send "function basgiath/live"
@@ -189,7 +191,7 @@ done
 # it is an entity, so the command executes, and it takes a title silently. A
 # component Bedrock does not accept logs an error here and fails the run.
 start="$(wc -l < "$LOG" | tr -d " ")"
-send 'titleraw @e[type=armor_stand,name="build_anchor",c=1] title {"rawtext":[{"text":"score component probe "},{"score":{"name":"#clock","objective":"map_state"}},{"text":" ticks"}]}'
+send 'titleraw @e[type=armor_stand,name="build_anchor",c=1] title {"rawtext":[{"text":"score component probe "},{"score":{"name":"bg_clock","objective":"map_state"}},{"text":" ticks"}]}'
 sleep 1
 tail -n +"$((start + 1))" "$LOG" >> "$LIVE_ERRORS" || true
 # Keep only real command errors. The probe mechanism itself logs
@@ -261,8 +263,32 @@ ok = (not pack_error) and all(values.get(name) == "true" for name in need_true)
 ok = ok and values.get("CTRL_NOT_GOLD") == "false"
 live_ok = not live_errors
 ok = ok and live_ok
+# Content-log command errors. With content logging on, every command the
+# server cannot parse is logged. Two line shapes are expected and excluded:
+# the bench's own "unless block test failed" probe result, and the
+# "Detect position ... out of range" warning for a probe outside the ticking
+# area. Anything else is a real parse or load failure and fails the bench.
+content_errors = [
+    line
+    for line in log.splitlines()
+    if (
+        "failed to parse" in line
+        or "Syntax error" in line
+        or "failed to load correctly" in line
+    )
+    and "unless block test failed" not in line
+    and "Detect position" not in line
+]
+content_ok = not content_errors
+ok = ok and content_ok
 lines.append(f"live_pass_clean={str(live_ok).lower()}")
 lines.append(f"live_pass_errors={len(live_errors)}")
+lines.append(f"content_log_clean={str(content_ok).lower()}")
+lines.append(f"content_log_errors={len(content_errors)}")
+if content_errors:
+    lines.append("content_log_sample_begin")
+    lines.extend(content_errors[:20])
+    lines.append("content_log_sample_end")
 lines.append(f"blocks_ok={str(ok).lower()}")
 lines.append("probe_deltas_begin")
 lines.extend(deltas[-80:])

@@ -32,7 +32,7 @@ fill ~125 ~-1 ~124 ~127 ~3 ~126 stone_bricks
 fill ~126 ~ ~125 ~126 ~2 ~125 air
 fill ~117 ~4 ~124 ~127 ~4 ~126 stone_bricks
 fill ~118 ~-1 ~124 ~126 ~-1 ~124 stone_bricks
-fill ~121 ~-1 ~125 ~123 ~-1 ~144 dirt_path
+fill ~121 ~-1 ~125 ~123 ~-1 ~144 grass_path
 fill ~102 ~-1 ~126 ~102 ~3 ~144 stone_bricks
 fill ~103 ~-1 ~126 ~103 ~2 ~144 stone_bricks
 fill ~104 ~-1 ~126 ~104 ~1 ~144 stone_bricks

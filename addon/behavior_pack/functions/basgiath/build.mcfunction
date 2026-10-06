@@ -7,7 +7,7 @@ scoreboard objectives add gate_sec dummy
 scoreboard objectives add gate_start dummy
 scoreboard objectives add gate_pen dummy
 scoreboard objectives add gate_best dummy
-scoreboard players set #twenty map_state 20
+scoreboard players set bg_twenty map_state 20
 scoreboard objectives setdisplay sidebar gate_sec
 kill @e[type=armor_stand,name="build_anchor"]
 execute at @s run setblock ~ ~-1 ~ stone
@@ -27,8 +27,8 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea re
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea add circle ~40 ~32 ~110 4 college_c true
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea remove college_d
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea add circle ~120 ~32 ~110 4 college_d true
-scoreboard players set #done map_state 0
-scoreboard players set #pass map_state 1
+scoreboard players set bg_done map_state 0
+scoreboard players set bg_pass map_state 1
 schedule on_area_loaded add tickingarea college_b basgiath/fill_far
 schedule on_area_loaded add tickingarea college_d basgiath/fill_far
 schedule delay add basgiath/raise 300
@@ -64,5 +64,5 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgi
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_30
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_31
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_32
-scoreboard players set #stage map_state 0
+scoreboard players set bg_stage map_state 0
 tellraw @s {"rawtext":[{"text":"The college is rising. Stay still for 15 seconds. Fan-made. Not official. Not affiliated with any publisher."}]}

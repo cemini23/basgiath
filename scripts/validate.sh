@@ -43,3 +43,8 @@ if len(uuids) != len(set(uuids)):
 
 print(f"parsed {parsed} JSON files; {len(uuids)} pack UUIDs are unique")
 PY
+
+# The fuller manifest contract: exactly two packs, a resolving cross-pack
+# dependency, a pinned script API, and an engine minimum at or below the
+# release the world targets. This is what the Bedrock import dialog reads.
+python3 "$ROOT/scripts/validate_manifests.py"

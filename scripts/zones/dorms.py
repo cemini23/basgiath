@@ -219,8 +219,8 @@ def _dorm(ctx) -> None:
     ladder_x, ladder_z = x0 + 1, z0 + 1
     for y in (2, 5):
         ctx.setblock(ladder_x, y, ladder_z, "air")
-        ctx.setblock(ladder_x, y - 1, ladder_z, "ladder [facing_direction=2]")
-    ctx.setblock(ladder_x, -1, ladder_z, "ladder [facing_direction=2]")
+        ctx.setblock(ladder_x, y - 1, ladder_z, 'ladder["facing_direction"=2]')
+    ctx.setblock(ladder_x, -1, ladder_z, 'ladder["facing_direction"=2]')
 
     # Doorway through to the private room.
     ctx.fill(x1, -1, PRIVATE_DOOR_Z, x1, 1, PRIVATE_DOOR_Z, "air")
@@ -267,6 +267,6 @@ def _classroom(ctx) -> None:
         (x0 + 16, z0 + 5, 1),
     )
     for x, z, facing in lecterns:
-        ctx.setblock(x, 1, z, f"lectern [facing_direction={facing}]")
+        ctx.setblock(x, 1, z, f'lectern["direction"={facing}]')
     ctx.setblock(x0 + 16, 2, z0 + 2, "lantern")
     ctx.setblock(x0 + 2, 2, z1 - 2, "lantern")
