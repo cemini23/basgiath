@@ -136,12 +136,18 @@ send() {
   sleep 1
 }
 
-# A block probe: the marker is placed only when the score reads 999, and the
-# probe reports whether a block is really there. Reuses the bench's method.
-mark_result() {
+# A block probe. The marker is placed only when the score matches, and the
+# probe reports whether a gold block is really there. This is the bench's
+# method: a command that fails loudly when the condition holds.
+mark_clear() {
+  printf "%s\n" "setblock ${TEST_X} ${TEST_Y} ${TEST_Z} air" > fifo
+  sleep 0.5
+}
+
+mark_check() {
   local start
   start="$(wc -l < "$LOG" | tr -d ' ')"
-  printf "%s\n" "execute unless block ${TEST_X} ${TEST_Y} ${TEST_Z} gold_block run say MISS_WRITER" > fifo
+  printf "%s\n" "execute unless block ${TEST_X} ${TEST_Y} ${TEST_Z} gold_block run say MISS_MARK" > fifo
   sleep 1
   if tail -n +"$((start + 1))" "$LOG" | grep -q "unless block test failed"; then
     echo "true"
@@ -150,26 +156,34 @@ mark_result() {
   fi
 }
 
-send "setblock ${TEST_X} ${TEST_Y} ${TEST_Z} air"
-send "execute if score bg_twenty map_state matches 999 run setblock ${TEST_X} ${TEST_Y} ${TEST_Z} gold_block"
-send "setblock $((${TEST_X} + 1)) ${TEST_Y} ${TEST_Z} stone"
-WRITER_READ="$(mark_result)"
+score_marker() {
+  printf "%s\n" "execute if score $1 map_state matches $2 run setblock ${TEST_X} ${TEST_Y} ${TEST_Z} gold_block" > fifo
+  sleep 1
+}
 
-# Control: the same probe on a block that must not match, so a broken probe
-# cannot report success.
-start="$(wc -l < "$LOG" | tr -d ' ')"
-printf "%s\n" "execute unless block $((${TEST_X} + 1)) ${TEST_Y} ${TEST_Z} gold_block run say MISS_CTRL" > fifo
-sleep 1
-if tail -n +"$((start + 1))" "$LOG" | grep -q "unless block test failed"; then
-  CTRL="true"
-else
-  CTRL="false"
-fi
+# The probe must be able to report a false. This is the negative control: with
+# the marker cleared, the probe has to say the block is absent.
+mark_clear
+PROBE_FALSE="$(mark_check)"
+
+# Positive control: a score set over the console, read back immediately. If
+# this fails, the assert mechanism is broken, not the database write.
+mark_clear
+send "scoreboard players set bg_probe map_state 123"
+score_marker bg_probe 123
+PROBE_TRUE="$(mark_check)"
+
+# The real question: does the score the server loaded match what we wrote to
+# the database offline?
+mark_clear
+score_marker bg_twenty 999
+WRITER_READ="$(mark_check)"
 
 {
+  echo "probe_reports_false_when_absent=$PROBE_FALSE"
+  echo "probe_reports_true_when_present=$PROBE_TRUE"
   echo "writer_read=$WRITER_READ"
-  echo "writer_control_not_gold=$CTRL"
-  if [ "$WRITER_READ" = "true" ] && [ "$CTRL" = "false" ]; then
+  if [ "$WRITER_READ" = "true" ] && [ "$PROBE_TRUE" = "true" ] && [ "$PROBE_FALSE" = "false" ]; then
     echo "db_write_ok=true"
   else
     echo "db_write_ok=false"
