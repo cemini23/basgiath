@@ -1,0 +1,14 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:item": {
+    "description": {
+      "identifier": "dragon_rider:academy_archive",
+      "menu_category": { "category": "items" }
+    },
+    "components": {
+      "minecraft:icon": { "textures": { "default": "academy_archive" } },
+      "minecraft:display_name": { "value": "item.dragon_rider:academy_archive" },
+      "minecraft:max_stack_size": 1
+    }
+  }
+}

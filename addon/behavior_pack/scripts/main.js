@@ -413,6 +413,83 @@ function openVaultForm(player) {
   });
 }
 
+// ---------------------------------------------------------------------------
+// The codices
+//
+// Readable items. Using one opens its pages: paginated content, which is the
+// K283 extract, without depending on the vanilla book screen and its page
+// limit. Every line is original fan writing. No passage from any book, and no
+// character name: docs/CANON.md holds the denylist, and the release check
+// scans this file for it.
+
+const CODICES = {
+  "dragon_rider:flight_manual": {
+    title: "Flight Manual",
+    pages: [
+      "A wing answers the air, not the reins. Sit your weight forward and let the shoulders carry you. The animal reads the shift before you have finished making it.",
+      "Climb in long lines, not sharp ones. A hard turn costs more than a climb, and a climb costs more than patience. Most first-month falls are a turn taken too late.",
+      "When the wind turns against you, spend the height you have and wait it out. Nothing on the field is worth a broken neck before the season is out.",
+    ],
+  },
+  "dragon_rider:dragon_codex": {
+    title: "Dragon Codex",
+    pages: [
+      "The animal chooses before you do. Stand still, keep your hands down, and let it walk its circle. A circle means it is still deciding.",
+      "A bond is not a leash. You will not command it and it will not obey. What the two of you build is a habit of glancing the same way at the same time.",
+      "Feed it away from the others. A dragon crowded at its meal learns to guard the plate, and a guarding dragon is a danger to every rider nearby.",
+    ],
+  },
+  "dragon_rider:academy_archive": {
+    title: "Academy Archive",
+    pages: [
+      "The Parapet has been rebuilt twice. The first crossing was walked at night, in a storm, and the cadet who walked it came back along the span rather than over the gap.",
+      "The flight field floods every spring. That is why it sits where it does: the ground there is flat, and flat ground is rare on this side of the Vale.",
+      "Old riders say the Gauntlet measures a person. It measures only whether you stop at the far edge, which is a different question and a shorter one.",
+    ],
+  },
+};
+
+async function runCodex(player, codex) {
+  let page = 0;
+  for (;;) {
+    const last = page === codex.pages.length - 1;
+    const actions = [];
+    if (!last) actions.push("next");
+    if (page > 0) actions.push("back");
+    actions.push("close");
+
+    const form = new ActionFormData()
+      .title(`${codex.title} - page ${page + 1} of ${codex.pages.length}`)
+      .body(codex.pages[page]);
+    for (const action of actions) {
+      form.button(action === "next" ? "Next page" : action === "back" ? "Previous page" : "Close");
+    }
+
+    const response = await form.show(player);
+    if (response.canceled) return;
+    const action = actions[response.selection];
+    if (action === "next") page += 1;
+    else if (action === "back") page -= 1;
+    else return;
+  }
+}
+
+world.afterEvents.itemUse.subscribe((event) => {
+  const codex = CODICES[event.itemStack?.typeId];
+  if (!codex) return;
+  const player = event.source;
+  if (player?.typeId !== "minecraft:player") return;
+  system.run(() => {
+    runCodex(player, codex).catch(() => {
+      try {
+        player.sendMessage("§7The pages will not open right now. Try again.");
+      } catch (e) {
+        // The player is gone. Nothing left to say.
+      }
+    });
+  });
+});
+
 // A lodestone use is always cancelled so the compass screen never opens.
 // The form itself waits for the bond. The plaza stone stays where it is.
 // A keeper lectern is cancelled the same way, so the page screen never opens.

@@ -668,7 +668,49 @@ def check_currency() -> None:
     if f'"{block_id}"' not in script:
         fail(f"main.js never names {block_id}, so nothing opens the desk")
 
-    print(f"currency ok: {len(defined)} items, {len(recipes)} recipes, 1 block")
+    print(f"pack items ok: {len(defined)} defined, {len(recipes)} recipes, 1 block")
+
+
+def check_lore() -> None:
+    """The readable items have a codex entry with pages, and an icon to show.
+
+    The CODICES table is the list of readable items. An item is readable only
+    if the script names it there: matching on any mention would count the
+    currency items, whose ids also appear in this file. An entry with no title,
+    or fewer than two pages, opens a dead screen. The page text itself is
+    covered by check_names, which scans this file for the denylist.
+    """
+    script = (ROOT / "addon/behavior_pack/scripts/main.js").read_text()
+    table = re.search(r"const CODICES = \{(.*?)\n\};", script, re.S)
+    if not table:
+        fail("main.js has no CODICES table")
+    entries = re.findall(
+        r'"(dragon_rider:[a-z_]+)":\s*\{(.*?)\n  \},', table.group(1), re.S
+    )
+    if len(entries) < 3:
+        fail(f"expected at least 3 readable items, found {len(entries)}")
+
+    atlas = json.loads(
+        (ROOT / "addon/resource_pack/textures/item_texture.json").read_text()
+    )["texture_data"]
+    items = {}
+    for path in sorted((ROOT / "addon/behavior_pack/items").glob("*.json")):
+        item = json.loads(path.read_text())["minecraft:item"]
+        items[item["description"]["identifier"]] = item
+
+    for identifier, body in entries:
+        if identifier not in items:
+            fail(f"the codex names {identifier}, but no item defines it")
+        icon = items[identifier]["components"]["minecraft:icon"]["textures"]["default"]
+        if icon not in atlas:
+            fail(f"{identifier} icon {icon!r} is not in item_texture.json")
+        if "title:" not in body:
+            fail(f"{identifier} has no codex title")
+        pages = re.findall(r'^\s{6}"', body, re.M)
+        if len(pages) < 2:
+            fail(f"{identifier} has {len(pages)} page(s), need at least 2")
+
+    print(f"lore ok: {len(entries)} readable items")
 
 
 def main() -> None:
@@ -682,6 +724,7 @@ def main() -> None:
     check_manifests()
     check_hud()
     check_currency()
+    check_lore()
     check_world()
     print("release checks ok")
 

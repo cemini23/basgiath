@@ -5,6 +5,9 @@
     "copper_mark": { "textures": "textures/item/copper_mark" },
     "silver_mark": { "textures": "textures/item/silver_mark" },
     "gold_mark": { "textures": "textures/item/gold_mark" },
-    "bank_note": { "textures": "textures/item/bank_note" }
+    "bank_note": { "textures": "textures/item/bank_note" },
+    "flight_manual": { "textures": "textures/item/flight_manual" },
+    "dragon_codex": { "textures": "textures/item/dragon_codex" },
+    "academy_archive": { "textures": "textures/item/academy_archive" }
   }
 }

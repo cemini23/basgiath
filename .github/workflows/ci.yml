@@ -37,7 +37,7 @@ jobs:
         run: |
           python3 scripts/build_dragon_model.py
           python3 scripts/build_map.py
-          python3 scripts/build_currency_assets.py
+          python3 scripts/build_textures.py
           git diff --exit-code -- \
             addon/resource_pack/models/entity/dragon.geo.json \
             addon/resource_pack/textures/entity/dragon.png \
