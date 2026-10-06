@@ -425,7 +425,7 @@ scoreboard players add bg_storm map_state 1
 execute if score bg_storm map_state matches 200.. run scoreboard players set bg_storm map_state 0
 execute if score bg_storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
 scoreboard players add @a[tag=timed_run] run_tick 1
-scoreboard players operation @a[tag=timed_run] run_sec = @a[tag=timed_run] run_tick
+execute as @a[tag=timed_run] run scoreboard players operation @s run_sec = @s run_tick
 scoreboard players operation @a[tag=timed_run] run_sec /= bg_twenty map_state
 execute as @a[tag=timed_run] run titleraw @s actionbar {"rawtext":[{"text":"§bCourse  "},{"score":{"name":"@s","objective":"run_sec"}},{"text":"s"}]}
 """
@@ -474,6 +474,10 @@ The stand is the origin. Every later command is relative to it. The build stays 
 The script runs `basgiath/tick` every tick. After the build, that tick runs `basgiath/live` for wind, checkpoints, and the storm. A fall from the span is fatal. You respawn on the ground path until you reach the east tower.
 
 The Gauntlet is scored. Step onto the base of the cliff to start the clock; the sidebar shows `gate_time` in ticks. Every fresh rope grab adds 600 ticks (30 seconds) to that cadet's own penalty. Reaching the summit stops the clock, announces the finish, and keeps the best run in `gate_best`. The armor stand on the summit is scenery; the scoreboard is the stopwatch.
+
+`/function basgiath/run_start` starts a timed run, and `/function basgiath/run_stop` ends it.
+
+A run puts the tag `timed_run` on you, zeroes `run_tick` and `run_sec`, and puts the seconds on your action bar every tick. Build the college first: `run_start` writes scores the build creates, so the clock needs the build to have run. The flight readout stands down while the tag is set, because both write the action bar.
 
 Do not run the old placeholder functions. They are gone. Coordinates live in `scripts/build_map.py`.
 """

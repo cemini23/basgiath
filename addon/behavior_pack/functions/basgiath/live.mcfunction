@@ -16,7 +16,7 @@ scoreboard players add bg_storm map_state 1
 execute if score bg_storm map_state matches 200.. run scoreboard players set bg_storm map_state 0
 execute if score bg_storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
 scoreboard players add @a[tag=timed_run] run_tick 1
-scoreboard players operation @a[tag=timed_run] run_sec = @a[tag=timed_run] run_tick
+execute as @a[tag=timed_run] run scoreboard players operation @s run_sec = @s run_tick
 scoreboard players operation @a[tag=timed_run] run_sec /= bg_twenty map_state
 execute as @a[tag=timed_run] run titleraw @s actionbar {"rawtext":[{"text":"§bCourse  "},{"score":{"name":"@s","objective":"run_sec"}},{"text":"s"}]}
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run scoreboard players add bg_clock map_state 1

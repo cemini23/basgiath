@@ -25,6 +25,14 @@ function extract(name) {
   return source.slice(at, end + 2);
 }
 
+function extractClass(name) {
+  const at = source.indexOf(`class ${name} {`);
+  if (at < 0) throw new Error(`main.js has no class ${name}`);
+  const end = source.indexOf("\n}\n", at);
+  if (end < 0) throw new Error(`class ${name} is not closed`);
+  return source.slice(at, end + 2);
+}
+
 const constants = (name) => {
   const found = source.match(new RegExp(`^const ${name} = (-?[\\d.]+);`, "m"));
   if (!found) throw new Error(`main.js has no ${name}`);
@@ -34,13 +42,15 @@ const constants = (name) => {
 const code = [
   constants("HUD_BAR_CELLS"),
   constants("STAMINA_MAX"),
+  constants("HUD_TWEEN_DRAWS"),
   extract("easeInOutCubic"),
   extract("clamp"),
   extract("staminaBar"),
+  extractClass("Eased"),
 ].join("\n");
 
-const { easeInOutCubic, staminaBar } = new Function(
-  `${code}\nreturn { easeInOutCubic, staminaBar };`
+const { easeInOutCubic, staminaBar, Eased } = new Function(
+  `${code}\nreturn { easeInOutCubic, staminaBar, Eased };`
 )();
 
 let failed = 0;
@@ -112,6 +122,46 @@ check(
 );
 check("bar clamps above the maximum", staminaBar(999) === staminaBar(100));
 check("bar clamps below zero", staminaBar(-5) === staminaBar(0));
+
+// --- the tween ---
+// The readout's numbers are drawn through this, so a fault here is a fault in
+// the display, not in the curve.
+const started = new Eased(5);
+check("tween starts at its value", started.value === 5);
+
+const settles = new Eased(0);
+settles.aim(10);
+for (let i = 0; i < 20; i += 1) settles.advance();
+check("tween settles exactly on the target", settles.value === 10, `value=${settles.value}`);
+
+const walks = new Eased(0);
+walks.aim(100);
+let previous = walks.value;
+let monotone = true;
+for (let i = 0; i < 10; i += 1) {
+  const value = walks.advance();
+  if (value < previous - 1e-9) monotone = false;
+  previous = value;
+}
+check("tween walks toward the target, never past it", monotone && walks.value <= 100);
+
+const oneStep = new Eased(0);
+oneStep.aim(100);
+oneStep.advance();
+check("tween does not jump in one step", oneStep.value < 100, `value=${oneStep.value}`);
+
+const reaimed = new Eased(0);
+reaimed.aim(100);
+reaimed.advance();
+reaimed.advance();
+const midway = reaimed.value;
+reaimed.aim(-100);
+check("re-aiming restarts from the current value, not the old start",
+      reaimed.from === midway, `from=${reaimed.from} midway=${midway}`);
+
+const noise = new Eased(3);
+noise.aim(3);
+check("aiming at the current target changes nothing", noise.from === noise.to);
 
 console.log(failed ? `\n${failed} check(s) failed` : "\nflight readout ok");
 process.exit(failed ? 1 : 0);

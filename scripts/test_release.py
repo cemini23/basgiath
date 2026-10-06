@@ -344,6 +344,10 @@ def check_map() -> None:
             fail(f"the build does not create the {objective} objective")
     if "scoreboard players add @a[tag=timed_run] run_tick 1" not in live:
         fail("the live pass never advances the course clock")
+    # The copy must be scoped per cadet. A bare "@a[tag=timed_run] = @a[tag=timed_run]"
+    # resolves the source to one entity, so two runners would share one clock.
+    if "execute as @a[tag=timed_run] run scoreboard players operation @s run_sec = @s run_tick" not in live:
+        fail("the course clock copies the tick count without scoping it per cadet")
     if '"objective":"run_sec"' not in live:
         fail("the course clock does not show the cadet's time on the action bar")
     for path in (folder / "run_start.mcfunction", folder / "run_stop.mcfunction"):

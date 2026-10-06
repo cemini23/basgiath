@@ -10,4 +10,8 @@ The script runs `basgiath/tick` every tick. After the build, that tick runs `bas
 
 The Gauntlet is scored. Step onto the base of the cliff to start the clock; the sidebar shows `gate_time` in ticks. Every fresh rope grab adds 600 ticks (30 seconds) to that cadet's own penalty. Reaching the summit stops the clock, announces the finish, and keeps the best run in `gate_best`. The armor stand on the summit is scenery; the scoreboard is the stopwatch.
 
+`/function basgiath/run_start` starts a timed run, and `/function basgiath/run_stop` ends it.
+
+A run puts the tag `timed_run` on you, zeroes `run_tick` and `run_sec`, and puts the seconds on your action bar every tick. Build the college first: `run_start` writes scores the build creates, so the clock needs the build to have run. The flight readout stands down while the tag is set, because both write the action bar.
+
 Do not run the old placeholder functions. They are gone. Coordinates live in `scripts/build_map.py`.
