@@ -271,30 +271,37 @@ ok = ok and live_ok
 # the bench's own "unless block test failed" probe result, and the
 # "Detect position ... out of range" warning for a probe outside the ticking
 # area. Anything else is a real parse or load failure and fails the bench.
+# The wordings the server uses for a real content error. The list is grounded
+# in lines observed on 1.26.52.3. Match on a lowercased line: the server's
+# casing is not guaranteed.
+CONTENT_ERROR_PHRASES = (
+    "failed to parse",
+    "syntax error",
+    "failed to load correctly",
+    "is not a valid block state",
+    "unknown block state",
+    "invalid block state",
+    "invalid value for block state",
+    "is invalid on block",
+    # An entity JSON field the schema rejects, e.g. deals_damage given a
+    # boolean where a string is required.
+    "unknown child schema option type",
+)
+# Expected noise, not a shipped defect:
+# - the bench's own probe reports this on every run,
+# - a probe outside the ticking area warns,
+# - the titleraw shape probe aims at the anchor stand on purpose; titleraw
+#   takes only players, so the server logs this too.
+BENIGN_LOG_PHRASES = (
+    "unless block test failed",
+    "detect position",
+    "selector must be player-type",
+)
 content_errors = [
     line
     for line in log.splitlines()
-    if (
-        "failed to parse" in line
-        or "Syntax error" in line
-        or "failed to load correctly" in line
-        or "is not a valid block state" in line
-        or "Unknown block state" in line
-        or "Invalid block state" in line
-        # The two wordings the dedicated server actually uses for a bad block
-        # state or an out-of-range value. Observed on 1.26.52.3.
-        or "Invalid value for Block State" in line
-        or "is invalid on Block" in line
-        # An entity JSON field the schema rejects, e.g. deals_damage given a
-        # boolean where a string is required.
-        or "unknown child schema option type" in line
-    )
-    and "unless block test failed" not in line
-    and "Detect position" not in line
-    # The titleraw shape probe aims at the anchor stand on purpose. titleraw
-    # takes only players, so the server also logs "Selector must be
-    # player-type"; that line is the probe working, not a shipped defect.
-    and "Selector must be player-type" not in line
+    if any(phrase in line.lower() for phrase in CONTENT_ERROR_PHRASES)
+    and not any(noise in line.lower() for noise in BENIGN_LOG_PHRASES)
 ]
 content_ok = not content_errors
 ok = ok and content_ok
