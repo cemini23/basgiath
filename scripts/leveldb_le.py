@@ -352,18 +352,65 @@ def read_db(dbdir: Path) -> dict[str, bytes]:
     return {key: value for key, (_, value) in found.items()}
 
 
-def write_record(dbdir: Path, key: str, value: bytes, sequence: int) -> Path:
+def compound_get(node, name: str):
+    """The child node named ``name`` inside a compound node."""
+    for key, child in find_compound(node):
+        if key == name:
+            return child
+    raise KeyError(name)
+
+
+def compound_set(node, name: str, child) -> None:
+    """Replace, or append, a named child of a compound node."""
+    items = find_compound(node)
+    for index, (key, _) in enumerate(items):
+        if key == name:
+            items[index] = (name, child)
+            return
+    items.append((name, child))
+
+
+def node_value(node):
+    return node[1]
+
+
+def max_sequence(dbdir: Path) -> int:
+    """The highest sequence number the database has used."""
+    current = (dbdir / "CURRENT").read_text().strip()
+    state = parse_manifest(journal_records((dbdir / current).read_bytes()))
+    highest = state["last_sequence"]
+    for number in sorted(state["live"]):
+        path = dbdir / f"{number:06d}.ldb"
+        if path.exists():
+            for internal, _value in read_table(path):
+                highest = max(highest, split_internal_key(internal)[1])
+    for log in sorted(dbdir.glob("*.log")):
+        if int(log.stem) < state["log_number"]:
+            continue
+        for payload in journal_records(log.read_bytes()):
+            for sequence, _key, _value in parse_write_batch(payload):
+                highest = max(highest, sequence)
+    return highest
+
+
+def write_record(dbdir: Path, key: str, value: bytes, sequence: int | None = None) -> Path:
     """Append one put to a fresh journal file that recovery will replay.
 
     LevelDB replays every log numbered at or above the manifest's log_number,
-    so a new file with a higher number is picked up on the next open.
+    so a new file with a higher number is picked up on the next open. The
+    sequence defaults to one past the highest the database has used, which is
+    what makes the new value win over anything already stored.
     """
     current = (dbdir / "CURRENT").read_text().strip()
     state = parse_manifest(journal_records((dbdir / current).read_bytes()))
-    number = max(state["next_file"], max((int(p.stem) for p in dbdir.glob("*.log")), default=0) + 1)
+    number = max(
+        state["next_file"],
+        max((int(p.stem) for p in dbdir.glob("*.log")), default=0) + 1,
+    )
+    if sequence is None:
+        sequence = max_sequence(dbdir) + 1
     path = dbdir / f"{number:06d}.log"
-    batch = build_write_batch(sequence, key, value)
-    path.write_bytes(frame_journal(batch))
+    path.write_bytes(frame_journal(build_write_batch(sequence, key, value)))
     return path
 
 
@@ -379,6 +426,127 @@ def decode_value(value: bytes) -> tuple[str, dict]:
     name, offset = _read_string(raw, 1)
     body, _ = _decode_compound_body(raw, offset)
     return name, body
+
+
+# ------------------------------------------------------------ typed NBT codec
+#
+# Decoding to plain Python loses the tag types, so re-encoding would guess
+# wrong (an int32 becomes an int64, a list of compounds becomes a list of
+# ints). A writer must keep types. A node is (tag, value): a compound holds
+# [(name, node)], a list holds (element tag, [node]).
+
+TAG_END, TAG_BYTE, TAG_SHORT, TAG_INT, TAG_LONG = 0, 1, 2, 3, 4
+TAG_FLOAT, TAG_DOUBLE, TAG_BYTE_ARRAY, TAG_STRING = 5, 6, 7, 8
+TAG_LIST, TAG_COMPOUND, TAG_INT_ARRAY = 9, 10, 11
+
+_FIXED = {
+    TAG_BYTE: ("<b", 1),
+    TAG_SHORT: ("<h", 2),
+    TAG_INT: ("<i", 4),
+    TAG_LONG: ("<q", 8),
+    TAG_FLOAT: ("<f", 4),
+    TAG_DOUBLE: ("<d", 8),
+}
+
+
+def _read_text(data, offset):
+    (length,) = struct.unpack_from("<H", data, offset)
+    offset += 2
+    return data[offset : offset + length].decode("utf-8"), offset + length
+
+
+def _write_text(text: str) -> bytes:
+    raw = text.encode("utf-8")
+    return struct.pack("<H", len(raw)) + raw
+
+
+def read_node(data, offset, tag):
+    """Read a node body; the tag byte is already known."""
+    if tag in _FIXED:
+        fmt, size = _FIXED[tag]
+        return (tag, struct.unpack_from(fmt, data, offset)[0]), offset + size
+    if tag == TAG_STRING:
+        text, offset = _read_text(data, offset)
+        return (tag, text), offset
+    if tag == TAG_BYTE_ARRAY:
+        (count,) = struct.unpack_from("<i", data, offset)
+        offset += 4
+        return (tag, list(data[offset : offset + count])), offset + count
+    if tag == TAG_INT_ARRAY:
+        (count,) = struct.unpack_from("<i", data, offset)
+        offset += 4
+        return (tag, list(struct.unpack_from(f"<{count}i", data, offset))), offset + 4 * count
+    if tag == TAG_LIST:
+        elem, count = struct.unpack_from("<bi", data, offset)
+        offset += 5
+        items = []
+        for _ in range(count):
+            node, offset = read_node(data, offset, elem)
+            items.append(node)
+        return (tag, (elem, items)), offset
+    if tag == TAG_COMPOUND:
+        items = []
+        while True:
+            child = data[offset]
+            offset += 1
+            if child == TAG_END:
+                return (tag, items), offset
+            name, offset = _read_text(data, offset)
+            node, offset = read_node(data, offset, child)
+            items.append((name, node))
+    raise ValueError(f"unsupported NBT tag {tag}")
+
+
+def write_node(node) -> bytes:
+    tag, value = node
+    if tag in _FIXED:
+        return struct.pack(_FIXED[tag][0], value)
+    if tag == TAG_STRING:
+        return _write_text(value)
+    if tag == TAG_BYTE_ARRAY:
+        return struct.pack("<i", len(value)) + bytes(value)
+    if tag == TAG_INT_ARRAY:
+        return struct.pack("<i", len(value)) + b"".join(struct.pack("<i", v) for v in value)
+    if tag == TAG_LIST:
+        elem, items = value
+        return struct.pack("<bi", elem, len(items)) + b"".join(write_node(i) for i in items)
+    if tag == TAG_COMPOUND:
+        # Each child is written as tag byte + name + payload. write_node
+        # writes a payload only, so the tag byte is added here.
+        out = bytearray()
+        for name, child in value:
+            out += bytes([child[0]]) + _write_text(name) + write_node(child)
+        out += bytes([TAG_END])
+        return bytes(out)
+    raise ValueError(f"unsupported NBT tag {tag}")
+
+
+def decode_typed(value: bytes):
+    """A db value to (root name, typed node)."""
+    raw = zlib.decompress(value) if value[:1] == b"\x78" else value
+    if raw[0] != TAG_COMPOUND:
+        raise ValueError(f"stored value is not a compound (tag {raw[0]})")
+    name, offset = _read_text(raw, 1)
+    node, _ = read_node(raw, offset, TAG_COMPOUND)
+    return name, node
+
+
+def encode_typed(name: str, node) -> bytes:
+    """A typed node back to a compressed db value.
+
+    The root compound needs its own tag byte: write_node writes a compound
+    body only, because a nested compound already has its tag written by its
+    parent.
+    """
+    return zlib.compress(bytes([TAG_COMPOUND]) + _write_text(name) + write_node(node))
+
+
+def find_compound(node) -> list:
+    """The [(name, node)] list of a compound node."""
+    tag, value = node
+    if tag != TAG_COMPOUND:
+        raise ValueError("not a compound")
+    return value
 
 
 def escape_key(key: str) -> str:
