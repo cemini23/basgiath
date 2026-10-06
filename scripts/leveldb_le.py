@@ -572,7 +572,11 @@ def table_summary(path: Path) -> str:
 def db_stats(dbdir: Path) -> list[str]:
     """What the manifest says and what each file yields. For diagnosis."""
     current = (dbdir / "CURRENT").read_text().strip()
-    state = parse_manifest(journal_records((dbdir / current).read_bytes()))
+    try:
+        state = parse_manifest(journal_records((dbdir / current).read_bytes()))
+    except ValueError as exc:
+        # A diagnostic must never crash; report and stop here.
+        return [f"manifest {current}: cannot parse ({exc})"]
     lines = [
         f"manifest {current}: live={sorted(state['live'])} "
         f"log_number={state['log_number']} next_file={state['next_file']} "
