@@ -281,20 +281,26 @@ def _decompress(raw: bytes, kind: int) -> bytes:
     """A stored block to its contents.
 
     Select on the type number, never by trying one codec and hoping it fails:
-    zlib can accept a Snappy block's first two bytes as a header and return
-    silent garbage, which reads as an empty table.
+    zlib can accept another codec's leading bytes as a header and return silent
+    garbage, which reads as an empty table.
 
-    Google LevelDB uses 0 for none, 1 for Snappy and 2 for zlib. Mojang's
-    tables carry 4 for Snappy. An unknown number falls back to whichever codec
-    accepts the block.
+    Google LevelDB uses 0 for none, 1 for Snappy and 2 for zlib-wrapped
+    DEFLATE. Mojang's tables carry 4, which is DEFLATE with no zlib header; the
+    dumps in the world-db bench show a 17-byte index block expanding to 23
+    bytes only under ``wbits=-15``.
     """
     if kind == 0:
         return raw
-    if kind == 2:
-        return zlib.decompress(raw)
-    if kind in (1, 4):
+    if kind == 1:
         return snappy_decompress(raw)
-    for codec in (snappy_decompress, zlib.decompress):
+    if kind in (2, 4):
+        for codec in (lambda b: zlib.decompress(b, -15), zlib.decompress):
+            try:
+                return codec(raw)
+            except zlib.error:
+                continue
+        raise ValueError(f"block compression type {kind} is not DEFLATE")
+    for codec in (snappy_decompress, lambda b: zlib.decompress(b, -15), zlib.decompress):
         try:
             return codec(raw)
         except Exception:  # noqa: BLE001 - try the next codec
