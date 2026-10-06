@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 # Offline world-state test.
 #
+# STATUS (2026-10-06): the READER half works and is proven -- it reads a
+# log-only world database and decodes the server's own scoreboard record.
+# The WRITER half does NOT work yet. Two problems, both reproducible with this
+# script:
+#   1. write_record adds a journal file at a number above the manifest's
+#      log_number. The server then fails to open the database, drops the
+#      scoreboard ("No objective was found by the name 'map_state'") and starts
+#      a fresh world. Appending to the log the manifest names, or adding a
+#      VersionEdit for the new log, is the next thing to try.
+#   2. After a second boot compacts the database into an .ldb table, read_db no
+#      longer returns the scoreboard key, so table reading is incomplete.
+# The control boot (no edit) passes, which is what isolates the write.
+#
 # Proves scripts/leveldb_le.py can read and write the Bedrock world database
 # without a client. Run scripts/bench_bds.sh first: it boots the server once,
 # which creates db/. This script then:
