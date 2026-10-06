@@ -188,7 +188,7 @@ The bond. The dragon chooses. The cadet does not.
 
 - The current build gives the power at the plaza stone, on day one. Canon puts it weeks after the bond. Move it.
 - The stone can still open the form. Move the form to the post-bond state, in the valley, after the dragon chooses the player.
-- Keep the four original archetypes. See `DESIGN.md` and the naming policy below.
+- The archetypes are the map's own. The rules ban character names, book text and official art; they do not limit which powers the map may have, so the set can grow. See `DESIGN.md` and the naming policy below.
 
 ---
 

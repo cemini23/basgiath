@@ -16,7 +16,7 @@ Basgiath is a free Minecraft Bedrock map and add-on. You raise a war college wit
 
 The Parapet is the clip. You start on the ground and climb to a one-block span over a deep chasm. Wind pushes you, and a two-block gap sits in the middle. A fall kills you and sends you back to the start. Cross, and the far tower saves your respawn point.
 
-The Quad holds a Bonding Stone. Touch it and answer three questions. You get one of four original results: Stormcaller, Shadowwalker, Emberwright, or Stoneward. The result stays on your player. The college also keeps a wing roster of the last 24 riders.
+A dragon has to choose you first: the dell gives the bond, and only then does the signet stone open. Answer four questions and you get one of eight original results, from Stormcaller to Tidekeeper. The result stays on your player. The college also keeps a wing roster of the last 24 riders.
 
 South of the Quad are three barracks. Further on, a sunken valley has a gold pad. Run `/function basgiath/summon_dragon`, mount, and fly.
 
@@ -42,7 +42,7 @@ Basgiath is a free Bedrock world. One command builds a war college: a storm-lit 
 
 Climb to the Parapet, then cross it. The path is a single block wide. Wind pushes you toward the drop, and the middle is a two-block gap. A fall kills you and sends you back to the ground start. The far side sets a checkpoint.
 
-Touch the lodestone in the Quad for a three-question form. The four results are original: Stormcaller, Shadowwalker, Emberwright, and Stoneward. Your result is saved, and the world remembers who has joined the wing.
+After a dragon chooses you in the dell, touch the signet stone for a four-question form. The eight results are original, from Stormcaller to Tidekeeper. Your result is saved, and the world remembers who has joined the wing.
 
 In the valley, `/function basgiath/summon_dragon` puts a rideable dragon on the pad. You steer it in the air.
 
@@ -96,11 +96,11 @@ End card: `Free download. Fan-made. Not official. Not affiliated with Rebecca Ya
 
 Length: 22 seconds.
 
-Shot: The Quad at night. Touch the lodestone. Show the three questions, then the signet title.
+Shot: The dell at night, after the bond. Touch the lodestone on the dell floor. Show the four questions, then the signet title.
 
 On-screen text: `Touch the stone.`
 
-Spoken line: "Three questions. Four results. None of them are copied from the books. Mine stuck."
+Spoken line: "Four questions. Eight results. None of them are copied from the books. Mine stuck."
 
 End card: `Free download. Fan-made. Not official. Not affiliated with Rebecca Yarros, Entangled Publishing, or Red Tower Books.`
 

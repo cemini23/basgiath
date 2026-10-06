@@ -1,7 +1,10 @@
 // Dragon Rider Map — the signet form and the two keepers.
 // Target: Minecraft Bedrock 26.x, @minecraft/server 2.x
 //
-// Trigger: interact with a lodestone (the "Bonding Stone") after the bond.
+// Trigger: interact with the dell stone (a lodestone in the valley) after the
+//          bond. Canon puts the signet weeks after Threshing, in the valley,
+//          so the stone is not the plaza marker and any other lodestone is
+//          ignored.
 //          Canon puts the signet weeks after a dragon chooses the rider,
 //          so the form opens only for a player with the "bonded" tag.
 //          Threshing sets that tag (and the bg_bond score) when a dragon
@@ -19,6 +22,10 @@ import { ItemStack, world, system } from "@minecraft/server";
 import { ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
 
 const BONDING_BLOCK = "minecraft:lodestone";
+// The stone the build places in the dell, in anchor-relative block coordinates
+// (scripts/zones/signet.py). The form opens only here, not from any lodestone a
+// cadet might craft and carry: canon puts the signet in the valley.
+const SIGNET_STONE = { x: 50, y: -1, z: 130 };
 const SIGNET_PROPERTY = "dragon_rider:signet";
 const TEST_EVENT = "dragon_rider:signet";
 const BOND_TAG = "bonded";
@@ -43,34 +50,52 @@ const QUESTIONS = [
     ],
   },
   {
-    body: "The Parapet sways under your boots. What carries you across?",
+    body: "A cadet falls beside you on the span. What do you do?",
     choices: [
-      { text: "Rage.", signet: "ember" },
-      { text: "Discipline.", signet: "storm" },
-      { text: "Silence.", signet: "shadow" },
-      { text: "Patience.", signet: "stone" },
+      { text: "Catch them.", signet: "mender" },
+      { text: "Hold the line.", signet: "ward" },
+      { text: "Say their name.", signet: "chronicle" },
+      { text: "Find the footing.", signet: "tide" },
+    ],
+  },
+  {
+    body: "The wind turns on the crossing. What do you trust?",
+    choices: [
+      { text: "Your weight.", signet: "tide" },
+      { text: "Your grip.", signet: "stone" },
+      { text: "Your nerve.", signet: "ember" },
+      { text: "Your patience.", signet: "ward" },
     ],
   },
   {
     body: "Your wing is losing. What do you change?",
     choices: [
       { text: "The weather.", signet: "storm" },
-      { text: "The ground.", signet: "stone" },
       { text: "The dark.", signet: "shadow" },
-      { text: "The odds.", signet: "ember" },
+      { text: "The count.", signet: "chronicle" },
+      { text: "The wounded.", signet: "mender" },
     ],
   },
 ];
 
+// The map's archetypes. The IP rules ban character names, book text and
+// official art; they put no limit on which powers the map may have, so the
+// signet set is free to grow. Every line here is written for this map. Four
+// questions, each archetype offered twice, so every outcome is reachable and
+// none is favoured.
 const SIGNETS = {
   storm: { name: "Stormcaller", line: "The air answers before you speak." },
   shadow: { name: "Shadowwalker", line: "You are hardest to find when it matters." },
   ember: { name: "Emberwright", line: "You reach first and ask later." },
   stone: { name: "Stoneward", line: "Nothing moves you that you did not choose." },
+  mender: { name: "Mender", line: "You put back what the field takes." },
+  ward: { name: "Wardsmith", line: "You build the thing that holds when nothing else does." },
+  chronicle: { name: "Chronicler", line: "You remember what everyone else lets go." },
+  tide: { name: "Tidekeeper", line: "You keep your footing where the ground gives way." },
 };
 
 function blankScores() {
-  return { storm: 0, shadow: 0, ember: 0, stone: 0 };
+  return Object.fromEntries(Object.keys(SIGNETS).map((key) => [key, 0]));
 }
 
 // The Scroll-keeper holds the roll desk lectern in the Quad courtyard. The
@@ -499,6 +524,18 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   const type = event.block?.typeId;
 
   if (type === BONDING_BLOCK) {
+    // Only the dell stone opens the form. A lodestone anywhere else is left
+    // alone, so vanilla behaviour stands rather than being cancelled for a
+    // stone that was never the signet stone.
+    const origin = buildOrigin();
+    const loc = event.block.location;
+    const atStone =
+      origin !== null &&
+      loc.x === origin.x + SIGNET_STONE.x &&
+      loc.y === origin.y + SIGNET_STONE.y &&
+      loc.z === origin.z + SIGNET_STONE.z;
+    if (!atStone) return;
+
     event.cancel = true;
     system.run(() => {
       if (player.hasTag(BOND_TAG)) {

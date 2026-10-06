@@ -578,6 +578,58 @@ def check_world() -> None:
     print(f"world ok: {world.stat().st_size} bytes")
 
 
+def check_signets() -> None:
+    """The signet set holds together.
+
+    The script gates the form on one block position. If that is not the
+    lodestone the build places, the form never opens anywhere; if a quiz choice
+    names an archetype the table does not define, that answer can never win;
+    and an archetype no question offers can never be reached at all.
+    """
+    script = (ROOT / "addon/behavior_pack/scripts/main.js").read_text()
+
+    stone = re.search(
+        r"const SIGNET_STONE = \{ x: (-?\d+), y: (-?\d+), z: (-?\d+) \};", script
+    )
+    if not stone:
+        fail("main.js has no SIGNET_STONE")
+    gated = tuple(int(group) for group in stone.groups())
+
+    folder = ROOT / "addon/behavior_pack/functions/basgiath"
+    blob = "\n".join(path.read_text() for path in sorted(folder.glob("*.mcfunction")))
+    # The stage pass and the far retry both place the stone, so count cells, not
+    # commands.
+    placed = {
+        (coord(parts[1]), coord(parts[2]), coord(parts[3]))
+        for parts in (line.split() for line in blob.splitlines())
+        if len(parts) >= 5 and parts[0] == "setblock" and parts[4] == "lodestone"
+    }
+    if len(placed) != 1:
+        fail(f"the build places a lodestone at {len(placed)} cells: {sorted(placed)}")
+    stone_cell = next(iter(placed))
+    if gated != stone_cell:
+        fail(f"the signet is gated on {gated}, but the build places the stone at {stone_cell}")
+
+    table = re.search(r"const SIGNETS = \{(.*?)\n\};", script, re.S)
+    if not table:
+        fail("main.js has no SIGNETS table")
+    defined = set(re.findall(r"^\s{2}(\w+): \{", table.group(1), re.M))
+    if len(defined) < 8:
+        fail(f"expected at least 8 signet archetypes, found {len(defined)}")
+
+    offered = set(re.findall(r'signet: "(\w+)"', script))
+    if not offered:
+        fail("no quiz choice names an archetype")
+    unknown = sorted(offered - defined)
+    if unknown:
+        fail(f"quiz choices name archetypes with no table entry: {unknown}")
+    unreachable = sorted(defined - offered)
+    if unreachable:
+        fail(f"these archetypes can never win: {unreachable}")
+
+    print(f"signets ok: {len(defined)} archetypes, all reachable, stone {gated}")
+
+
 def check_signet() -> None:
     script = (ROOT / "addon/behavior_pack/scripts/main.js").read_text()
     if "beforeEvents.playerInteractWithBlock" not in script:
@@ -741,6 +793,7 @@ def main() -> None:
     check_names()
     check_map()
     check_signet()
+    check_signets()
     check_dragon()
     check_uuids()
     check_manifests()

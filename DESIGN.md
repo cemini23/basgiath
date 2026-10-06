@@ -51,15 +51,15 @@ Seven beats, in the canon order the first year runs them. The zone modules under
 - `/function basgiath/summon_dragon` still places the rideable dragon on the pad for the ride.
 
 ### 7. The Signet
-- A lodestone on the dell floor at 50, -1, 130. The script opens the form only after the bond is set.
+- A lodestone on the dell floor at 50, -1, 130. The script opens the form only at that stone, and only after the bond is set. A lodestone anywhere else is left alone.
 - No compass is required. The script listens before the block use, and it cancels the lodestone screen.
 - Moved here from the plaza: canon puts the signet weeks after the bond, not on day one.
 
 ## The signet form
 
-Three questions, four outcomes. It runs from the signet stone in the dell, and only once the bond is set. The script uses stable `@minecraft/server` 2.0.0 and `@minecraft/server-ui` 2.0.0. Do not enable Beta APIs. The result is stored as a dynamic property, so it persists across sessions. See `addon/behavior_pack/scripts/main.js`.
+Four questions, eight outcomes. It runs from the signet stone in the dell, and only once the bond is set. Each archetype is offered by two questions, so every outcome is reachable and none is favoured. The script uses stable `@minecraft/server` 2.0.0 and `@minecraft/server-ui` 2.0.0. Do not enable Beta APIs. The result is stored as a dynamic property, so it persists across sessions. See `addon/behavior_pack/scripts/main.js`.
 
-The outcomes are original archetypes — Stormcaller, Shadowwalker, Emberwright, Stoneward. They are original names, so the work stays transformative.
+The outcomes are the map's own archetypes — Stormcaller, Shadowwalker, Emberwright, Stoneward, Mender, Wardsmith, Chronicler, Tidekeeper. The rules ban character names, book text and official art. They put no limit on which powers the map may have, so this set is free to grow.
 
 ## Scope cuts, declared up front
 
