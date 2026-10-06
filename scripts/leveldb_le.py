@@ -544,8 +544,12 @@ def table_summary(path: Path) -> str:
     ]
     try:
         index_kind = data[index_off + index_size]
+        raw = data[index_off : index_off + index_size]
         entries = _decode_block(_block_at(data, index_off, index_size))
         lines.append(f"  index block type={index_kind} entries={len(entries)}")
+        lines.append(f"    raw={raw.hex()}")
+        if index_kind != 0:
+            lines.append(f"    snappy={snappy_decompress(raw).hex()}")
         for position, (_sep, handle) in enumerate(entries[:4]):
             h_off, cursor = read_varint(handle, 0)
             h_size, _ = read_varint(handle, cursor)
