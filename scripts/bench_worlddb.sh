@@ -200,6 +200,13 @@ WRITER_READ="$(mark_check)"
 } | tee "$RESULT"
 
 echo
+echo "=== server log: errors and scoreboard lines ==="
+grep -iE "error|unknown|objective|not found|invalid|failed" "$LOG" 2>/dev/null \
+  | grep -v "unless block test failed" | tail -25 || true
+echo "=== server log: last 12 lines ==="
+tail -n 12 "$LOG" 2>/dev/null || true
+echo
+
 if grep -q '^db_write_ok=true$' "$RESULT"; then
   echo "world db writer ok"
 else
