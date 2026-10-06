@@ -310,12 +310,15 @@ def is_content_error(line):
     low = line.lower()
     if any(noise in low for noise in BENIGN_LOG_PHRASES):
         return False
-    if any(phrase in low for phrase in CONTENT_ERROR_PHRASES):
+    # The server's own error level. This is the real gate. A hand-kept list of
+    # phrasings kept missing new wordings: a recipe fault ("1.20+ Recipes
+    # require unlock data") slipped through and the bench reported clean while
+    # the log held six errors.
+    if "error]" in low:
         return True
-    # A plain fault inside a behavior-pack script: "[Scripting] ... Error: ...".
-    # The flight readout runs on a tick interval, so on a host with no player
-    # its mistake would otherwise never show.
-    return "[scripting]" in low and ("error:" in low or "exception" in low)
+    # Warning-level wordings that are still real faults, such as a function
+    # that failed to load. The server logs those as WARN, not ERROR.
+    return any(phrase in low for phrase in CONTENT_ERROR_PHRASES)
 
 
 content_errors = [line for line in log.splitlines() if is_content_error(line)]
