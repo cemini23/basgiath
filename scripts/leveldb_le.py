@@ -280,22 +280,26 @@ def snappy_decompress(data: bytes) -> bytes:
 def _decompress(raw: bytes, kind: int) -> bytes:
     """A stored block to its contents.
 
-    Block compression is Snappy with a type number that differs between
-    LevelDB forks (Mojang's tables carry 4), and the values inside are a
-    separate zlib layer. The payloads identify themselves, so try each.
+    Select on the type number, never by trying one codec and hoping it fails:
+    zlib can accept a Snappy block's first two bytes as a header and return
+    silent garbage, which reads as an empty table.
+
+    Google LevelDB uses 0 for none, 1 for Snappy and 2 for zlib. Mojang's
+    tables carry 4 for Snappy. An unknown number falls back to whichever codec
+    accepts the block.
     """
     if kind == 0:
         return raw
-    try:
+    if kind == 2:
         return zlib.decompress(raw)
-    except zlib.error:
-        pass
-    try:
+    if kind in (1, 4):
         return snappy_decompress(raw)
-    except Exception as exc:  # noqa: BLE001 - report the type, whatever failed
-        raise ValueError(
-            f"LevelDB block compression type {kind}: neither zlib nor snappy ({exc})"
-        ) from exc
+    for codec in (snappy_decompress, zlib.decompress):
+        try:
+            return codec(raw)
+        except Exception:  # noqa: BLE001 - try the next codec
+            continue
+    raise ValueError(f"unknown LevelDB block compression type {kind}")
 
 
 def _block_at(data: bytes, offset: int, size: int) -> bytes:
@@ -522,6 +526,39 @@ def write_record(dbdir: Path, key: str, value: bytes, sequence: int | None = Non
     return path
 
 
+def table_summary(path: Path) -> str:
+    """Handles and block counts, so a table that reads empty says why."""
+    data = path.read_bytes()
+    if len(data) < 48:
+        return "too short"
+    footer = data[-48:-8]
+    offset = 0
+    meta_off, offset = read_varint(footer, offset)
+    meta_size, offset = read_varint(footer, offset)
+    index_off, offset = read_varint(footer, offset)
+    index_size, offset = read_varint(footer, offset)
+    magic = struct.unpack_from("<Q", data, len(data) - 8)[0]
+    lines = [
+        f"magic={magic:#x} metaindex=({meta_off},{meta_size}) "
+        f"index=({index_off},{index_size})"
+    ]
+    try:
+        index_kind = data[index_off + index_size]
+        entries = _decode_block(_block_at(data, index_off, index_size))
+        lines.append(f"  index block type={index_kind} entries={len(entries)}")
+        for position, (_sep, handle) in enumerate(entries[:4]):
+            h_off, cursor = read_varint(handle, 0)
+            h_size, _ = read_varint(handle, cursor)
+            kind = data[h_off + h_size]
+            rows = len(_decode_block(_block_at(data, h_off, h_size)))
+            lines.append(
+                f"    block[{position}] at ({h_off},{h_size}) type={kind} entries={rows}"
+            )
+    except Exception as exc:  # noqa: BLE001 - this is a diagnostic
+        lines.append(f"  index read failed: {exc}")
+    return "\n".join(lines)
+
+
 def db_stats(dbdir: Path) -> list[str]:
     """What the manifest says and what each file yields. For diagnosis."""
     current = (dbdir / "CURRENT").read_text().strip()
@@ -542,6 +579,7 @@ def db_stats(dbdir: Path) -> list[str]:
             continue
         try:
             lines.append(f"  table {number}: {len(read_table(path))} entries")
+            lines.append("    " + table_summary(path).replace("\n", "\n    "))
         except Exception as exc:  # noqa: BLE001 - report whatever went wrong
             lines.append(f"  table {number}: ERROR {exc}")
     for log in sorted(dbdir.glob("*.log")):
