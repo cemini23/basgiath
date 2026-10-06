@@ -6,4 +6,5 @@ item.dragon_rider:copper_mark=Copper Mark
 item.dragon_rider:silver_mark=Silver Mark
 item.dragon_rider:gold_mark=Gold Mark
 item.dragon_rider:bank_note=Bank Note
+tile.dragon_rider:vault_desk.name=Vault Desk
 

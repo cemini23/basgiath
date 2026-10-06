@@ -15,7 +15,7 @@
 //
 // Original archetypes only. Do not replace these with the book's signets.
 
-import { world, system } from "@minecraft/server";
+import { ItemStack, world, system } from "@minecraft/server";
 import { ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
 
 const BONDING_BLOCK = "minecraft:lodestone";
@@ -295,6 +295,124 @@ async function runSignetQuiz(player) {
   if (again.selection === 0) runSignetQuiz(player);
 }
 
+// ---------------------------------------------------------------------------
+// The vault desk
+//
+// The academy bank: a custom block that takes the marks a cadet is carrying and
+// keeps a balance per rider, then pays marks back out. The balance is a number
+// on the player, so it survives a restart and needs no scoreboard.
+//
+// Every value is in copper marks and matches the conversion recipes: a silver
+// mark is nine copper, a gold mark is nine silver, a note is nine gold.
+
+const VAULT_BLOCK = "dragon_rider:vault_desk";
+const BANK_PROPERTY = "dragon_rider:bank";
+const VAULT_EVENT = "dragon_rider:vault";
+
+const CURRENCY = [
+  { item: "dragon_rider:copper_mark", value: 1 },
+  { item: "dragon_rider:silver_mark", value: 9 },
+  { item: "dragon_rider:gold_mark", value: 81 },
+  { item: "dragon_rider:bank_note", value: 729 },
+];
+
+const WITHDRAWALS = [
+  { label: "Withdraw a silver mark", item: "dragon_rider:silver_mark", cost: 9 },
+  { label: "Withdraw a gold mark", item: "dragon_rider:gold_mark", cost: 81 },
+  { label: "Withdraw a bank note", item: "dragon_rider:bank_note", cost: 729 },
+];
+
+function bankBalance(player) {
+  const raw = player.getDynamicProperty(BANK_PROPERTY);
+  return typeof raw === "number" && Number.isFinite(raw) ? raw : 0;
+}
+
+function setBankBalance(player, value) {
+  player.setDynamicProperty(BANK_PROPERTY, Math.max(0, Math.floor(value)));
+}
+
+// What the rider is carrying, and in which slots, so a deposit can empty them.
+function carriedMarks(player) {
+  const container = player.getComponent("minecraft:inventory")?.container;
+  if (!container) return { value: 0, slots: [] };
+  let value = 0;
+  const slots = [];
+  for (let slot = 0; slot < container.size; slot += 1) {
+    const stack = container.getItem(slot);
+    if (!stack) continue;
+    const coin = CURRENCY.find((entry) => entry.item === stack.typeId);
+    if (!coin) continue;
+    value += coin.value * stack.amount;
+    slots.push(slot);
+  }
+  return { value, slots };
+}
+
+function depositAll(player) {
+  const container = player.getComponent("minecraft:inventory")?.container;
+  if (!container) return 0;
+  const { value, slots } = carriedMarks(player);
+  for (const slot of slots) container.setItem(slot, undefined);
+  if (value > 0) setBankBalance(player, bankBalance(player) + value);
+  return value;
+}
+
+// Charge only what the pack accepts: a full inventory must not cost marks.
+function withdraw(player, entry) {
+  if (bankBalance(player) < entry.cost) return false;
+  const container = player.getComponent("minecraft:inventory")?.container;
+  if (!container) return false;
+  if (container.addItem(new ItemStack(entry.item, 1))) return false;
+  setBankBalance(player, bankBalance(player) - entry.cost);
+  return true;
+}
+
+async function runVaultForm(player) {
+  const carried = carriedMarks(player).value;
+  const balance = bankBalance(player);
+
+  const form = new ActionFormData()
+    .title("Vault Desk")
+    .body(`You carry ${carried} in marks.\nThe vault holds ${balance}.`)
+    .button("Deposit carried marks");
+  for (const entry of WITHDRAWALS) {
+    form.button(`${entry.label} (${entry.cost})`);
+  }
+
+  const response = await form.show(player);
+  if (response.canceled) return;
+
+  if (response.selection === 0) {
+    const banked = depositAll(player);
+    player.sendMessage(
+      banked > 0
+        ? `§7The desk counts §f${banked}§7 into the vault. It holds §f${bankBalance(player)}§7.`
+        : "§7There is nothing in your hands to bank."
+    );
+    return;
+  }
+
+  const entry = WITHDRAWALS[response.selection - 1];
+  if (!entry) return;
+  player.sendMessage(
+    withdraw(player, entry)
+      ? `§7The desk pays out. The vault holds §f${bankBalance(player)}§7.`
+      : "§7The vault cannot cover that, or your hands are full."
+  );
+}
+
+function openVaultForm(player) {
+  system.run(() => {
+    runVaultForm(player).catch(() => {
+      try {
+        player.sendMessage("§7The desk cannot open right now. Try again.");
+      } catch (e) {
+        // The player is gone. Nothing left to say.
+      }
+    });
+  });
+}
+
 // A lodestone use is always cancelled so the compass screen never opens.
 // The form itself waits for the bond. The plaza stone stays where it is.
 // A keeper lectern is cancelled the same way, so the page screen never opens.
@@ -312,6 +430,12 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
         player.sendMessage(NO_BOND_LINE);
       }
     });
+    return;
+  }
+
+  if (type === VAULT_BLOCK) {
+    event.cancel = true;
+    openVaultForm(player);
     return;
   }
 
@@ -347,6 +471,15 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
   const entity = event.sourceEntity;
   if (entity?.typeId !== "minecraft:player") return;
   system.run(() => runSignetQuiz(entity));
+});
+
+// Test bypass for the vault desk, so the bank is reachable without placing the
+// block.
+system.afterEvents.scriptEventReceive.subscribe((event) => {
+  if (event.id !== VAULT_EVENT) return;
+  const entity = event.sourceEntity;
+  if (entity?.typeId !== "minecraft:player") return;
+  openVaultForm(entity);
 });
 
 // Test bypasses for the two keepers. Each opens its own form for the source

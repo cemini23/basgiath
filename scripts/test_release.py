@@ -648,7 +648,27 @@ def check_currency() -> None:
             if ref not in defined:
                 fail(f"{path.name} names {ref}, which this pack does not define")
 
-    print(f"currency ok: {len(defined)} items, {len(recipes)} recipes")
+    # The vault desk: a custom block. Its texture must be in the terrain atlas
+    # and on disk, or the block renders as a missing texture, and the script
+    # must name that exact block id or nothing opens the desk.
+    block = json.loads(
+        (ROOT / "addon/behavior_pack/blocks/vault_desk.json").read_text()
+    )["minecraft:block"]
+    block_id = block["description"]["identifier"]
+    terrain = json.loads(
+        (ROOT / "addon/resource_pack/textures/terrain_texture.json").read_text()
+    )["texture_data"]
+    block_texture = block["components"]["minecraft:material_instances"]["*"]["texture"]
+    if block_texture not in terrain:
+        fail(f"{block_id} texture {block_texture!r} is not in terrain_texture.json")
+    block_png = ROOT / "addon/resource_pack" / (terrain[block_texture]["textures"] + ".png")
+    if not block_png.exists():
+        fail(f"{block_id} block texture is missing on disk: {block_png}")
+    script = (ROOT / "addon/behavior_pack/scripts/main.js").read_text()
+    if f'"{block_id}"' not in script:
+        fail(f"main.js never names {block_id}, so nothing opens the desk")
+
+    print(f"currency ok: {len(defined)} items, {len(recipes)} recipes, 1 block")
 
 
 def main() -> None:
