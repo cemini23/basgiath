@@ -114,7 +114,23 @@ sys.path.insert(0, str(Path(root) / "scripts"))
 import leveldb_le as L
 
 db = Path(db_arg)
-name, node = L.decode_typed(L.read_db(db)["scoreboard"])
+before = L.read_db(db)
+if "scoreboard" not in before:
+    raise SystemExit("the world database has no scoreboard record")
+original = before["scoreboard"]
+name, node = L.decode_typed(original)
+
+# Decode then re-encode the record untouched. If that is not byte-identical,
+# the typed codec is lossy and any edit it writes is suspect.
+again_bytes = L.encode_typed(name, node)
+print(f"  round-trip identical: {again_bytes == original} "
+      f"({len(original)} vs {len(again_bytes)} bytes)")
+if again_bytes != original:
+    for i, (a, b) in enumerate(zip(original, again_bytes)):
+        if a != b:
+            print(f"  first difference at {i}: {a:#04x} vs {b:#04x}")
+            break
+node = L.decode_typed(original)[1]
 
 target_id = None
 for entry in L.compound_get(node, "Entries")[1][1]:
