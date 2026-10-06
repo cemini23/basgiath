@@ -231,21 +231,70 @@ def frame_journal(record: bytes, start_offset: int = 0) -> bytes:
 TABLE_MAGIC = 0xDB4775248B80FB57
 
 
+def snappy_decompress(data: bytes) -> bytes:
+    """Raw Snappy (no framing), as a LevelDB table block stores it."""
+    offset = 0
+    length = 0
+    shift = 0
+    while True:
+        byte = data[offset]
+        offset += 1
+        length |= (byte & 0x7F) << shift
+        if not byte & 0x80:
+            break
+        shift += 7
+
+    out = bytearray()
+    while offset < len(data):
+        tag = data[offset]
+        offset += 1
+        kind = tag & 0x03
+        if kind == 0:  # a literal run
+            size = tag >> 2
+            if size >= 60:
+                extra = size - 59
+                size = int.from_bytes(data[offset : offset + extra], "little")
+                offset += extra
+            size += 1
+            out += data[offset : offset + size]
+            offset += size
+            continue
+        if kind == 1:
+            size = ((tag >> 2) & 0x07) + 4
+            back = ((tag >> 5) << 8) | data[offset]
+            offset += 1
+        elif kind == 2:
+            size = (tag >> 2) + 1
+            back = int.from_bytes(data[offset : offset + 2], "little")
+            offset += 2
+        else:
+            size = (tag >> 2) + 1
+            back = int.from_bytes(data[offset : offset + 4], "little")
+            offset += 4
+        start = len(out) - back
+        for step in range(size):
+            out.append(out[start + step])
+    return bytes(out[:length])
+
+
 def _decompress(raw: bytes, kind: int) -> bytes:
     """A stored block to its contents.
 
-    The type number is not portable between LevelDB forks: Google uses 1 for
-    Snappy and 2 for zlib, and Mojang's tables carry 4 here. The payload
-    identifies itself with a zlib header, so try zlib whatever the number says
-    and report the number only when that fails.
+    Block compression is Snappy with a type number that differs between
+    LevelDB forks (Mojang's tables carry 4), and the values inside are a
+    separate zlib layer. The payloads identify themselves, so try each.
     """
     if kind == 0:
         return raw
     try:
         return zlib.decompress(raw)
-    except zlib.error as exc:
+    except zlib.error:
+        pass
+    try:
+        return snappy_decompress(raw)
+    except Exception as exc:  # noqa: BLE001 - report the type, whatever failed
         raise ValueError(
-            f"LevelDB block compression type {kind} is not zlib: {exc}"
+            f"LevelDB block compression type {kind}: neither zlib nor snappy ({exc})"
         ) from exc
 
 

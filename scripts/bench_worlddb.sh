@@ -89,6 +89,7 @@ boot_and_probe() {
 echo "=== control: does the scoreboard survive a restart at all? ==="
 echo "    (no edit; the first boot set bg_twenty to 20)"
 BEFORE="$(boot_and_probe before bg_twenty 20)"
+echo "    control result: $BEFORE"
 
 echo "=== editing the scoreboard offline ==="
 python3 - "$ROOT" "$DB" <<'PY'
