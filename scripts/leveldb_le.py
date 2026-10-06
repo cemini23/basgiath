@@ -87,6 +87,21 @@ def _mask(crc: int) -> int:
     return ((crc >> 15) | (crc << 17)) + 0xA282EAD8 & 0xFFFFFFFF
 
 
+def _unmask(masked: int) -> int:
+    rotated = (masked - 0xA282EAD8) & 0xFFFFFFFF
+    return ((rotated >> 17) | (rotated << 15)) & 0xFFFFFFFF
+
+
+def record_crc(rtype: int, chunk: bytes) -> int:
+    """The stored CRC covers the record type byte and then the payload.
+
+    LevelDB seeds its CRC with the one-byte type, so hashing the payload alone
+    produces a checksum the server rejects; it treats the record as corrupt and
+    drops it.
+    """
+    return _mask(crc32c(bytes([rtype]) + chunk))
+
+
 # ------------------------------------------------------------------- journal
 
 BLOCK_SIZE = 32768
@@ -95,8 +110,13 @@ HEADER_SIZE = 7  # crc(4) + length(2) + type(1)
 FULL, FIRST, MIDDLE, LAST = 1, 2, 3, 4
 
 
-def journal_records(data: bytes) -> list[bytes]:
-    """Assemble the logical records from a LevelDB log file."""
+def journal_records(data: bytes, strict: bool = False) -> list[bytes]:
+    """Assemble the logical records from a LevelDB log file.
+
+    With ``strict``, a record whose stored CRC does not match the type byte and
+    payload is an error. LevelDB itself drops such a record; the writer bench
+    sets strict so a checksum bug is loud instead of silent.
+    """
     records: list[bytes] = []
     pending = bytearray()
     offset = 0
@@ -108,8 +128,15 @@ def journal_records(data: bytes) -> list[bytes]:
         header = data[offset : offset + HEADER_SIZE]
         if len(header) < HEADER_SIZE:
             break
-        _crc, length, rtype = struct.unpack("<IHB", header)
+        crc, length, rtype = struct.unpack("<IHB", header)
         offset += HEADER_SIZE
+        if strict and rtype != 0:
+            body = data[offset : offset + length]
+            if record_crc(rtype, body) != crc:
+                raise ValueError(
+                    f"bad journal CRC at offset {offset - HEADER_SIZE}: "
+                    f"stored {crc:#x}, computed {record_crc(rtype, body):#x}"
+                )
         chunk = data[offset : offset + length]
         if len(chunk) < length:
             break
@@ -191,7 +218,7 @@ def frame_journal(record: bytes, start_offset: int = 0) -> bytes:
             rtype = MIDDLE
         else:
             rtype = LAST
-        header = struct.pack("<IHB", _mask(crc32c(chunk)), take, rtype)
+        header = struct.pack("<IHB", record_crc(rtype, chunk), take, rtype)
         out += header + chunk
         offset += HEADER_SIZE + take
         first = False

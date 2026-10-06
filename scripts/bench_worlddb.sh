@@ -79,6 +79,11 @@ if changed != 1:
 path = L.write_record(db, "scoreboard", L.encode_typed("", node))
 print(f"wrote {path.name}")
 
+# The server drops a journal record whose checksum is wrong, so verify the one
+# we just wrote before trusting the in-game assert.
+L.journal_records(path.read_bytes(), strict=True)
+print("journal checksum verified")
+
 # Re-read through the reader, as the server would on the next open.
 again = L.read_db(db)
 _name2, node2 = L.decode_typed(again["scoreboard"])
