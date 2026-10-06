@@ -65,5 +65,8 @@ jobs:
       - name: Static world bench
         run: python3 scripts/bench_static.py
 
+      - name: Voxel consistency metric prototype
+        run: python3 scripts/check_voxel_consistency.py
+
       - name: Build the .mcaddon
         run: bash scripts/package.sh
