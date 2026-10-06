@@ -1,0 +1,10 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:recipe_shaped": {
+    "description": { "identifier": "dragon_rider:silver_mark_from_copper_marks" },
+    "tags": ["crafting_table"],
+    "pattern": ["###", "###", "###"],
+    "key": { "#": { "item": "dragon_rider:copper_mark" } },
+    "result": { "item": "dragon_rider:silver_mark" }
+  }
+}

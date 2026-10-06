@@ -1,0 +1,10 @@
+{
+  "resource_pack_name": "dragon_rider",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "copper_mark": { "textures": "textures/item/copper_mark" },
+    "silver_mark": { "textures": "textures/item/silver_mark" },
+    "gold_mark": { "textures": "textures/item/gold_mark" },
+    "bank_note": { "textures": "textures/item/bank_note" }
+  }
+}

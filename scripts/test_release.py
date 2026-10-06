@@ -602,6 +602,55 @@ def check_hud() -> None:
     print("flight readout ok")
 
 
+def check_currency() -> None:
+    """The coin items, their icons, and the conversion recipes hold together.
+
+    An item whose icon key is not in the atlas renders as a missing texture,
+    and a recipe that names an item this pack does not define simply
+    disappears. Both are silent in game, so they are checked here.
+    """
+    items_dir = ROOT / "addon/behavior_pack/items"
+    atlas = json.loads(
+        (ROOT / "addon/resource_pack/textures/item_texture.json").read_text()
+    )
+    registered = atlas["texture_data"]
+
+    defined = set()
+    for path in sorted(items_dir.glob("*.json")):
+        item = json.loads(path.read_text())["minecraft:item"]
+        identifier = item["description"]["identifier"]
+        if not identifier.startswith("dragon_rider:"):
+            fail(f"{path.name} is not a dragon_rider item: {identifier}")
+        defined.add(identifier)
+        texture = item["components"]["minecraft:icon"]["textures"]["default"]
+        if texture not in registered:
+            fail(f"{identifier} icon {texture!r} is not in item_texture.json")
+        on_disk = ROOT / "addon/resource_pack" / (registered[texture]["textures"] + ".png")
+        if not on_disk.exists():
+            fail(f"{identifier} texture is missing on disk: {on_disk}")
+    if len(defined) < 4:
+        fail(f"expected at least 4 currency items, found {len(defined)}")
+
+    recipes = sorted((ROOT / "addon/behavior_pack/recipes").glob("*.json"))
+    if not recipes:
+        fail("no conversion recipes")
+    for path in recipes:
+        recipe = json.loads(path.read_text())
+        body = recipe.get("minecraft:recipe_shaped") or recipe.get("minecraft:recipe_shapeless")
+        if not body:
+            fail(f"{path.name} is neither a shaped nor a shapeless recipe")
+        if body.get("tags") != ["crafting_table"]:
+            fail(f"{path.name} is not a crafting-table recipe: {body.get('tags')!r}")
+        referenced = [body["result"]["item"]]
+        referenced += [entry["item"] for entry in body.get("key", {}).values()]
+        referenced += [entry["item"] for entry in body.get("ingredients", [])]
+        for ref in referenced:
+            if ref not in defined:
+                fail(f"{path.name} names {ref}, which this pack does not define")
+
+    print(f"currency ok: {len(defined)} items, {len(recipes)} recipes")
+
+
 def main() -> None:
     run([sys.executable, "scripts/build_map.py"])
     run([sys.executable, "scripts/build_dragon_model.py"])
@@ -612,6 +661,7 @@ def main() -> None:
     check_uuids()
     check_manifests()
     check_hud()
+    check_currency()
     check_world()
     print("release checks ok")
 

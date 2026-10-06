@@ -37,9 +37,11 @@ jobs:
         run: |
           python3 scripts/build_dragon_model.py
           python3 scripts/build_map.py
+          python3 scripts/build_coin_textures.py
           git diff --exit-code -- \
             addon/resource_pack/models/entity/dragon.geo.json \
             addon/resource_pack/textures/entity/dragon.png \
+            addon/resource_pack/textures/item \
             addon/behavior_pack/functions
 
       - name: No series names in the packs
