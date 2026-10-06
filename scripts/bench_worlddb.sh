@@ -122,9 +122,10 @@ name, node = L.decode_typed(original)
 
 # Decode then re-encode the record untouched. If that is not byte-identical,
 # the typed codec is lossy and any edit it writes is suspect.
-again_bytes = L.encode_typed(name, node)
+again_bytes = L.encode_typed(name, node, compress=L.value_is_compressed(original))
 print(f"  round-trip identical: {again_bytes == original} "
-      f"({len(original)} vs {len(again_bytes)} bytes)")
+      f"({len(original)} vs {len(again_bytes)} bytes, "
+      f"original compressed={L.value_is_compressed(original)})")
 if again_bytes != original:
     for i, (a, b) in enumerate(zip(original, again_bytes)):
         if a != b:
@@ -151,7 +152,9 @@ for objective in L.compound_get(node, "Objectives")[1][1]:
 if changed != 1:
     raise SystemExit(f"expected exactly one score to change, changed {changed}")
 
-path = L.write_record(db, "scoreboard", L.encode_typed("", node))
+path = L.write_record(
+    db, "scoreboard", L.encode_typed("", node, compress=L.value_is_compressed(original))
+)
 L.journal_records(path.read_bytes(), strict=True)
 print(f"  wrote {path.name}, checksum verified")
 PY

@@ -721,14 +721,24 @@ def decode_typed(value: bytes):
     return name, node
 
 
-def encode_typed(name: str, node) -> bytes:
-    """A typed node back to a compressed db value.
+def value_is_compressed(value: bytes) -> bool:
+    """Whether a stored value carries a zlib header."""
+    return value[:1] == b"\x78"
+
+
+def encode_typed(name: str, node, compress: bool = False) -> bytes:
+    """A typed node back to a db value.
 
     The root compound needs its own tag byte: write_node writes a compound
     body only, because a nested compound already has its tag written by its
     parent.
+
+    Compression is the caller's choice, because the database mixes the two:
+    the scoreboard record is stored as bare NBT (starting 0x0a) while locational
+    data is zlib. Writing a record in the other form makes the server drop it.
     """
-    return zlib.compress(bytes([TAG_COMPOUND]) + _write_text(name) + write_node(node))
+    blob = bytes([TAG_COMPOUND]) + _write_text(name) + write_node(node)
+    return zlib.compress(blob) if compress else blob
 
 
 def find_compound(node) -> list:
