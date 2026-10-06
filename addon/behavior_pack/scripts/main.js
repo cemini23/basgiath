@@ -612,6 +612,9 @@ const STAMINA_DRAIN = 3.0; // per draw, at full work
 const STAMINA_RECOVER = 1.2; // per draw, below the work threshold
 const STAMINA_WORK = 0.35;
 const HUD_TEST_EVENT = "dragon_rider:hud";
+// While a cadet carries this tag the course clock owns the action bar, so the
+// flight readout stands down. Both draw to the same line.
+const COURSE_TAG = "timed_run";
 
 // Slow at both ends, fast through the middle. A linear walk reads as a slide;
 // this reads as a settle.
@@ -737,6 +740,7 @@ function drawFlightHud(player, forced) {
 system.runInterval(() => {
   for (const player of world.getAllPlayers()) {
     try {
+      if (player.hasTag(COURSE_TAG)) continue; // the course clock owns the line
       drawFlightHud(player);
     } catch (e) {
       // One player's readout must never take the tick loop down.

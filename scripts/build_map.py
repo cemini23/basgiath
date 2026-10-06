@@ -349,6 +349,10 @@ def build_text(stage_count: int) -> str:
         "scoreboard objectives add gate_start dummy",
         "scoreboard objectives add gate_pen dummy",
         "scoreboard objectives add gate_best dummy",
+        # The cadet course clock. run_tick counts up per cadet; run_sec is the
+        # same number divided by the twenty-tick divisor, for the action bar.
+        "scoreboard objectives add run_tick dummy",
+        "scoreboard objectives add run_sec dummy",
         "scoreboard players set bg_twenty map_state 20",
         "scoreboard objectives setdisplay sidebar gate_sec",
         'kill @e[type=armor_stand,name="build_anchor"]',
@@ -420,6 +424,26 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tag @a[x=~38,y
 scoreboard players add bg_storm map_state 1
 execute if score bg_storm map_state matches 200.. run scoreboard players set bg_storm map_state 0
 execute if score bg_storm map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] run weather thunder 999999
+scoreboard players add @a[tag=timed_run] run_tick 1
+scoreboard players operation @a[tag=timed_run] run_sec = @a[tag=timed_run] run_tick
+scoreboard players operation @a[tag=timed_run] run_sec /= bg_twenty map_state
+execute as @a[tag=timed_run] run titleraw @s actionbar {"rawtext":[{"text":"§bCourse  "},{"score":{"name":"@s","objective":"run_sec"}},{"text":"s"}]}
+"""
+
+# A cadet course clock: an on-screen timer for a timed run. No experimental
+# flag is involved; the clock is a scoreboard and a titleraw line, so it works
+# on a phone. The flight readout stands down while a cadet has the tag, because
+# both draw to the action bar and only one can own it.
+RUN_START = """scoreboard players set @s run_tick 0
+scoreboard players set @s run_sec 0
+tag @s add timed_run
+titleraw @s actionbar {"rawtext":[{"text":"§bCourse 0s"}]}
+"""
+
+RUN_STOP = """tag @s remove timed_run
+scoreboard players reset @s run_tick
+scoreboard players reset @s run_sec
+titleraw @s actionbar {"rawtext":[{"text":"§7Course clock stopped."}]}
 """
 
 
@@ -613,6 +637,8 @@ def main() -> None:
     )
     (BASGIATH / "live.mcfunction").write_text(live_text(), encoding="utf-8")
     (BASGIATH / "summon_dragon.mcfunction").write_text(SUMMON, encoding="utf-8")
+    (BASGIATH / "run_start.mcfunction").write_text(RUN_START, encoding="utf-8")
+    (BASGIATH / "run_stop.mcfunction").write_text(RUN_STOP, encoding="utf-8")
     # The phone does not run tick.json. main.js runs basgiath/tick instead.
     (OUT / "tick.json").write_text(
         json.dumps({"values": []}, indent=2) + "\n",

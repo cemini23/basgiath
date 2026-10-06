@@ -7,6 +7,8 @@ scoreboard objectives add gate_sec dummy
 scoreboard objectives add gate_start dummy
 scoreboard objectives add gate_pen dummy
 scoreboard objectives add gate_best dummy
+scoreboard objectives add run_tick dummy
+scoreboard objectives add run_sec dummy
 scoreboard players set bg_twenty map_state 20
 scoreboard objectives setdisplay sidebar gate_sec
 kill @e[type=armor_stand,name="build_anchor"]

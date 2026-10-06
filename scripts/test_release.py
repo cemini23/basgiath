@@ -42,6 +42,10 @@ DOC_DENY = (
 # The two reference docs exist to name what the ban forbids. They are the only
 # files allowed to hold a denylist.
 POLICY_DOCS = {"docs/CANON.md", "docs/IP-RULES.md"}
+# The tag a cadet carries during a timed run. The course clock owns the action
+# bar while it is set, and the flight readout stands down, so both names must
+# be the same string.
+COURSE_TAG_NAME = "timed_run"
 REQUIRED_BONES = (
     "body",
     "head",
@@ -333,6 +337,20 @@ def check_map() -> None:
             fail(f"the live pass never touches {needle}")
     if "operation @s gate_sec /= bg_twenty map_state" not in live:
         fail("the live pass never turns ticks into seconds")
+    # The cadet course clock. The objective must exist before the live pass
+    # writes it, and the action bar line must carry the seconds, not ticks.
+    for objective in ("run_tick", "run_sec"):
+        if f"scoreboard objectives add {objective} dummy" not in build:
+            fail(f"the build does not create the {objective} objective")
+    if "scoreboard players add @a[tag=timed_run] run_tick 1" not in live:
+        fail("the live pass never advances the course clock")
+    if '"objective":"run_sec"' not in live:
+        fail("the course clock does not show the cadet's time on the action bar")
+    for path in (folder / "run_start.mcfunction", folder / "run_stop.mcfunction"):
+        if not path.exists():
+            fail(f"the course clock is missing {path.name}")
+    if f'const COURSE_TAG = "{COURSE_TAG_NAME}"' not in script:
+        fail("the script does not name the course tag")
     # The start and summit zones come from BANDS in the zone module, not from
     # rewritten numbers. This compares the emitted boxes against the module's
     # own geometry, and the bench additionally proves they sit on the cliff.
