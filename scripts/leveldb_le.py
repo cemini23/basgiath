@@ -480,24 +480,80 @@ def max_sequence(dbdir: Path) -> int:
 
 
 def write_record(dbdir: Path, key: str, value: bytes, sequence: int | None = None) -> Path:
-    """Append one put to a fresh journal file that recovery will replay.
+    """Record one put, so the server sees it on the next open.
 
-    LevelDB replays every log numbered at or above the manifest's log_number,
-    so a new file with a higher number is picked up on the next open. The
-    sequence defaults to one past the highest the database has used, which is
-    what makes the new value win over anything already stored.
+    The record goes into the journal the manifest names. An extra log the
+    manifest does not know about is not replayed: the server fails to open the
+    database and starts a fresh world. The sequence defaults to one past the
+    highest the database has used, which is what makes the new value win over
+    anything already stored.
+
+    When the named journal is gone (the data was compacted into a table), a new
+    log is created and registered with a VersionEdit appended to the manifest,
+    which is how LevelDB itself announces a journal.
     """
     current = (dbdir / "CURRENT").read_text().strip()
-    state = parse_manifest(journal_records((dbdir / current).read_bytes()))
+    manifest_path = dbdir / current
+    state = parse_manifest(journal_records(manifest_path.read_bytes()))
+    if sequence is None:
+        sequence = max_sequence(dbdir) + 1
+    batch = build_write_batch(sequence, key, value)
+
+    named = dbdir / f"{state['log_number']:06d}.log"
+    if named.exists():
+        with named.open("ab") as handle:
+            handle.write(frame_journal(batch, start_offset=named.stat().st_size))
+        return named
+
     number = max(
         state["next_file"],
         max((int(p.stem) for p in dbdir.glob("*.log")), default=0) + 1,
     )
-    if sequence is None:
-        sequence = max_sequence(dbdir) + 1
     path = dbdir / f"{number:06d}.log"
-    path.write_bytes(frame_journal(build_write_batch(sequence, key, value)))
+    path.write_bytes(frame_journal(batch))
+    edit = (
+        write_varint(_LOG_NUMBER)
+        + write_varint(number)
+        + write_varint(_NEXT_FILE)
+        + write_varint(number + 1)
+    )
+    with manifest_path.open("ab") as handle:
+        handle.write(frame_journal(edit, start_offset=manifest_path.stat().st_size))
     return path
+
+
+def db_stats(dbdir: Path) -> list[str]:
+    """What the manifest says and what each file yields. For diagnosis."""
+    current = (dbdir / "CURRENT").read_text().strip()
+    state = parse_manifest(journal_records((dbdir / current).read_bytes()))
+    lines = [
+        f"manifest {current}: live={sorted(state['live'])} "
+        f"log_number={state['log_number']} next_file={state['next_file']} "
+        f"last_sequence={state['last_sequence']}"
+    ]
+    for path in sorted(dbdir.iterdir()):
+        if path.name in ("CURRENT", "LOCK", "LOG", "LOG.old"):
+            continue
+        lines.append(f"  file {path.name} ({path.stat().st_size} bytes)")
+    for number in sorted(state["live"]):
+        path = dbdir / f"{number:06d}.ldb"
+        if not path.exists():
+            lines.append(f"  table {number}: MISSING")
+            continue
+        try:
+            lines.append(f"  table {number}: {len(read_table(path))} entries")
+        except Exception as exc:  # noqa: BLE001 - report whatever went wrong
+            lines.append(f"  table {number}: ERROR {exc}")
+    for log in sorted(dbdir.glob("*.log")):
+        number = int(log.stem)
+        if number < state["log_number"]:
+            continue
+        try:
+            rows = sum(len(parse_write_batch(p)) for p in journal_records(log.read_bytes()))
+            lines.append(f"  log {number}: {rows} rows")
+        except Exception as exc:  # noqa: BLE001
+            lines.append(f"  log {number}: ERROR {exc}")
+    return lines
 
 
 def decode_value(value: bytes) -> tuple[str, dict]:
@@ -651,7 +707,12 @@ def main() -> None:
     parser.add_argument("--grep", help="only show keys containing this text")
     parser.add_argument("--hex", metavar="KEY", help="dump one key's value as hex")
     parser.add_argument("--decode", metavar="KEY", help="zlib+NBT decode one key's value")
+    parser.add_argument("--stats", action="store_true", help="what the manifest lists")
     args = parser.parse_args()
+
+    if args.stats:
+        print("\n".join(db_stats(args.dbdir)))
+        return
 
     data = read_db(args.dbdir)
 
