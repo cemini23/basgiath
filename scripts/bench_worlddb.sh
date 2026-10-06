@@ -20,7 +20,9 @@ DB="$WORLD/db"
 RESULT="$WORK/writer-result.txt"
 LOG="$WORK/writer-server.log"
 TEST_X=0
-TEST_Y=250
+# The bench writes to (0,79,0) and probes it, so the chunk is loaded and the
+# height is writable. A high y is not: the server refuses it silently.
+TEST_Y=79
 TEST_Z=0
 
 if [ "$(uname -s)" != "Linux" ]; then
@@ -166,8 +168,14 @@ score_marker() {
 mark_clear
 PROBE_FALSE="$(mark_check)"
 
+# Can the marker be placed at all here? If this fails, the position or the
+# probe is wrong and the later results mean nothing.
+mark_clear
+send "setblock ${TEST_X} ${TEST_Y} ${TEST_Z} gold_block"
+MARKER_PLACE="$(mark_check)"
+
 # Positive control: a score set over the console, read back immediately. If
-# this fails, the assert mechanism is broken, not the database write.
+# this fails, the score test is broken, not the database write.
 mark_clear
 send "scoreboard players set bg_probe map_state 123"
 score_marker bg_probe 123
@@ -181,6 +189,7 @@ WRITER_READ="$(mark_check)"
 
 {
   echo "probe_reports_false_when_absent=$PROBE_FALSE"
+  echo "marker_places_unconditionally=$MARKER_PLACE"
   echo "probe_reports_true_when_present=$PROBE_TRUE"
   echo "writer_read=$WRITER_READ"
   if [ "$WRITER_READ" = "true" ] && [ "$PROBE_TRUE" = "true" ] && [ "$PROBE_FALSE" = "false" ]; then
