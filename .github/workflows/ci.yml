@@ -59,6 +59,9 @@ jobs:
       - name: Release checks
         run: python3 scripts/test_release.py
 
+      - name: No known Bedrock schema deprecation
+        run: python3 scripts/migrate_schema.py
+
       - name: Static world bench
         run: python3 scripts/bench_static.py
 
