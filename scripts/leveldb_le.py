@@ -232,11 +232,21 @@ TABLE_MAGIC = 0xDB4775248B80FB57
 
 
 def _decompress(raw: bytes, kind: int) -> bytes:
+    """A stored block to its contents.
+
+    The type number is not portable between LevelDB forks: Google uses 1 for
+    Snappy and 2 for zlib, and Mojang's tables carry 4 here. The payload
+    identifies itself with a zlib header, so try zlib whatever the number says
+    and report the number only when that fails.
+    """
     if kind == 0:
         return raw
-    if kind == 2:
+    try:
         return zlib.decompress(raw)
-    raise ValueError(f"unsupported LevelDB block compression type {kind}")
+    except zlib.error as exc:
+        raise ValueError(
+            f"LevelDB block compression type {kind} is not zlib: {exc}"
+        ) from exc
 
 
 def _block_at(data: bytes, offset: int, size: int) -> bytes:
