@@ -1,0 +1,2 @@
+pack pack-free-basgiath-java: 183479 chars, model poolside/laguna-s-2.1:free
+the endpoint refused it: 429 b'{"error":{"message":"Provider returned error","code":429,"metadata":{"raw":"poolside/laguna-s-2.1:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations","provider_name":"Poolside","is_byok":false,"limit_source":"upstream_provider_shared_pool","remedy_hint":"Retry shortly, add your own provide'

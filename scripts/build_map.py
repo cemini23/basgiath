@@ -13,6 +13,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from editions import DROPPED as JAVA_DROPPED
+from editions import java_lines as to_java_lines
+from editions import write_java_functions
 from zones.dorms import build as build_dorms
 from zones.flight import build as build_flight
 from zones.gauntlet import build as build_gauntlet
@@ -205,21 +208,75 @@ def write_named_stages(prefix: str, commands: list[str]) -> int:
     return len(stages)
 
 
-def write_functions(commands: list[str]) -> int:
-    count = write_named_stages("stage", commands)
-    tick_lines = ["scoreboard players operation bg_now map_state = bg_stage map_state"]
+def tick_lines(count: int) -> list[str]:
+    """The tick body. Bedrock runs it from the script; Java runs it from a tag."""
+    lines = ["scoreboard players operation bg_now map_state = bg_stage map_state"]
     for index in range(1, count + 1):
         nxt = index + 1 if index < count else 0
         name = f"stage_{index:02d}"
-        tick_lines.append(
+        lines.append(
             f'execute if score bg_now map_state matches {index} as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/{name}'
         )
-        tick_lines.append(
+        lines.append(
             f"execute if score bg_now map_state matches {index} run scoreboard players set bg_stage map_state {nxt}"
         )
-    tick_lines.append('execute if score bg_now map_state matches 0 run function basgiath/live')
-    (BASGIATH / "tick.mcfunction").write_text("\n".join(tick_lines) + "\n", encoding="utf-8")
+    lines.append('execute if score bg_now map_state matches 0 run function basgiath/live')
+    return lines
+
+
+def write_functions(commands: list[str]) -> int:
+    count = write_named_stages("stage", commands)
+    (BASGIATH / "tick.mcfunction").write_text(
+        "\n".join(tick_lines(count)) + "\n", encoding="utf-8"
+    )
     return count
+
+
+def _chunks(commands: list[str]) -> list[list[str]]:
+    return [commands[i : i + MAX_CMDS] for i in range(0, len(commands), MAX_CMDS)]
+
+
+_JAVA_DROPS: dict[str, int] = {}
+
+
+def _java_drop_reason(key: str) -> str:
+    return JAVA_DROPPED.get(key, "NO REASON RECORDED")
+
+
+def _translate(lines: list[str], where: str) -> str:
+    translated, drops = to_java_lines([line for line in lines if line.strip()], where)
+    for key, count in drops.items():
+        _JAVA_DROPS[key] = _JAVA_DROPS.get(key, 0) + count
+    return "\n".join(translated) + "\n"
+
+
+def write_java(commands: list[str], far: list[str], count: int) -> int:
+    """Emit the Java datapack tree beside the Bedrock one.
+
+    The Bedrock pass runs first and is left untouched, so this cannot change what
+    ships to MCPEDL. It reads the same command lists and translates them. The
+    Java edition is not a second generator: it is the same commands, rendered for
+    a different edition. See scripts/editions.py.
+    """
+    far_calls = stage_calls("far", len(_chunks(far)))
+    files: dict[str, str] = {}
+    for index, chunk in enumerate(_chunks(commands), start=1):
+        files[f"stage_{index:02d}.mcfunction"] = _translate(chunk, f"stage_{index:02d}")
+    for index, chunk in enumerate(_chunks(far), start=1):
+        files[f"far_{index:02d}.mcfunction"] = _translate(chunk, f"far_{index:02d}")
+    files["tick.mcfunction"] = _translate(tick_lines(count), "tick")
+    files["build.mcfunction"] = _translate(build_text(count).split("\n"), "build")
+    files["fill_far.mcfunction"] = _translate(far_calls, "fill_far")
+    files["raise.mcfunction"] = _translate(raise_text().split("\n"), "raise")
+    files["open.mcfunction"] = _translate(
+        ["scoreboard players set bg_pass map_state 2", *far_calls, *welcome_lines()], "open"
+    )
+    files["live.mcfunction"] = _translate(live_text().split("\n"), "live")
+    files["summon_dragon.mcfunction"] = _translate(SUMMON.split("\n"), "summon_dragon")
+    files["run_start.mcfunction"] = _translate(RUN_START.split("\n"), "run_start")
+    files["run_stop.mcfunction"] = _translate(RUN_STOP.split("\n"), "run_stop")
+    write_java_functions(ROOT, files, "tick")
+    return len(_chunks(far))
 
 
 def at_anchor(command: str) -> str:
@@ -653,7 +710,12 @@ def main() -> None:
         path = OUT / name
         if path.exists():
             path.unlink()
+    java_far = write_java(commands, far, count)
     print(f"wrote {count} stages, {len(commands)} build commands")
+    print(f"wrote the Java datapack: {count} stages, {java_far} far stages")
+    if _JAVA_DROPS:
+        for key, n in sorted(_JAVA_DROPS.items()):
+            print(f"  Java drops {n:3d} x {key}: {_java_drop_reason(key)}")
 
 
 if __name__ == "__main__":

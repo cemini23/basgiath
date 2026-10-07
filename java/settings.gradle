@@ -1,0 +1,19 @@
+// Basgiath — Java port (NeoForge).
+//
+// This is a self-contained Gradle build. Gradle never runs from the repo root,
+// and the Bedrock Python chain never runs Gradle. See docs/JAVA-PORT-PROMPT.md.
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.neoforged.net/releases' }
+    }
+}
+
+plugins {
+    // Lets Gradle find or download a matching JDK for the toolchain in build.gradle,
+    // instead of failing when the machine has a different default Java.
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+rootProject.name = 'basgiath'

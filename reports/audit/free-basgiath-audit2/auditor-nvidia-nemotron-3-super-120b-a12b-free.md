@@ -1,0 +1,10 @@
+<!-- model=nvidia/nemotron-3-super-120b-a12b:free pack=pack-free-basgiath-audit2 usage={'prompt_tokens': 110214, 'completion_tokens': 24714, 'total_tokens': 134928, 'cost': 0, 'is_byok': False, 'prompt_tokens_details': {'cached_tokens': 0, 'cache_write_tokens': 0, 'audio_tokens': 0, 'video_tokens': 0}, 'cost_details': {'upstream_inference_cost': 0, 'upstream_inference_prompt_cost': 0, 'upstream_inference_completions_cost': 0}, 'completion_tokens_details': {'reasoning_tokens': 24377, 'image_tokens': 0, 'audio_tokens': 0}} -->
+
+| Severity | Finding | Evidence (file:line) | Why a single-edition audit would miss it | Fix |
+|----------|---------|----------------------|------------------------------------------|-----|
+| High | The Java edition displays tellraw chat messages in the actionbar instead of in the chat, changing where the player sees the message. | generated/live.mcfunction:7 | A Bedrock-only audit would see the messages as chat and not realize the Java edition shows them in the actionbar. A Java-only audit would see the messages in the actionbar and not realize the Bedrock edition shows them in chat. | Correct the translation of tellraw commands in editions.py to remain tellraw and not convert to title. |
+
+**Root cause**: The editions.py translator incorrectly handles tellraw commands by converting them to title actionbar messages, likely due to a mistake in the conditional branching where tellraw is being processed by the titleraw branch or a similar error.  
+**Confidence**: high  
+**What would change your mind**: If we found that the tellraw commands in the Java live function were actually being sent to chat (i.e., if the generated file showed tellraw @s ...) then we would know the issue is not present.  
+**Unique angle**: The issue is systematic for all tellraw commands in the live function, affecting multiple game messages (span warning, relic mark, dragon bond message, etc.), and was not caught because the Bedrock edition's tellraw commands are rare in the live function (only a few) and the Java edition's title actionbar messages look similar at a glance.

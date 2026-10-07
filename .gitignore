@@ -19,3 +19,11 @@ __pycache__/
 
 # Generated audit packs (file copies, rebuilt per run)
 reports/audit/pack-*/
+
+# Java port — a self-contained Gradle build inside java/.
+# Run it from there: cd java && ./gradlew build
+java/build/
+java/.gradle/
+java/run/
+java/run-data/
+java/runs/

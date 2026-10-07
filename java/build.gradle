@@ -1,0 +1,172 @@
+// Basgiath — Java port (NeoForge ModDevGradle).
+//
+// Run every Gradle command from java/:  cd java && ./gradlew build
+// Gradle does not live at the repo root, and it never touches the Bedrock chain.
+
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+    // Publishing to Modrinth. The token is read from the environment and is never
+    // written into this file or the repository.
+    id 'com.modrinth.minotaur' version '2.10.0'
+}
+
+tasks.named('wrapper', Wrapper).configure {
+    // BIN, not ALL. The ALL distribution carries Gradle's own sources and docs.
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+// Minecraft 1.21.1 ships Java 21 to end users, so the mod targets Java 21.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    // GeckoLib, the standard for a Bedrock-style animated entity on Java. It is the
+    // dragon's model and animation runtime.
+    maven {
+        name = 'GeckoLib'
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+    }
+}
+
+neoForge {
+    // Pin the loader by the version in gradle.properties. Changing it is a deliberate act.
+    version = project.neo_version
+
+    // Official Mojang mappings (Mojmap). Parchment adds parameter names and javadoc only.
+    // Never Yarn.
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    // Access transformers are picked up from META-INF/accesstransformer.cfg when present.
+    validateAccessTransformers = true
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        // Runs the registered game tests headlessly, then exits.
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        // The headless port check. Raises the college, summons the dragon, and stops.
+        // See com.basgiath.BasgiathSmokeTest. Run it with: ./gradlew runSmoke
+        smoke {
+            server()
+            programArgument '--nogui'
+            systemProperty 'basgiath.smoke', 'true'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all',
+                    '--output', file('src/generated/resources/').getAbsolutePath(),
+                    '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+// Data generation writes here, so the built jar picks it up.
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// 'localRuntime' is for dependencies needed at runtime but not published downstream.
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    // The dragon's model and animations. A required dependency: without it the mod
+    // has no entity to render, so it is declared as implementation and published.
+    implementation "software.bernie.geckolib:${geckolib_artifact}:${geckolib_version}"
+}
+
+// neoforge.mods.toml is a template. These properties are expanded into it at build time,
+// so the version numbers live in gradle.properties and nowhere else.
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// ---------------------------------------------------------------------------
+// Modrinth
+//
+// Free and fan-made, like the Bedrock release. The Java mod gets its own version
+// tags and its own listing; the two editions publish separately from this one repo.
+//
+// Run it with the token in the environment:
+//     MODRINTH_TOKEN=... ./gradlew modrinth
+//
+// The `publish` workflow does exactly that, on a tag. Nothing here runs on a normal
+// build, so CI stays free of the token and of the network call.
+// ---------------------------------------------------------------------------
+
+modrinth {
+    token = System.getenv('MODRINTH_TOKEN')
+    // The Modrinth slug. The first upload creates it; change this line if the
+    // project is created under a different slug.
+    projectId = 'basgiath'
+    versionNumber = "${mod_version}+${minecraft_version}"
+    versionName = "${mod_name} ${mod_version} for Minecraft ${minecraft_version}"
+    versionType = 'release'
+    uploadFile = jar
+    gameVersions = [minecraft_version]
+    loaders = ['neoforge']
+    changelog = "Java port ${mod_version}. Built against NeoForge ${neo_version} on Minecraft ${minecraft_version}."
+    // The dragon does not render without GeckoLib, so it is a hard requirement,
+    // exactly as the mod metadata declares.
+    dependencies {
+        required.project 'geckolib'
+    }
+}

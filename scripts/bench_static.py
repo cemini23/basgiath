@@ -598,12 +598,24 @@ function buildModule() {
   return new vm.SourceTextModule(readFileSync(MAIN, "utf8"), { identifier: MAIN });
 }
 
+// main.js imports ItemStack from @minecraft/server. The vault desk constructs one
+// when it pays a withdrawal out, so the stub needs a constructor and not just the
+// name: a missing export fails the whole module link, which takes the proof down
+// before it can check anything.
+class ItemStack {
+  constructor(item, amount = 1) {
+    this.typeId = item;
+    this.amount = amount;
+  }
+}
+
 function stubModule() {
   return new vm.SyntheticModule(
-    ["world", "system", "ActionFormData", "MessageFormData", "ModalFormData"],
+    ["world", "system", "ItemStack", "ActionFormData", "MessageFormData", "ModalFormData"],
     function () {
       this.setExport("world", world);
       this.setExport("system", system);
+      this.setExport("ItemStack", ItemStack);
       this.setExport("ActionFormData", forms.ActionFormData);
       this.setExport("MessageFormData", forms.MessageFormData);
       this.setExport("ModalFormData", forms.ModalFormData);
@@ -657,7 +669,12 @@ forms.seen = [];
 
 const world = {
   beforeEvents: { playerInteractWithBlock: { subscribe: (fn) => { interact = fn; } } },
-  afterEvents: { scriptEventReceive: { subscribe: () => {} } },
+  afterEvents: {
+    scriptEventReceive: { subscribe: () => {} },
+    // main.js subscribes here for the codices. The proof drives the block-interact
+    // path, so this only has to exist for the module to link.
+    itemUse: { subscribe: () => {} },
+  },
   sendMessage: (text) => { messages.push(String(text)); },
   getDynamicProperty: () => undefined,
   setDynamicProperty: () => {},

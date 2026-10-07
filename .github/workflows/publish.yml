@@ -1,0 +1,44 @@
+name: publish
+
+# The Java mod publishes on its own tags, so the Bedrock release keeps its own
+# version line and the two never collide. Push a tag like `java-v0.1.0` to release.
+on:
+  push:
+    tags: ["java-v*"]
+
+  # So a release can be re-run without moving a tag.
+  workflow_dispatch:
+
+jobs:
+  modrinth:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: java
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      # Nothing ships that has not passed the same two checks CI runs. A release
+      # that skips them is a release that can be broken on arrival.
+      - name: Build the Java mod
+        run: ./gradlew build
+
+      - name: The port works on a live server
+        run: |
+          set -o pipefail
+          ./gradlew runSmoke --no-daemon | tee /tmp/smoke.log
+          grep -qE "^SMOKE RESULT  passed=[0-9]+ failed=0$" /tmp/smoke.log
+
+      # MODRINTH_TOKEN is a repository secret. It is read from the environment by
+      # build.gradle and never written to a file in this repository.
+      - name: Publish to Modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: ./gradlew modrinth

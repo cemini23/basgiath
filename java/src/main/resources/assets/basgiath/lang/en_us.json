@@ -1,0 +1,11 @@
+{
+  "item.basgiath.copper_mark": "Copper Mark",
+  "item.basgiath.silver_mark": "Silver Mark",
+  "item.basgiath.gold_mark": "Gold Mark",
+  "item.basgiath.bank_note": "Bank Note",
+  "item.basgiath.flight_manual": "Flight Manual",
+  "item.basgiath.dragon_codex": "Dragon Codex",
+  "item.basgiath.academy_archive": "Academy Archive",
+  "block.basgiath.vault_desk": "Vault Desk",
+  "itemGroup.basgiath": "Basgiath"
+}

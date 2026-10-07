@@ -1,0 +1,32 @@
+# Basgiath — NeoForge mod metadata.
+# Version numbers are expanded from gradle.properties at build time. Edit those, not this.
+#
+# IP rule: no series name, no book title, and no character name in any shipped string.
+# docs/IP-RULES.md wins on any conflict.
+
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+
+license="${mod_license}"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+# Free, fan-made work. Not official, and not affiliated with the rights holder.
+description='''${mod_description}'''
+
+[[dependencies.${mod_id}]]
+modId="neoforge"
+type="required"
+versionRange="${neo_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"

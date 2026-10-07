@@ -1,0 +1,3 @@
+<!-- model=openai/gpt-5.1-codex pack=pack-free-basgiath-java usage={'prompt_tokens': 46136, 'completion_tokens': 16000, 'total_tokens': 62136, 'cost': 0.2154933, 'is_byok': False, 'prompt_tokens_details': {'cached_tokens': 0, 'cache_write_tokens': 0, 'audio_tokens': 0, 'video_tokens': 0}, 'cost_details': {'upstream_inference_cost': 0.21767, 'upstream_inference_prompt_cost': 0.05767, 'upstream_inference_completions_cost': 0.16}, 'completion_tokens_details': {'reasoning_tokens': 16000, 'image_tokens': 0, 'audio_tokens': 0}} -->
+
+<!-- the model returned nothing at all. Raise max_tokens, or narrow the task. -->

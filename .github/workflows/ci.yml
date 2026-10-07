@@ -38,21 +38,27 @@ jobs:
           python3 scripts/build_dragon_model.py
           python3 scripts/build_map.py
           python3 scripts/build_textures.py
+          python3 scripts/build_java_assets.py
           git diff --exit-code -- \
             addon/resource_pack/models/entity/dragon.geo.json \
             addon/resource_pack/textures/entity/dragon.png \
             addon/resource_pack/textures/item \
             addon/resource_pack/textures/blocks \
-            addon/behavior_pack/functions
+            addon/behavior_pack/functions \
+            java/src/main/resources/data \
+            java/src/main/resources/assets
 
-      - name: No series names in the packs
+      - name: The Java dialect is strict, and the Bedrock output did not move
+        run: python3 scripts/test_editions.py
+
+      - name: No series names in the shipped content
         run: |
           if grep -Ril \
             -e "fourth wing" -e "empyrean" -e "iron flame" -e "onyx storm" \
             -e "dragonkind" -e "tairn" -e "andarna" -e "sgaeyl" \
             -e "xaden" -e "violet sorrengail" -e "yarros" \
-            addon scripts; then
-            echo "::error::Series name found in the packs"
+            addon scripts java/src; then
+            echo "::error::Series name found in the shipped content"
             exit 1
           fi
 
@@ -70,3 +76,34 @@ jobs:
 
       - name: Build the .mcaddon
         run: bash scripts/package.sh
+
+  # The Java port is a separate toolchain. This job runs Gradle and nothing else.
+  # The validate job above runs the Python chain and never runs Gradle.
+  # Neither job calls the other. See docs/JAVA-PORT-PROMPT.md.
+  java:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: java
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Build the Java mod
+        run: ./gradlew build
+
+      # Raises the college and summons the dragon on a headless server, then stops.
+      # This is the check that catches a generated function the game refused to load,
+      # which is silent in every other check. The assertion is anchored to the whole
+      # result line so a partial or malformed line cannot read as a pass.
+      - name: The port works on a live server
+        run: |
+          set -o pipefail
+          ./gradlew runSmoke --no-daemon | tee /tmp/smoke.log
+          grep -qE "^SMOKE RESULT  passed=[0-9]+ failed=0$" /tmp/smoke.log
