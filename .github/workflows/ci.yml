@@ -39,14 +39,24 @@ jobs:
           python3 scripts/build_map.py
           python3 scripts/build_textures.py
           python3 scripts/build_java_assets.py
+          # Text output is byte-reproducible anywhere, so a plain diff is the right
+          # gate. The textures are not, and are checked below instead.
           git diff --exit-code -- \
             addon/resource_pack/models/entity/dragon.geo.json \
-            addon/resource_pack/textures/entity/dragon.png \
-            addon/resource_pack/textures/item \
-            addon/resource_pack/textures/blocks \
             addon/behavior_pack/functions \
             java/src/main/resources/data \
-            java/src/main/resources/assets
+            java/src/main/resources/assets/basgiath/models \
+            java/src/main/resources/assets/basgiath/blockstates \
+            java/src/main/resources/assets/basgiath/lang \
+            java/src/main/resources/assets/basgiath/geo \
+            java/src/main/resources/assets/basgiath/animations
+
+      # Pillow hands a PNG to the platform's zlib, and macOS and Ubuntu do not agree
+      # on the compressed bytes for the same image. This compares the pixels instead,
+      # so the gate means "the committed art is the art the script makes" and not
+      # "both machines link the same zlib".
+      - name: Generated textures match the scripts
+        run: python3 scripts/check_textures.py
 
       - name: The Java dialect is strict, and the Bedrock output did not move
         run: python3 scripts/test_editions.py
