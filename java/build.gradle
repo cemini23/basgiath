@@ -159,7 +159,11 @@ modrinth {
     projectId = 'basgiath'
     versionNumber = "${mod_version}+${minecraft_version}"
     versionName = "${mod_name} ${mod_version} for Minecraft ${minecraft_version}"
-    versionType = 'release'
+    // beta, not release: no client has ever loaded this build. It is verified on a
+    // dedicated server — the college raises, the dragon summons, the Vale registers —
+    // and every function loads. The screens and the dragon's render have only been
+    // reasoned about, not seen. Flip the property in gradle.properties, not here.
+    versionType = project.mod_version_type
     uploadFile = jar
     gameVersions = [minecraft_version]
     loaders = ['neoforge']
