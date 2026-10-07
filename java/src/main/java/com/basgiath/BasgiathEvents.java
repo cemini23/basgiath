@@ -52,8 +52,11 @@ public final class BasgiathEvents {
     /** How far around the player to look for the anchor when the cache is cold. */
     private static final int SEARCH_RADIUS = 320;
 
+    // Only the id is cached. The position is read back off the entity on every call,
+    // because the generator kills and re-summons the anchor on a rebuild and the new
+    // one stands somewhere else. A cached position would be wrong the moment that
+    // happened; a cached id simply fails to resolve and the search runs again.
     private static UUID cachedAnchor;
-    private static BlockPos cachedOrigin;
 
     // -----------------------------------------------------------------------
     // Finding the build
@@ -79,7 +82,6 @@ public final class BasgiathEvents {
                 return floor(stand);
             }
             cachedAnchor = null;
-            cachedOrigin = null;
         }
         var box = new net.minecraft.world.phys.AABB(
                 near.getX() - SEARCH_RADIUS, level.getMinBuildHeight(), near.getZ() - SEARCH_RADIUS,
@@ -92,8 +94,7 @@ public final class BasgiathEvents {
         }
         ArmorStand anchor = stands.get(0);
         cachedAnchor = anchor.getUUID();
-        cachedOrigin = floor(anchor);
-        return cachedOrigin;
+        return floor(anchor);
     }
 
     private static BlockPos floor(ArmorStand stand) {
@@ -105,7 +106,6 @@ public final class BasgiathEvents {
 
     public static void forgetOrigin() {
         cachedAnchor = null;
-        cachedOrigin = null;
     }
 
     // -----------------------------------------------------------------------

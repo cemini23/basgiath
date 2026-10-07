@@ -64,6 +64,40 @@ def collect(pack: Path) -> str:
     return "".join(parts)
 
 
+SYSTEM = (
+    "You are a code auditor. You did not write this code. Answer with the requested "
+    "structure and nothing else. Every claim needs a file and a line. If you cannot "
+    "point at a line, say so instead of guessing. Do not explain the project."
+)
+
+
+def call(endpoint: str, key_name: str, model: str, body: str, thought_budget: int,
+         exclude_thinking: bool) -> dict:
+    """One completion. `thought_budget` is a hard cap on reasoning tokens."""
+    payload = json.dumps({
+        "model": model,
+        "messages": [
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": body},
+        ],
+        "temperature": 0,
+        "max_tokens": 12000,
+        # The whole reason earlier attempts failed. Left uncapped, a reasoning model
+        # spends the entire output budget thinking and returns an empty answer. A
+        # hard cap forces it to stop and write, and `exclude` keeps the thinking out
+        # of the reply so the budget goes to the answer.
+        "reasoning": {"max_tokens": thought_budget, "exclude": exclude_thinking},
+    }).encode("utf-8")
+    request = urllib.request.Request(endpoint, data=payload, headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + api_key(key_name),
+        "HTTP-Referer": "https://github.com/cemini23/basgiath",
+        "X-Title": "Basgiath port audit",
+    })
+    with urllib.request.urlopen(request, timeout=900) as response:
+        return json.load(response)
+
+
 def main() -> None:
     if len(sys.argv) < 3:
         raise SystemExit(__doc__)
@@ -74,7 +108,7 @@ def main() -> None:
     if provider not in PROVIDERS:
         raise SystemExit(f"unknown provider {provider!r}; known: {sorted(PROVIDERS)}")
     if not model:
-        raise SystemExit("name a model, e.g. nvidia/nemotron-3-ultra-550b-a55b:free")
+        raise SystemExit("name a model, e.g. anthropic/claude-sonnet-4.5")
     endpoint, key_name = PROVIDERS[provider]
     if not pack.is_dir():
         raise SystemExit(f"no pack at {pack}")
@@ -82,53 +116,29 @@ def main() -> None:
     body = collect(pack)
     print(f"pack {pack.name}: {len(body)} chars, model {model}")
 
-    payload = json.dumps({
-        "model": model,
-        "messages": [
-            {"role": "system", "content":
-                "You are an auditor. You did not write this code. Report only what "
-                "you can point at with a file and a line. Be concrete and terse."},
-            {"role": "user", "content": body},
-        ],
-        "temperature": 0,
-        # A reasoning model spends this budget on thinking before it writes a word.
-        # Too low a ceiling and it returns an empty report having thought the whole
-        # way there, which is exactly what happened on the first attempts. The
-        # `reasoning` cap is what leaves room for an actual answer.
-        "max_tokens": 16000,
-        "reasoning": {"effort": "medium"},
-    }).encode("utf-8")
+    # Three attempts, each with more room to think. The first is the one that
+    # normally works; the others exist so a stubborn model is not simply lost.
+    attempts = [(2500, True), (8000, True), (20000, False)]
+    report, usage, note = "", {}, ""
+    for budget, exclude in attempts:
+        try:
+            result = call(endpoint, key_name, model, body, budget, exclude)
+        except urllib.error.HTTPError as error:
+            raise SystemExit(f"the endpoint refused it: {error.code} {error.read()[:400]!r}")
+        message = result["choices"][0]["message"]
+        usage = result.get("usage", {})
+        text = (message.get("content") or "").strip()
+        if text:
+            report = text
+            break
+        note = f"empty answer at thought_budget={budget}"
 
-    request = urllib.request.Request(endpoint, data=payload, headers={
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + api_key(key_name),
-        "HTTP-Referer": "https://github.com/cemini23/basgiath",
-        "X-Title": "Basgiath port audit",
-    })
-    try:
-        with urllib.request.urlopen(request, timeout=900) as response:
-            result = json.load(response)
-    except urllib.error.HTTPError as error:
-        raise SystemExit(f"the endpoint refused it: {error.code} {error.read()[:400]!r}")
+    if not report:
+        report = f"<!-- {note}; the model never answered. -->"
 
-    message = result["choices"][0]["message"]
-    report = message.get("content") or ""
-    usage = result.get("usage", {})
-    # These endpoints serve reasoning-first models. Given a code audit they can spend
-    # the whole output budget thinking and return an empty answer. The thinking is
-    # still the analysis, so keep it rather than lose the call.
-    if not report.strip():
-        reasoning = message.get("reasoning_content") or ""
-        if reasoning.strip():
-            report = ("<!-- the model returned no answer; this is its reasoning trace -->\n\n"
-                      + reasoning)
-        else:
-            report = ("<!-- the model returned nothing at all. Raise max_tokens, or "
-                      "narrow the task. -->")
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(
-        f"<!-- model={model} pack={pack.name} usage={usage} -->\n\n{report}\n",
-        encoding="utf-8")
+    out.write_text(f"<!-- model={model} pack={pack.name} usage={usage} -->\n\n{report}\n",
+                   encoding="utf-8")
     print(f"wrote {out} ({len(report)} chars, usage {usage})")
 
 

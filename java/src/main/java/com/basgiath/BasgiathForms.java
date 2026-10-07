@@ -120,32 +120,50 @@ public final class BasgiathForms {
 
     private static final Map<UUID, Pending> PENDING = new LinkedHashMap<>();
     private static final Map<UUID, Integer> NEXT_ID = new LinkedHashMap<>();
+    /** The form each player is currently looking at, so an older answer can be told apart. */
+    private static final Map<UUID, Integer> LIVE_FORM = new LinkedHashMap<>();
 
     /** Put a form on the screen and remember what the answer is for. */
     public static void open(ServerPlayer player, Pending pending, Kind kind,
                             String title, String body, List<String> options) {
-        PENDING.put(player.getUUID(), pending);
-        int id = NEXT_ID.merge(player.getUUID(), 1, Integer::sum);
+        UUID key = player.getUUID();
+        int id = NEXT_ID.merge(key, 1, Integer::sum);
+        PENDING.put(key, pending);
+        LIVE_FORM.put(key, id);
         PacketDistributor.sendToPlayer(player,
                 new OpenForm(id, kind.ordinal(), title, body, List.copyOf(options)));
     }
 
-    /** Forget a player's flow. Called on disconnect so the map cannot grow forever. */
+    /** Forget a player's flow. Called on disconnect so the maps do not grow forever. */
     public static void forget(ServerPlayer player) {
-        PENDING.remove(player.getUUID());
-        NEXT_ID.remove(player.getUUID());
+        UUID key = player.getUUID();
+        PENDING.remove(key);
+        NEXT_ID.remove(key);
+        LIVE_FORM.remove(key);
     }
 
     /**
      * The answer came back. Route it to the flow that asked for it.
      *
-     * <p>A cancellation drops the flow. That matches the Bedrock script, where
-     * {@code response.canceled} returns from the flow and leaves nothing behind.
+     * <p>The form id is checked before anything is touched. A screen is replaced
+     * when the server sends the next one, but a client that has not drawn the new
+     * form yet can still answer the old one, and that answer would otherwise be
+     * applied to the flow that replaced it — a click on "Stand your ground" landing
+     * on the wrong question. A mismatched answer is dropped and the live flow is
+     * left alone.
+     *
+     * <p>A cancellation for the live form drops the flow. That matches the Bedrock
+     * script, where {@code response.canceled} returns and leaves nothing behind.
      */
     public static void handle(ServerPlayer player, FormAnswer answer) {
-        Pending pending = PENDING.remove(player.getUUID());
+        UUID key = player.getUUID();
+        Integer live = LIVE_FORM.get(key);
+        if (live == null || live.intValue() != answer.formId()) {
+            return;
+        }
+        LIVE_FORM.remove(key);
+        Pending pending = PENDING.remove(key);
         if (pending == null) {
-            // A stale answer from a form the server already dropped. Nothing to do.
             return;
         }
         if (answer.selection() == FormAnswer.CANCELED) {
