@@ -101,6 +101,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install Pillow
+        run: python3 -m pip install --quiet "pillow==12.2.0"
+
       - name: Build the .mcworld and the .mcaddon
         run: bash scripts/package.sh
 
