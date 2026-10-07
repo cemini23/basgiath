@@ -200,5 +200,5 @@ These run locally. `bench_bds.sh` and `bench_gametest.sh` cannot run on a Mac �
 
 ## Out of scope for this prompt
 
-- **The Java port.** It has its own prompt: `docs/JAVA-PORT-PROMPT.md` (staged copy `briefs/2026-10-05_java-port-and-tooling.md` for the research). Do not start it here. Run it **after** this prompt, as a parallel track — see that file for the order and the one open operator decision.
+- **The Java port.** It has its own prompt: `docs/JAVA-PORT-PROMPT.md` (research in `briefs/2026-10-05_java-port-and-tooling.md`). Do not start it here. Run it **after** this prompt, as a parallel track. **Decided 2026-10-06: the port ships publicly, and it lives in this same repo, in a `java/` subfolder — not a new repo** — so the shared generator stays in one place. See that file for the two-stage audit plan.
 - **The fal MCP generative asset pipeline from `universal-modder` — do not adopt it.** Operator decision (2026-10-05): we will not pay for it, so we do not use it. **Extract only the free parts** — the skill-tree layout and the free asset-iteration loop (make a variant with free tools, show it in-game, keep or discard).
