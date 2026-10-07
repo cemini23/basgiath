@@ -87,6 +87,36 @@ jobs:
       - name: Build the .mcaddon
         run: bash scripts/package.sh
 
+  # The Bedrock edition gets the same treatment as the Java one: a live server,
+  # not just a static replay. bench_bds.sh downloads the official server, unzips
+  # the shipped .mcworld, boots it, and probes real blocks at known coordinates.
+  # It refuses to run on macOS, which is why this never ran before — a developer
+  # machine cannot run the Linux server binary, but this runner is Linux.
+  bedrock-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Build the .mcworld and the .mcaddon
+        run: bash scripts/package.sh
+
+      - name: Boot the Bedrock server and probe the world
+        run: bash scripts/bench_bds.sh
+
+      # The log is the only evidence if the step above fails, and it is thrown
+      # away with the runner otherwise.
+      - name: Keep the server log
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: bedrock-server-log
+          path: /tmp/basgiath-bds/
+          if-no-files-found: ignore
+
   # The Java port is a separate toolchain. This job runs Gradle and nothing else.
   # The validate job above runs the Python chain and never runs Gradle.
   # Neither job calls the other. See docs/JAVA-PORT-PROMPT.md.
