@@ -34,6 +34,20 @@ public final class BasgiathClient {
     }
 
     /**
+     * Say so when the client side is up.
+     *
+     * <p>A client-side failure — a renderer registered against nothing, a model layer
+     * that will not bake — takes the game down at startup, and nothing on a dedicated
+     * server can see it. CI starts the client under a virtual display and waits for
+     * this line. If it never appears, the client died and the log says where.
+     */
+    @SubscribeEvent
+    public static void onClientSetup(
+            net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
+        com.mojang.logging.LogUtils.getLogger().info("BASGIATH CLIENT READY");
+    }
+
+    /**
      * The dragon's renderer.
      *
      * <p>GeckoLib draws it, from the Bedrock geometry and animation files the pack

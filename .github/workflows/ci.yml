@@ -120,6 +120,66 @@ jobs:
           path: /tmp/basgiath-bds/
           if-no-files-found: ignore
 
+  # The only check that can see a client-side failure. A renderer registered against
+  # nothing, or a model layer that will not bake, takes the game down at startup and
+  # is invisible to every other job here — a dedicated server never loads any of it.
+  #
+  # No developer machine can run this: it needs a display, and the people who own
+  # this repo play Bedrock. A virtual framebuffer on a Linux runner is the same
+  # trick the mod's own users cannot do for us.
+  client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: java
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Install a virtual display and software OpenGL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils
+
+      - name: The client starts and the mod loads
+        run: |
+          set -o pipefail
+          # The client runs until it is killed, so this waits for the marker and then
+          # stops it. A client that dies on its own stops the wait early, which is
+          # what makes a startup crash fail this step instead of hanging it.
+          xvfb-run -a ./gradlew runClient --no-daemon > /tmp/client.log 2>&1 &
+          CLIENT=$!
+          for _ in $(seq 1 60); do
+            grep -q "BASGIATH CLIENT READY" /tmp/client.log && break
+            kill -0 "$CLIENT" 2>/dev/null || break
+            sleep 5
+          done
+          pkill -f net.neoforged.devlaunch 2>/dev/null || true
+          kill "$CLIENT" 2>/dev/null || true
+          wait "$CLIENT" 2>/dev/null || true
+
+          if grep -q "BASGIATH CLIENT READY" /tmp/client.log; then
+            echo "the client started and the mod loaded"
+            exit 0
+          fi
+          echo "::error::the client never reported ready"
+          grep -iE "exception|error|caused by|failed" /tmp/client.log | head -40 || true
+          exit 1
+
+      - name: Keep the client log
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: minecraft-client-log
+          path: /tmp/client.log
+          if-no-files-found: ignore
+
   # The Java port is a separate toolchain. This job runs Gradle and nothing else.
   # The validate job above runs the Python chain and never runs Gradle.
   # Neither job calls the other. See docs/JAVA-PORT-PROMPT.md.
