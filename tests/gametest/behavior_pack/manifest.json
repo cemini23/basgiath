@@ -19,7 +19,7 @@
   "dependencies": [
     {
       "uuid": "7a3f9c2e-1b4d-4e8a-9f21-0c5d6e7a8b90",
-      "version": [0, 1, 6]
+      "version": [0, 1, 8]
     },
     {
       "module_name": "@minecraft/server",

@@ -25,21 +25,26 @@ setblock ~50 ~-1 ~130 lodestone
 setblock ~50 ~ ~130 air
 fill ~90 ~-1 ~18 ~96 ~-1 ~22 stone_bricks
 fill ~92 ~-1 ~23 ~95 ~-1 ~48 stone_bricks
-fill ~92 ~-1 ~49 ~95 ~-1 ~79 stone_bricks
-fill ~71 ~-1 ~116 ~98 ~-1 ~120 stone_bricks
-setblock ~45 ~32 ~20 air
-setblock ~46 ~32 ~20 air
-setblock ~5 ~33 ~20 stone_pressure_plate
-setblock ~86 ~33 ~20 stone_pressure_plate
-setblock ~128 ~ ~46 stone_pressure_plate
-setblock ~43 ~-1 ~115 stone_pressure_plate
-time set night
-weather thunder 999999
-gamerule doDaylightCycle false
-gamerule doWeatherCycle false
-gamerule doMobSpawning false
-gamerule keepInventory true
-gamerule sendCommandFeedback false
-gamerule commandBlockOutput false
-gamerule doImmediateRespawn true
-spawnpoint @p ~8 ~0 ~66
+fill ~92 ~-1 ~49 ~95 ~-1 ~78 stone_bricks
+fill ~106 ~ ~69 ~112 ~3 ~78 air
+fill ~106 ~-1 ~69 ~112 ~-1 ~78 stone_bricks
+setblock ~107 ~ ~68 oak_log
+setblock ~107 ~1 ~68 lantern
+setblock ~111 ~ ~68 oak_log
+setblock ~111 ~1 ~68 lantern
+setblock ~107 ~-1 ~69 sea_lantern
+setblock ~111 ~-1 ~69 sea_lantern
+fill ~90 ~-1 ~79 ~112 ~-1 ~79 dirt_path
+fill ~90 ~-1 ~80 ~95 ~-1 ~114 dirt_path
+setblock ~89 ~-1 ~84 sea_lantern
+setblock ~88 ~ ~84 oak_log
+setblock ~88 ~1 ~84 lantern
+setblock ~89 ~-1 ~96 sea_lantern
+setblock ~88 ~ ~96 oak_log
+setblock ~88 ~1 ~96 lantern
+setblock ~89 ~-1 ~108 sea_lantern
+setblock ~88 ~ ~108 oak_log
+setblock ~88 ~1 ~108 lantern
+fill ~96 ~-1 ~115 ~101 ~-1 ~119 dirt_path
+fill ~102 ~-1 ~116 ~102 ~-1 ~117 dirt_path
+fill ~71 ~-1 ~115 ~95 ~-1 ~119 dirt_path

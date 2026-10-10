@@ -321,6 +321,25 @@ def check_map() -> None:
     for needle in ("spawnpoint", "cp_west", "cp_east", "cp_quad", "cp_valley", "~0.18"):
         if needle not in live:
             fail(f"live function missing {needle}")
+    # The gap is air at x=45 and x=46. A teleport push on that stretch kills
+    # the jump, because Bedrock tp clears vertical speed. The sprint starts
+    # well before the edge. West wind ends at x=28. East wind starts at x=65.
+    wind_lines = [line for line in live.splitlines() if "~0.18" in line]
+    if wind_lines != [
+        'execute if score bg_wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~15 ~33 ~19 as @a[dx=13,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18',
+        'execute if score bg_wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~65 ~33 ~19 as @a[dx=13,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18',
+    ]:
+        fail("wind still covers the run-up, or the calm stretch moved")
+    road = "\n".join(path.read_text() for path in sorted(folder.glob("*.mcfunction")))
+    if "fill ~90 ~-1 ~80 ~95 ~-1 ~114 grass_path" not in road:
+        fail("the forest road is missing")
+    if "fill ~71 ~-1 ~116 ~98 ~-1 ~120 stone_bricks" in road:
+        fail("the valley link is still a stone strip")
+    go = (folder / "go.mcfunction").read_text()
+    if "tp @p ~120 ~0 ~40 -90 0" not in go:
+        fail("go function does not put the player in the courtyard")
+    if "Raise the college first" not in go:
+        fail("go function is silent when the college is not built")
     # The Gauntlet scores for real. The objectives are created once at build
     # time, the clock lives in the live pass, and the penalty is per cadet.
     for objective in ("gate_time", "gate_sec", "gate_start", "gate_pen", "gate_best"):

@@ -139,6 +139,21 @@ class ZoneCtx:
         return lines
 
 
+def _lamp(ctx: ZoneCtx, x: int, z: int, ground: int) -> None:
+    """A log with a lantern on it. ground is the block the log stands on."""
+    ctx.setblock(x, ground + 1, z, "oak_log")
+    ctx.setblock(x, ground + 2, z, "lantern")
+
+
+def _road_tree(ctx: ZoneCtx, x: int, z: int, ground: int) -> None:
+    """One squat oak beside the road. ground is the grass under the trunk."""
+    trunk = ground + 1
+    ctx.fill(x, trunk, z, x, trunk + 2, z, "oak_log")
+    ctx.fill(x - 1, trunk + 3, z - 1, x + 1, trunk + 3, z + 1, "oak_leaves")
+    ctx.fill(x - 1, trunk + 4, z, x + 1, trunk + 4, z, "oak_leaves")
+    ctx.fill(x, trunk + 4, z - 1, x, trunk + 4, z + 1, "oak_leaves")
+
+
 def paths(ctx: ZoneCtx) -> None:
     """The ground walks between the beats.
 
@@ -146,12 +161,46 @@ def paths(ctx: ZoneCtx) -> None:
     courtyard now fills its south rim at x=96..168, z=69..78 and the College
     court starts at z=80, so that line ran into a wall. The line moves to the
     west gate: the Parapet landing at 90..96, z=18..22 continues north of the
-    wall and then runs south along x=92..95, outside the ring, to the College
-    court and the valley walk. Nothing it crosses is built on.
+    wall and then runs south along x=92..95, outside the ring.
+
+    The forest road leaves that stone. A gate in the south wall of the
+    courtyard opens onto a grass path. The path runs west of the College,
+    steps down one block, and ends at the moss pad in the dell. Lamps and
+    oaks mark it, because the stone strip it replaces read as more floor.
     """
     ctx.fill(90, -1, 18, 96, -1, 22, "stone_bricks")  # landing to the west gate
-    ctx.fill(92, -1, 23, 95, -1, 79, "stone_bricks")  # around the outside of the ring
-    ctx.fill(71, -1, 116, 98, -1, 120, "stone_bricks")  # valley to the College
+    ctx.fill(92, -1, 23, 95, -1, 78, "stone_bricks")  # around the outside of the ring
+
+    # A gate through the south wall, on the inner court, so the exit is visible.
+    ctx.fill(106, 0, 69, 112, 3, 78, "air")
+    ctx.fill(106, -1, 69, 112, -1, 78, "stone_bricks")
+    _lamp(ctx, 107, 68, -1)
+    _lamp(ctx, 111, 68, -1)
+    ctx.setblock(107, -1, 69, "sea_lantern")
+    ctx.setblock(111, -1, 69, "sea_lantern")
+
+    # The turn off the stone, then the road south along the College's west side.
+    ctx.fill(90, -1, 79, 112, -1, 79, "grass_path")
+    ctx.fill(90, -1, 80, 95, -1, 114, "grass_path")
+    for z in (84, 96, 108):
+        ctx.setblock(89, -1, z, "sea_lantern")
+        _lamp(ctx, 88, z, -1)
+
+    # West to the dell. The College door is at x=102. The dell floor is y=-2.
+    ctx.fill(96, -1, 115, 101, -1, 119, "grass_path")
+    ctx.fill(102, -1, 116, 102, -1, 117, "grass_path")
+    ctx.fill(71, -1, 115, 95, -1, 119, "grass_path")
+    ctx.fill(68, -2, 115, 70, -2, 119, "grass_path")
+    ctx.fill(45, -2, 116, 67, -2, 118, "grass_path")
+    for x, z in ((94, 114), (95, 114), (94, 120), (95, 120)):
+        ctx.fill(x, 0, z, x, 3, z, "stone_bricks")
+        ctx.setblock(x, 2, z, "sea_lantern")
+    ctx.fill(94, 4, 114, 95, 4, 120, "stone_bricks")
+    for x in (56, 74, 88):
+        _road_tree(ctx, x, 112, -2 if x < 71 else -1)
+        _road_tree(ctx, x, 122, -2 if x < 71 else -1)
+    for x in (50, 62, 78):
+        ctx.setblock(x, -2 if x < 71 else -1, 114, "sea_lantern")
 
 
 def finish(ctx: ZoneCtx) -> None:
@@ -275,6 +324,7 @@ def write_java(commands: list[str], far: list[str], count: int) -> int:
     files["summon_dragon.mcfunction"] = _translate(SUMMON.split("\n"), "summon_dragon")
     files["run_start.mcfunction"] = _translate(RUN_START.split("\n"), "run_start")
     files["run_stop.mcfunction"] = _translate(RUN_STOP.split("\n"), "run_stop")
+    files["go.mcfunction"] = _translate(GO.split("\n"), "go")
     write_java_functions(ROOT, files, "tick")
     return len(_chunks(far))
 
@@ -464,9 +514,28 @@ def raise_text() -> str:
     ]
     return "\n".join(lines) + "\n"
 
+def wind_line(x: int, dx: int) -> str:
+    """One south push on the span deck.
+
+    The box starts at this x and runs dx blocks east. y=33 is the feet of a
+    player standing on the deck at y=32. A Bedrock teleport clears vertical
+    speed, so this box must not cover the gap jump.
+    """
+    return (
+        'execute if score bg_wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] '
+        f"at @s positioned ~{x} ~33 ~19 as @a[dx={dx},dy=2,dz=2] at @s run tp @s ~ ~ ~0.18"
+    )
+
+
+# Span blocks are x=15..77 at z=20, with air at x=45 and x=46. The calm
+# stretch is x=28..64. A sprint needs a long run before the edge, and the
+# landing runs on past the gap. West wind is x=15..28. East wind is x=65..78.
+# Seventeen blocks of runway, then the gap, then eighteen blocks to land.
+WIND = "\n".join((wind_line(15, 13), wind_line(65, 13)))
+
 LIVE = """scoreboard players add bg_wind map_state 1
 execute if score bg_wind map_state matches 4.. run scoreboard players set bg_wind map_state 0
-execute if score bg_wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~15 ~33 ~19 as @a[dx=63,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
+""" + WIND + """
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~20 ~34 ~20
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~40 ~34 ~20
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run particle minecraft:basic_smoke_particle ~55 ~34 ~20
@@ -503,6 +572,14 @@ scoreboard players reset @s run_sec
 titleraw @s actionbar {"rawtext":[{"text":"§7Course clock stopped."}]}
 """
 
+# A short phone command. The courtyard floor at 120, 40 is open stone, west of
+# the roll-call stands. Face east. The chat command that does this is long, and
+# the build turns command feedback off, so a mistype looks like nothing happened.
+GO = """execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tp @p ~120 ~0 ~40 -90 0
+execute as @e[type=armor_stand,name="build_anchor",c=1] run tellraw @p {"rawtext":[{"text":"You are in the courtyard."}]}
+execute unless entity @e[type=armor_stand,name="build_anchor"] run tellraw @s {"rawtext":[{"text":"Raise the college first. Run /function basgiath/build"}]}
+"""
+
 
 def live_text() -> str:
     """The tick body: the existing wind, checkpoints, and storm first.
@@ -525,6 +602,8 @@ README = """# Functions
 `/function basgiath/build` raises the college around an armor stand named `build_anchor`.
 
 The stand is the origin. Every later command is relative to it. The build stays at your feet. The screen says "Building" at once. It places one stone under the stand, then gives that stand invisibility and resistance. The stone keeps the stand from falling. The same command places every stage. About 15 seconds later the game moves you onto the plaza for a few seconds, places the stairs, then returns you to the start. Close chat. Do not walk until the screen says "Welcome, candidate".
+
+`/function basgiath/go` moves you to the courtyard. Run it after the welcome title.
 
 `/function basgiath/summon_dragon` summons `dragon_rider:dragon` on the valley pad.
 
@@ -700,6 +779,7 @@ def main() -> None:
     (BASGIATH / "summon_dragon.mcfunction").write_text(SUMMON, encoding="utf-8")
     (BASGIATH / "run_start.mcfunction").write_text(RUN_START, encoding="utf-8")
     (BASGIATH / "run_stop.mcfunction").write_text(RUN_STOP, encoding="utf-8")
+    (BASGIATH / "go.mcfunction").write_text(GO, encoding="utf-8")
     # The phone does not run tick.json. main.js runs basgiath/tick instead.
     (OUT / "tick.json").write_text(
         json.dumps({"values": []}, indent=2) + "\n",

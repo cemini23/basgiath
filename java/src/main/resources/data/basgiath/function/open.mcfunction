@@ -25,6 +25,7 @@ execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run 
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:far_24
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:far_25
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:far_26
+execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:far_27
 execute if score bg_done map_state matches 0 run gamemode adventure @a
 execute if score bg_done map_state matches 0 as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run title @p title {"text":"Welcome, candidate"}
 execute if score bg_done map_state matches 0 as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run title @p subtitle {"text":"Cross the Parapet"}

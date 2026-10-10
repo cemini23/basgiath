@@ -61,6 +61,24 @@ unzip -qo "$WORLD" -d worlds/Basgiath
 STAGES="$(find worlds -path '*/functions/basgiath/stage_*.mcfunction' | wc -l | tr -d ' ')"
 if [ "$STAGES" -lt 1 ]; then echo "no stage functions in the world" >&2; exit 1; fi
 
+# The calm stretch is the shipped 0.1.8 pair. A player is not on this server,
+# so the push itself cannot be felt. These two lines are the boxes that run.
+LIVE_FN="$(find worlds -path '*/functions/basgiath/live.mcfunction' | head -1)"
+if [ -z "$LIVE_FN" ]; then echo "live.mcfunction missing from the world" >&2; exit 1; fi
+if ! grep -F 'positioned ~15 ~33 ~19 as @a[dx=13,dy=2,dz=2]' "$LIVE_FN" >/dev/null; then
+  echo "west wind box is not the wide calm build" >&2
+  exit 1
+fi
+if ! grep -F 'positioned ~65 ~33 ~19 as @a[dx=13,dy=2,dz=2]' "$LIVE_FN" >/dev/null; then
+  echo "east wind box is not the wide calm build" >&2
+  exit 1
+fi
+if grep -E 'dx=28|dx=29' "$LIVE_FN" >/dev/null; then
+  echo "the narrow wind boxes are still in the pack" >&2
+  exit 1
+fi
+echo "wind boxes: west dx=13 at x=15, east dx=13 at x=65" >&2
+
 cat > bds/server.properties <<'EOF'
 server-name=Basgiath bench
 gamemode=adventure
@@ -154,12 +172,42 @@ probe() {
 # The stone at (0,79,0) is the anchor's floor. An armor stand has gravity,
 # so without it the anchor drops and every relative coordinate shifts.
 send "tickingarea add circle 0 80 0 4 bench"
+# The road and the south gate sit past chunk radius 4 from the origin.
+# These are the same four areas build.mcfunction adds. Coordinates are
+# absolute because the anchor is summoned at 0 80 0. Preload so far fills land.
+send "tickingarea add circle 40 112 40 4 college_a true"
+send "tickingarea add circle 120 112 40 4 college_b true"
+send "tickingarea add circle 40 112 110 4 college_c true"
+send "tickingarea add circle 120 112 110 4 college_d true"
 send "setblock 0 79 0 stone"
 send "summon armor_stand \"build_anchor\" 0 80 0"
 send "effect @e[type=armor_stand,name=\"build_anchor\"] resistance 999999 255 true"
 send "scoreboard objectives add map_state dummy"
 send "scoreboard players set bg_stage map_state 1"
 sleep 3
+
+# A probe outside a loaded chunk logs "Detect position" and reads false.
+# Wait until each far chunk answers before the stage fills run.
+wait_chunk() {
+  local x="$1" y="$2" z="$3"
+  local start i
+  for i in $(seq 1 8); do
+    start="$(wc -l < "$LOG" | tr -d " ")"
+    printf "%s\n" "execute unless block ${x} ${y} ${z} air run say PRELOAD" > bds.fifo
+    sleep 1
+    if ! tail -n +"$((start + 1))" "$LOG" | grep -qi "Detect position"; then
+      return 0
+    fi
+    sleep 4
+  done
+  echo "chunk ${x} ${y} ${z} did not load" >&2
+  return 1
+}
+wait_chunk 92 79 100
+wait_chunk 109 81 74
+wait_chunk 50 78 117
+wait_chunk 40 112 20
+
 tick_line="$(probe TICK_SPAN 20 112 20 stone_bricks)"
 echo "tick path ${tick_line}" >&2
 
@@ -170,6 +218,9 @@ if [ "$tick_line" != "TICK_SPAN=true" ]; then
   done
   sleep 2
 fi
+# The phone retries far fills after the areas load. Run that same retry here.
+send "function basgiath/fill_far"
+sleep 4
 
 # The live pass. Nothing above this line runs it, which is why a malformed
 # command inside basgiath/live has never surfaced here: the stage path places
@@ -231,6 +282,15 @@ echo "live pass ran clean: 3 calls, no command error" >&2
   # is absolute (50, 79, 123).
   probe LECTERN_SCROLL 128 81 34 lectern
   probe LECTERN_ROLL 50 79 123 lectern
+  # Pack 0.1.8. The anchor is at (0, 80, 0), so these are relative plus 80 on y.
+  # RUNWAY is the calm span. GATE_AIR is the south courtyard opening.
+  # ROAD and DELL_PATH are the forest path. MOSS is the pad the path must miss.
+  probe RUNWAY 40 112 20 stone_bricks
+  probe GATE_AIR 109 81 74 air
+  probe ROAD 92 79 100 grass_path
+  probe FOREST_FRAME 94 84 117 stone_bricks
+  probe DELL_PATH 50 78 117 grass_path
+  probe MOSS 43 78 117 moss_block
 } > "$WORK/probe-results.txt"
 
 python3 - "$LOG" "$RESULT" "$WORK/probe-results.txt" "$WORK/probe-deltas.txt" "$LIVE_ERRORS.real" <<'PY'
@@ -259,7 +319,11 @@ for line in probes:
     if "=" in line:
         key, value = line.split("=", 1)
         values[key] = value.strip()
-need_true = ("CTRL_STONE", "SPAN", "GAP45", "GAP46", "COLUMN", "LECTERN_SCROLL", "LECTERN_ROLL")
+need_true = (
+    "CTRL_STONE", "SPAN", "GAP45", "GAP46", "COLUMN",
+    "LECTERN_SCROLL", "LECTERN_ROLL",
+    "RUNWAY", "GATE_AIR", "ROAD", "FOREST_FRAME", "DELL_PATH", "MOSS",
+)
 lines = ["server_started=yes", f"pack_error={pack_error or 'none'}"]
 lines.extend(probes)
 ok = (not pack_error) and all(values.get(name) == "true" for name in need_true)

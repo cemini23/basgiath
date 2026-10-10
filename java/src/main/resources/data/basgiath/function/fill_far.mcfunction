@@ -24,3 +24,4 @@ execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run 
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:far_24
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:far_25
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:far_26
+execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:far_27

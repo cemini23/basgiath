@@ -1,6 +1,7 @@
 scoreboard players add bg_wind map_state 1
 execute if score bg_wind map_state matches 4.. run scoreboard players set bg_wind map_state 0
-execute if score bg_wind map_state matches 0 as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s positioned ~15 ~33 ~19 as @a[dx=63,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
+execute if score bg_wind map_state matches 0 as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s positioned ~15 ~33 ~19 as @a[dx=13,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
+execute if score bg_wind map_state matches 0 as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s positioned ~65 ~33 ~19 as @a[dx=13,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run particle minecraft:smoke ~20 ~34 ~20 0 0 0 0 1 normal
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run particle minecraft:smoke ~40 ~34 ~20 0 0 0 0 1 normal
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run particle minecraft:smoke ~55 ~34 ~20 0 0 0 0 1 normal

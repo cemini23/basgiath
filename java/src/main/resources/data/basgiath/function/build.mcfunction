@@ -56,5 +56,7 @@ execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run 
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:stage_30
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:stage_31
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:stage_32
+execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:stage_33
+execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:stage_34
 scoreboard players set bg_stage map_state 0
 tellraw @s {"text":"The college is rising. Stay still for 15 seconds. Fan-made. Not official. Not affiliated with any publisher."}

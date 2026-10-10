@@ -62,5 +62,9 @@ execute if score bg_now map_state matches 30 run scoreboard players set bg_stage
 execute if score bg_now map_state matches 31 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_31
 execute if score bg_now map_state matches 31 run scoreboard players set bg_stage map_state 32
 execute if score bg_now map_state matches 32 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_32
-execute if score bg_now map_state matches 32 run scoreboard players set bg_stage map_state 0
+execute if score bg_now map_state matches 32 run scoreboard players set bg_stage map_state 33
+execute if score bg_now map_state matches 33 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_33
+execute if score bg_now map_state matches 33 run scoreboard players set bg_stage map_state 34
+execute if score bg_now map_state matches 34 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/stage_34
+execute if score bg_now map_state matches 34 run scoreboard players set bg_stage map_state 0
 execute if score bg_now map_state matches 0 run function basgiath/live
