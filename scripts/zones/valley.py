@@ -149,49 +149,32 @@ def _say(text: str) -> str:
 
 
 def live_lines() -> list[str]:
-    """Commands that run every tick. Each line already includes execute-at-anchor."""
+    """Commands that run every tick. Each line already includes execute-at-anchor.
+
+    The lines run the later stages FIRST and the crossing LAST. A function runs
+    its lines top to bottom inside one tick, so with the old order a cadet who
+    stepped into the dell earned `bonded`, then `bondcall`, then `relic`, then
+    `trial` on the same tick, and every story line printed at once. Reading the
+    later stages first makes each one visible only after the previous one has
+    existed for a tick: a tag added on this tick is not yet set when the earlier
+    stages are evaluated.
+    """
     # The bond is gated on the crossing. A player who walks to the dell without
     # crossing the span never earns the tag, so the bond below cannot fire.
     in_center = (
         "as @a[x=~38,y=~-2,z=~112,dx=12,dy=4,dz=12,tag=crossed,tag=!bonded] "
     )
     fresh = "as @a[tag=bonded,tag=!bondcall] "
-    on_pad = (
-        "as @a[x=~42,y=~-2,z=~116,dx=2,dy=3,dz=2,tag=trial,tag=!flew] "
+    # The flight trial is proven in the air: the cadet must rise above the dell
+    # floor on the dragon before the landing beat. The old pad box sat inside
+    # the dell box, so standing still on the moss pad satisfied it.
+    airborne = (
+        "as @a[x=~38,y=~1,z=~112,dx=12,dy=24,dz=12,tag=trial,tag=!flew] "
     )
     at_keeper = (
         "as @a[x=~48,y=~-2,z=~122,dx=4,dy=3,dz=4,tag=flew,tag=!named] "
     )
     lines = [
-        # 0. The crossing. Earned on the span or the roof, never on the ground.
-        ANCHOR + f"as @a[{CROSSED_BOX}] run tag @s add crossed",
-        # 1. A dragon chooses the player. The player does not choose the dragon.
-        ANCHOR + in_center + "run tag @s add bonded",
-        ANCHOR + fresh + "at @s run summon dragon_rider:dragon ~1 ~ ~",
-        ANCHOR + fresh + "run scoreboard players set bg_bond map_state 1",
-        ANCHOR
-        + fresh
-        + "run "
-        + _say(
-            "A dragon has chosen you. You did not choose it. Stand still and let it look."
-        ),
-        ANCHOR + fresh + "run tag @s add bondcall",
-        # 2. The relic.
-        ANCHOR
-        + "as @a[tag=bondcall,tag=!relic] run "
-        + _say("A relic mark burns onto your arm, shaped like the one that chose you."),
-        ANCHOR + "as @a[tag=bondcall,tag=!relic] run tag @s add relic",
-        # 3. The flight trial.
-        ANCHOR
-        + "as @a[tag=relic,tag=!trial] run "
-        + _say("Hold your seat. The dragon will fly and turn. Do not let go."),
-        ANCHOR + "as @a[tag=relic,tag=!trial] run tag @s add trial",
-        # 4. The landing pad.
-        ANCHOR
-        + on_pad
-        + "run "
-        + _say("You held. Walk south to the roll-keeper and give the full name."),
-        ANCHOR + on_pad + "run tag @s add flew",
         # 5. The roll-keeper. The rider gives the dragon's full name, and the
         # keeper is the only one who hears it. docs/CANON.md says the same.
         ANCHOR
@@ -201,5 +184,37 @@ def live_lines() -> list[str]:
             "Give the keeper the full name, nothing held back. Only you and the keeper will know it."
         ),
         ANCHOR + at_keeper + "run tag @s add named",
+        # 4. The flight trial lands.
+        ANCHOR
+        + airborne
+        + "run "
+        + _say("You held. Walk south to the roll-keeper and give the full name."),
+        ANCHOR + airborne + "run tag @s add flew",
+        # 3. The flight trial.
+        ANCHOR
+        + "as @a[tag=relic,tag=!trial] run "
+        + _say("Hold your seat. The dragon will fly and turn. Do not let go."),
+        ANCHOR + "as @a[tag=relic,tag=!trial] run tag @s add trial",
+        # 2. The relic.
+        ANCHOR
+        + "as @a[tag=bondcall,tag=!relic] run "
+        + _say("A relic mark burns onto your arm, shaped like the one that chose you."),
+        ANCHOR + "as @a[tag=bondcall,tag=!relic] run tag @s add relic",
+        # 1. A dragon chooses the player. The player does not choose the dragon.
+        ANCHOR + fresh + "at @s run summon dragon_rider:dragon ~1 ~ ~",
+        ANCHOR + fresh + "run scoreboard players set bg_bond map_state 1",
+        ANCHOR
+        + fresh
+        + "run "
+        + _say(
+            "A dragon has chosen you. You did not choose it. Stand still and let it look."
+        ),
+        # The bond pays copper marks, once, on the fresh bond.
+        ANCHOR + fresh + "run give @s dragon_rider:copper_mark 5",
+        ANCHOR + fresh + "run tag @s add bondcall",
+        # 0. A dragon chooses only a cadet who has crossed the Parapet.
+        ANCHOR + in_center + "run tag @s add bonded",
+        # The crossing. Earned on the span or the roof, never on the ground.
+        ANCHOR + f"as @a[{CROSSED_BOX}] run tag @s add crossed",
     ]
     return lines

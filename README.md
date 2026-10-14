@@ -125,23 +125,4 @@ The manifests pin `@minecraft/server` 2.0.0 and `@minecraft/server-ui` 2.0.0. Th
 
 ## Support
 
-Thank you for visiting — stars, shares, and kind words all help. The map is free. It will stay free. Tips pay for the build time behind it, and nothing here is ever sold.
-
-**Donation-only addresses** — not trading or production wallets.
-
-| Chain family | Address |
-|--------------|---------|
-| **X Money** (fiat, US) | Request [@Cemini23](https://x.com/Cemini23) in the X app — scan the Request QR |
-| **EVM** (Ethereum, Polygon, Base, Arbitrum, …) | `0x444C5C2eC439E0382aa5a17F70313c536BcC5D58` |
-| **Solana / SVM** | `J4zNn4hK9jTrKBFY8sbAGJHLoZvXvQf4B9pQSbSrocZE` |
-| **Polymarket** (referral) | [polymarket.com/?r=Cemini23](https://polymarket.com/?r=Cemini23) |
-| **Hyperliquid** (referral) | [app.hyperliquid.xyz/join/CEMINI23](https://app.hyperliquid.xyz/join/CEMINI23) |
-
-**Projects & sites**
-
-| Project | Link |
-|---------|------|
-| **Outlier Weekly** (methodology newsletter) | [outlierweekly.substack.com](https://outlierweekly.substack.com) |
-| **Atto** — organize Italian family documents on your computer | [youratto.com](https://youratto.com) |
-| **GuruWatcher** — Discord alerts for your newsletter's price levels | [guruwatcher.com](https://guruwatcher.com) |
-| **X** | [@Cemini23](https://x.com/Cemini23) | Build logs and walkthroughs |
+The map is free and it stays free. No donation and no paid access, ever. Stars, shares, and kind words are the whole of it.

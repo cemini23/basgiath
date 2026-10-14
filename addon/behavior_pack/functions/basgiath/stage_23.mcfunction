@@ -17,6 +17,8 @@ setblock ~126 ~3 ~106 stone_bricks
 setblock ~128 ~2 ~102 lantern
 setblock ~138 ~2 ~108 lantern
 summon armor_stand "A rider kneels and the dragon decides." ~130 ~ ~105
+setblock ~134 ~ ~103 dragon_rider:vault_desk
+setblock ~135 ~ ~103 crafting_table
 fill ~126 ~-1 ~84 ~140 ~9 ~92 stone_bricks
 fill ~127 ~ ~85 ~139 ~8 ~91 air
 fill ~127 ~-1 ~85 ~139 ~-1 ~91 polished_andesite
@@ -31,20 +33,18 @@ setblock ~127 ~5 ~85 air
 setblock ~127 ~4 ~85 ladder["facing_direction"=2]
 setblock ~127 ~-1 ~85 ladder["facing_direction"=2]
 fill ~140 ~-1 ~90 ~140 ~1 ~90 air
-setblock ~129 ~-1 ~86 red_wool
-setblock ~131 ~-1 ~86 red_wool
-setblock ~133 ~-1 ~86 red_wool
-setblock ~135 ~-1 ~86 red_wool
-setblock ~137 ~-1 ~86 red_wool
-setblock ~129 ~-1 ~88 red_wool
-setblock ~131 ~-1 ~88 red_wool
-setblock ~133 ~-1 ~88 red_wool
-setblock ~135 ~-1 ~88 red_wool
-setblock ~137 ~-1 ~88 red_wool
-setblock ~129 ~-1 ~90 red_wool
-setblock ~131 ~-1 ~90 red_wool
-setblock ~133 ~-1 ~90 red_wool
-setblock ~135 ~-1 ~90 red_wool
-setblock ~137 ~-1 ~90 red_wool
-setblock ~129 ~-1 ~92 red_wool
-setblock ~131 ~-1 ~92 red_wool
+setblock ~129 ~ ~86 red_wool
+setblock ~131 ~ ~86 red_wool
+setblock ~133 ~ ~86 red_wool
+setblock ~135 ~ ~86 red_wool
+setblock ~137 ~ ~86 red_wool
+setblock ~129 ~ ~87 red_wool
+setblock ~131 ~ ~87 red_wool
+setblock ~133 ~ ~87 red_wool
+setblock ~135 ~ ~87 red_wool
+setblock ~137 ~ ~87 red_wool
+setblock ~129 ~ ~89 red_wool
+setblock ~131 ~ ~89 red_wool
+setblock ~133 ~ ~89 red_wool
+setblock ~135 ~ ~89 red_wool
+setblock ~137 ~ ~89 red_wool

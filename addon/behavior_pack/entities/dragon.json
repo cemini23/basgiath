@@ -7,24 +7,6 @@
       "is_summonable": true,
       "is_experimental": false
     },
-    "component_groups": {
-      "dragon_rider": {
-        "minecraft:physics": {
-          "has_collision": true,
-          "has_gravity": false
-        },
-        "minecraft:flying_speed": {
-          "value": 0.15
-        },
-        "minecraft:input_air_controlled": {
-          "strafe_speed_modifier": 1.0,
-          "backwards_movement_modifier": 0.5
-        },
-        "minecraft:vertical_movement_action": {
-          "vertical_velocity": 0.4
-        }
-      }
-    },
     "components": {
       "minecraft:type_family": {
         "family": ["dragon", "mob"]
@@ -85,10 +67,6 @@
       "minecraft:vertical_movement_action": {
         "vertical_velocity": 0.4
       },
-      "minecraft:behavior.controlled_by_player": {
-        "priority": 0,
-        "mount_speed_multiplier": 1.2
-      },
       "minecraft:damage_sensor": {
         "triggers": [
           {
@@ -96,13 +74,6 @@
             "deals_damage": "no"
           }
         ]
-      }
-    },
-    "events": {
-      "minecraft:entity_spawned": {
-        "add": {
-          "component_groups": ["dragon_rider"]
-        }
       }
     }
   }

@@ -41,7 +41,8 @@ ENTITY_MAP = {
 # does not. An id in neither is a build failure.
 SAME_BLOCK = frozenset({
     "air", "allium", "azure_bluet", "bell", "black_wool", "chain",
-    "chiseled_stone_bricks", "cobblestone", "cornflower", "cyan_wool",
+    "chiseled_stone_bricks", "cobblestone", "cornflower", "crafting_table",
+    "cyan_wool",
     "dandelion", "glass", "granite", "grass_block", "ladder", "lantern",
     "lectern", "light_blue_stained_glass", "light_blue_wool",
     "light_gray_wool", "lily_of_the_valley", "lime_wool", "lodestone",
@@ -56,6 +57,22 @@ SAME_BLOCK = frozenset({
 BLOCK_RENAME = {
     # Java renamed this in 1.17. Bedrock never did.
     "grass_path": "dirt_path",
+    # A custom Bedrock block. The Java mod registers the same block, so the
+    # Bedrock id maps to the mod's namespaced id.
+    "dragon_rider:vault_desk": f"{JAVA_NAMESPACE}:vault_desk",
+}
+
+# The custom items. Java gives the same way as Bedrock; only the item id is
+# namespaced to the mod. A `dragon_rider:` item that is not listed here stops
+# the build, rather than shipping a Bedrock id into the Java tree.
+ITEM_MAP = {
+    "dragon_rider:copper_mark": f"{JAVA_NAMESPACE}:copper_mark",
+    "dragon_rider:silver_mark": f"{JAVA_NAMESPACE}:silver_mark",
+    "dragon_rider:gold_mark": f"{JAVA_NAMESPACE}:gold_mark",
+    "dragon_rider:bank_note": f"{JAVA_NAMESPACE}:bank_note",
+    "dragon_rider:flight_manual": f"{JAVA_NAMESPACE}:flight_manual",
+    "dragon_rider:dragon_codex": f"{JAVA_NAMESPACE}:dragon_codex",
+    "dragon_rider:academy_archive": f"{JAVA_NAMESPACE}:academy_archive",
 }
 
 GAMERULE_MAP = {
@@ -382,6 +399,9 @@ def to_java(line: str) -> str | None:
     elif verb == "summon":
         out = _summon(line, args)
 
+    elif verb == "give":
+        out = _give(line, args)
+
     elif verb == "tellraw":
         if len(args) < 2:
             raise TranslationError(f"short tellraw: {line!r}")
@@ -472,9 +492,44 @@ def _summon(line: str, args: list[str]) -> str:
     coords, tail = rest[:3], rest[3:]
     parts = [entity, *coords, *tail]
     if name is not None:
-        # Java carries the name as a JSON text component, quoted inside the NBT string.
-        parts.append("{CustomName:'" + json.dumps({"text": name}, ensure_ascii=False, separators=(",", ":")) + "'}")
+        # Java carries the name as a JSON text component, quoted inside the NBT
+        # string. An armor stand needs more than Bedrock does: Bedrock hides the
+        # build anchor with an invisibility effect, but a Java armor stand takes
+        # no potion effect, so `Invisible` must be set on the entity or the
+        # anchor shows at the player's feet. A named decoration stand needs
+        # `CustomNameVisible`, or its label only shows when a player aims at it
+        # from within four blocks.
+        tags = {
+            "CustomName": "'"
+            + json.dumps({"text": name}, ensure_ascii=False, separators=(",", ":"))
+            + "'",
+        }
+        if name == "build_anchor":
+            tags["Invisible"] = "1b"
+        elif entity == "minecraft:armor_stand":
+            tags["CustomNameVisible"] = "1b"
+        if entity == "minecraft:armor_stand":
+            tags["NoGravity"] = "1b"
+            tags["Invulnerable"] = "1b"
+        parts.append("{" + ",".join(f"{key}:{value}" for key, value in tags.items()) + "}")
     return _join(["summon", *parts])
+
+
+def _give(line: str, args: list[str]) -> str:
+    """Java gives the same way. Only the item id is namespaced to the mod."""
+    if len(args) < 2:
+        raise TranslationError(f"short give: {line!r}")
+    raw = args[1]
+    if raw.startswith("dragon_rider:"):
+        item = ITEM_MAP.get(raw)
+        if item is None:
+            raise TranslationError(
+                f"the Java dialect has no item mapping for {raw!r}. "
+                "Add it to ITEM_MAP in scripts/editions.py."
+            )
+    else:
+        item = raw
+    return _join(["give", args[0], item, *args[2:]])
 
 
 def _titleraw(line: str, args: list[str]) -> str:

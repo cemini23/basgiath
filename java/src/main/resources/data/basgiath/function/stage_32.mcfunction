@@ -1,3 +1,5 @@
+setblock ~55 ~-1 ~130 cornflower
+setblock ~56 ~-1 ~106 short_grass
 setblock ~56 ~-1 ~135 short_grass
 setblock ~57 ~-1 ~111 allium
 setblock ~58 ~-1 ~116 poppy
@@ -19,7 +21,7 @@ setblock ~68 ~-1 ~108 oxeye_daisy
 setblock ~68 ~-1 ~137 cornflower
 setblock ~69 ~-1 ~113 short_grass
 setblock ~50 ~-2 ~124 stone_bricks
-summon minecraft:armor_stand ~50 ~-1 ~124 {CustomName:'{"text":"Roll-keeper"}'}
+summon minecraft:armor_stand ~50 ~-1 ~124 {CustomName:'{"text":"Roll-keeper"}',CustomNameVisible:1b,NoGravity:1b,Invulnerable:1b}
 setblock ~50 ~-1 ~123 lectern
 setblock ~50 ~-1 ~130 lodestone
 setblock ~50 ~ ~130 air
@@ -46,5 +48,3 @@ setblock ~89 ~-1 ~108 sea_lantern
 setblock ~88 ~ ~108 oak_log
 setblock ~88 ~1 ~108 lantern
 fill ~96 ~-1 ~115 ~101 ~-1 ~119 dirt_path
-fill ~102 ~-1 ~116 ~102 ~-1 ~117 dirt_path
-fill ~71 ~-1 ~115 ~95 ~-1 ~119 dirt_path

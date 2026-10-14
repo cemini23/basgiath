@@ -44,7 +44,7 @@ setblock ~147 ~15 ~23 bell
 setblock ~147 ~16 ~23 sea_lantern
 setblock ~128 ~ ~34 chiseled_stone_bricks
 setblock ~128 ~1 ~34 lectern
-summon minecraft:armor_stand ~124 ~1 ~36 {CustomName:'{"text":"wing1_flame_squad1"}'}
-summon minecraft:armor_stand ~125 ~1 ~36 {CustomName:'{"text":"wing1_flame_squad2"}'}
-summon minecraft:armor_stand ~126 ~1 ~36 {CustomName:'{"text":"wing1_flame_squad3"}'}
-summon minecraft:armor_stand ~127 ~1 ~36 {CustomName:'{"text":"wing1_claw_squad1"}'}
+summon minecraft:armor_stand ~124 ~1 ~36 {CustomName:'{"text":"wing1_flame_squad1"}',CustomNameVisible:1b,NoGravity:1b,Invulnerable:1b}
+summon minecraft:armor_stand ~125 ~1 ~36 {CustomName:'{"text":"wing1_flame_squad2"}',CustomNameVisible:1b,NoGravity:1b,Invulnerable:1b}
+summon minecraft:armor_stand ~126 ~1 ~36 {CustomName:'{"text":"wing1_flame_squad3"}',CustomNameVisible:1b,NoGravity:1b,Invulnerable:1b}
+summon minecraft:armor_stand ~127 ~1 ~36 {CustomName:'{"text":"wing1_claw_squad1"}',CustomNameVisible:1b,NoGravity:1b,Invulnerable:1b}

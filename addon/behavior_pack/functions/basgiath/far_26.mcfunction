@@ -1,3 +1,5 @@
+setblock ~56 ~-1 ~135 short_grass
+setblock ~57 ~-1 ~111 allium
 setblock ~58 ~-1 ~116 poppy
 setblock ~59 ~-1 ~121 short_grass
 setblock ~60 ~-1 ~97 azure_bluet
@@ -46,5 +48,3 @@ setblock ~88 ~1 ~108 lantern
 fill ~96 ~-1 ~115 ~101 ~-1 ~119 grass_path
 fill ~102 ~-1 ~116 ~102 ~-1 ~117 grass_path
 fill ~71 ~-1 ~115 ~95 ~-1 ~119 grass_path
-fill ~68 ~-2 ~115 ~70 ~-2 ~119 grass_path
-fill ~45 ~-2 ~116 ~48 ~-2 ~118 grass_path

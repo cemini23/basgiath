@@ -496,6 +496,16 @@ def welcome_lines() -> list[str]:
         once
         + 'tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. The glowing stairs are in front of you. A fall from the span sends you back here. Cross the Parapet. The signet stone waits in the dell, after a dragon chooses you."}]}',
         once + f"tp @p ~{sx} ~{sy} ~{sz} 180 0",
+        # The starter kit: the three readable codices and a handful of marks,
+        # so the lore and the vault desk are reachable from a fresh build
+        # instead of only by cheat. The vault desk and the crafting table stand
+        # in the keep.
+        once + "give @p dragon_rider:flight_manual",
+        once + "give @p dragon_rider:dragon_codex",
+        once + "give @p dragon_rider:academy_archive",
+        once + "give @p dragon_rider:copper_mark 9",
+        once + "give @p dragon_rider:silver_mark 9",
+        once + "give @p dragon_rider:gold_mark 1",
         "scoreboard players set bg_done map_state 1",
     ]
 
@@ -592,7 +602,8 @@ def live_text() -> str:
     lines.extend(build_valley_live())
     return "\n".join(lines) + "\n"
 
-SUMMON = """execute unless entity @e[type=dragon_rider:dragon] as @e[type=armor_stand,name="build_anchor",c=1] at @s run summon dragon_rider:dragon ~43 ~-1 ~117
+SUMMON = """execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @e[type=dragon_rider:dragon] run tp @s ~43 ~-1 ~117
+execute unless entity @e[type=dragon_rider:dragon] as @e[type=armor_stand,name="build_anchor",c=1] at @s run summon dragon_rider:dragon ~43 ~-1 ~117
 execute as @e[type=armor_stand,name="build_anchor",c=1] run tellraw @a {"rawtext":[{"text":"A dragon waits on the moss pad. Mount it and fly."}]}
 execute unless entity @e[type=armor_stand,name="build_anchor"] run tellraw @s {"rawtext":[{"text":"Raise the college first. Run /function basgiath/build"}]}
 """

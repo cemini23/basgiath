@@ -317,7 +317,23 @@ async function runSignetQuiz(player) {
     .button2("Done");
 
   const again = await result.show(player);
-  if (again.selection === 0) runSignetQuiz(player);
+  if (again.selection === 0) openSignetQuiz(player);
+}
+
+// form.show can reject when the player disconnects or already has a screen
+// open, and system.run discards the promise it is handed. Catch it here, the
+// same way openKeeperForm does, so a signet quiz can never surface as an
+// unhandled rejection in the QuickJS engine.
+function openSignetQuiz(player) {
+  system.run(() => {
+    runSignetQuiz(player).catch(() => {
+      try {
+        player.sendMessage("§7The signet cannot open right now. Try again.");
+      } catch (e) {
+        // The player is gone. Nothing left to say.
+      }
+    });
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -342,6 +358,7 @@ const CURRENCY = [
 ];
 
 const WITHDRAWALS = [
+  { label: "Withdraw a copper mark", item: "dragon_rider:copper_mark", cost: 1 },
   { label: "Withdraw a silver mark", item: "dragon_rider:silver_mark", cost: 9 },
   { label: "Withdraw a gold mark", item: "dragon_rider:gold_mark", cost: 81 },
   { label: "Withdraw a bank note", item: "dragon_rider:bank_note", cost: 729 },
@@ -539,7 +556,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
     event.cancel = true;
     system.run(() => {
       if (player.hasTag(BOND_TAG)) {
-        runSignetQuiz(player);
+        openSignetQuiz(player);
       } else {
         player.sendMessage(NO_BOND_LINE);
       }
@@ -555,16 +572,13 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
 
   if (type !== LECTERN_BLOCK) return;
 
-  // No anchor means the college was never built here. Cancel the use so the
-  // page screen does not open, and say why instead of failing silently.
+  // No anchor means the college was never built here, so none of these
+  // lecterns is a keeper. Leave the vanilla page screen alone: cancelling the
+  // use would break every lectern in a world the college was never built in,
+  // and the import instructions tell a player to add the pack to an existing
+  // survival world.
   const origin = buildOrigin();
-  if (!origin) {
-    event.cancel = true;
-    system.run(() => {
-      player.sendMessage("§7The college is not built here. Run /function basgiath/build first.");
-    });
-    return;
-  }
+  if (!origin) return;
 
   const loc = event.block.location;
   const keeper = KEEPERS.find(
@@ -584,7 +598,7 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
   if (event.id !== TEST_EVENT) return;
   const entity = event.sourceEntity;
   if (entity?.typeId !== "minecraft:player") return;
-  system.run(() => runSignetQuiz(entity));
+  openSignetQuiz(entity);
 });
 
 // Test bypass for the vault desk, so the bank is reachable without placing the

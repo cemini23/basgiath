@@ -97,6 +97,8 @@ def check_recipe_unlock(path: Path, data) -> list[Finding]:
 
 def fix_recipe_unlock(data) -> int:
     changed = 0
+    if not isinstance(data, dict):
+        return changed
     for key in ("minecraft:recipe_shaped", "minecraft:recipe_shapeless"):
         body = data.get(key)
         if isinstance(body, dict) and "unlock" not in body:
@@ -119,6 +121,10 @@ def check_format_version(path: Path, data) -> list[Finding]:
     """
     found = []
     if "resource_pack" in path.parts:
+        return found
+    # A pack JSON is not always an object: texts/languages.json is a JSON array
+    # of locale names. Only an object can carry format_version.
+    if not isinstance(data, dict):
         return found
     raw = data.get("format_version")
     if isinstance(raw, str) and raw.count(".") == 2:

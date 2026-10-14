@@ -1,3 +1,5 @@
+fill ~68 ~-2 ~115 ~70 ~-2 ~119 grass_path
+fill ~45 ~-2 ~116 ~48 ~-2 ~118 grass_path
 fill ~49 ~-2 ~116 ~67 ~-2 ~118 grass_path
 fill ~94 ~ ~114 ~94 ~3 ~114 stone_bricks
 setblock ~94 ~2 ~114 sea_lantern

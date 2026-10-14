@@ -129,8 +129,11 @@ def live_lines() -> list[str]:
     # the first. The tag line must come first so the box that follows can see
     # gate_run on a cadet who just earned it in this same tick.
     start = _box_selector(start_box())
-    lines.append(ANCHOR + f"as @a[{start},tag=!gate_run] run tag @s add gate_run")
+    # Clear gate_done FIRST. Both lines match `tag=!gate_run`, so the add must
+    # come last: once gate_run is on, the second selector no longer matches and
+    # a fresh run would keep the old gate_done.
     lines.append(ANCHOR + f"as @a[{start},tag=!gate_run] run tag @s remove gate_done")
+    lines.append(ANCHOR + f"as @a[{start},tag=!gate_run] run tag @s add gate_run")
     lines.append(
         ANCHOR
         + f"as @a[{start}] run scoreboard players operation @s gate_start = bg_clock map_state"
@@ -171,7 +174,10 @@ def live_lines() -> list[str]:
     # execute, so one bad line cannot take the whole tick down.
     summit = _box_selector(summit_box())
     finish = f"as @a[{summit},tag=gate_run]"
-    lines.append(ANCHOR + f"{finish} run tag @s remove gate_run")
+    # Every finish line below selects on `tag=gate_run`. The tag is removed LAST,
+    # after the announcement and the best-time bank. Removing it first (the old
+    # order) emptied the selector, so gate_done was never added, gate_best was
+    # never banked, and the finish title never fired.
     lines.append(ANCHOR + f"{finish} run tag @s add gate_done")
     # A missing score is 0 to `operation` and to an `if score`, but not to a
     # selector `matches 0..`, so normalise first.
@@ -197,6 +203,10 @@ def live_lines() -> list[str]:
         + '{"score":{"name":"@s","objective":"gate_sec"}},'
         + '{"text":" seconds."}]}'
     )
+    # A finished run pays three silver marks. gate_run is still set on this line,
+    # so the award fires once and the tag removal below stops the repeat.
+    lines.append(ANCHOR + f"{finish} run give @s dragon_rider:silver_mark 3")
+    lines.append(ANCHOR + f"{finish} run tag @s remove gate_run")
     for x, y, z, height in _rope_specs():
         box = f"x=~{x},y=~{y},z=~{z},dx=1,dy={height},dz=1"
         # The penalty lands on the cadet who grabbed the rope, not on a fake
@@ -334,7 +344,9 @@ def _chimney(ctx) -> None:
     ctx.fill(162, 18, 98, 162, 21, 98, "air")
     ctx.fill(161, 18, 98, 161, 19, 98, "air")
     for y in range(18, 22):
-        ctx.setblock(162, y, 98, "ladder")
+        # A ladder needs a facing, or it renders flat against no wall. North,
+        # the same facing the dorm shaft uses.
+        ctx.setblock(162, y, 98, 'ladder["facing_direction"=2]')
 
 
 def _ramp(ctx) -> None:

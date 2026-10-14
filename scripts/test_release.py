@@ -22,8 +22,36 @@ FORBIDDEN = (
     _phrase("onyx", " storm"),
     _phrase("dragon", "kind"),
     _phrase("xa", "den"),
-    _phrase("violet", " sorrengail"),
+    _phrase("vio", "let sorrengail"),
     _phrase("yar", "ros"),
+    # Character first names. docs/CANON.md rule 3 bans every one of these in
+    # the map, the pack, and every shipped string. Split with _phrase so this
+    # file never carries the literal name it forbids.
+    _phrase("vio", "let"),
+    _phrase("dai", "n"),
+    _phrase("mi", "ra"),
+    _phrase("lil", "ith"),
+    _phrase("bren", "nan"),
+    _phrase("rhian", "non"),
+    _phrase("imo", "gen"),
+    _phrase("garr", "ick"),
+    _phrase("bod", "hi"),
+    _phrase("slo", "ane"),
+    _phrase("rid", "oc"),
+    _phrase("saw", "yer"),
+    _phrase("li", "am"),
+    _phrase("ja", "ck"),
+    # The canon dragon names, kept out of ids and strings.
+    _phrase("tair", "n"),
+    _phrase("andar", "na"),
+    _phrase("sgae", "yl"),
+)
+# One whole-name matcher for the shipped content. A name is matched between
+# non-alphanumeric characters, so an id such as `vio_let` is caught while a
+# longer word that merely contains the letters ("mirable") is not. The
+# substring form the docs scan uses would let a name hide inside an id.
+_DENY_RE = re.compile(
+    r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(name) for name in FORBIDDEN) + r")(?![A-Za-z0-9])"
 )
 FILL = re.compile(
     r"^fill (~?-?\d*) (~?-?\d*) (~?-?\d*) (~?-?\d*) (~?-?\d*) (~?-?\d*) \S+"
@@ -34,7 +62,7 @@ FILL = re.compile(
 # author's name in the disclaimer, so those stay out of this list.
 DOC_DENY = (
     _phrase("xa", "den"),
-    _phrase("violet", " sorrengail"),
+    _phrase("vio", "let sorrengail"),
     _phrase("tair", "n"),
     _phrase("andar", "na"),
     _phrase("sgae", "yl"),
@@ -87,18 +115,37 @@ def run(cmd: list[str]) -> None:
 
 def forbidden_in(path: Path) -> None:
     text = path.read_text(encoding="utf-8", errors="replace").lower()
-    for name in FORBIDDEN:
-        if name in text:
-            fail(f"forbidden name {name!r} in {path}")
+    match = _DENY_RE.search(text)
+    if match:
+        fail(f"forbidden name {match.group(0)!r} in {path}")
+
+
+# Trees that ship or are built: the Bedrock add-on and the generators, the Java
+# port sources, and the test packs. The Java port ships publicly under java/,
+# and a name pasted into a test pack is a name pasted into the repo, so both are
+# scanned. Build outputs (java/build, java/.gradle) are skipped: they are
+# compiled copies, not source.
+SCAN_ROOTS = (
+    ROOT / "addon",
+    ROOT / "scripts",
+    ROOT / "java" / "src",
+    ROOT / "tests",
+)
+SKIP_PARTS = {"build", ".gradle", "__pycache__", ".git"}
+BINARY_SUFFIXES = {".png", ".mcaddon", ".mcworld", ".class", ".jar"}
 
 
 def check_names() -> None:
-    roots = [ROOT / "addon", ROOT / "scripts"]
-    for root in roots:
+    self_path = Path(__file__).resolve()
+    for root in SCAN_ROOTS:
         for path in root.rglob("*"):
             if not path.is_file():
                 continue
-            if path.suffix.lower() in {".png", ".mcaddon", ".mcworld"}:
+            if path.resolve() == self_path:
+                continue  # this check holds the denylist on purpose
+            if any(part in SKIP_PARTS for part in path.parts):
+                continue
+            if path.suffix.lower() in BINARY_SUFFIXES:
                 continue
             forbidden_in(path)
     # A name pasted into the docs shipped unnoticed for five audits. Read the

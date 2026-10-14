@@ -1,3 +1,5 @@
+fill ~160 ~4 ~84 ~160 ~8 ~84 chain
+fill ~148 ~8 ~88 ~148 ~12 ~88 chain
 fill ~154 ~8 ~88 ~154 ~12 ~88 chain
 fill ~160 ~8 ~88 ~160 ~12 ~88 chain
 fill ~148 ~12 ~92 ~148 ~16 ~92 chain
@@ -46,5 +48,3 @@ setblock ~141 ~-1 ~126 stone_bricks
 fill ~141 ~ ~126 ~141 ~2 ~126 white_wool
 setblock ~141 ~-1 ~130 stone_bricks
 fill ~141 ~ ~130 ~141 ~2 ~130 orange_wool
-setblock ~141 ~-1 ~134 stone_bricks
-fill ~141 ~ ~134 ~141 ~2 ~134 yellow_wool

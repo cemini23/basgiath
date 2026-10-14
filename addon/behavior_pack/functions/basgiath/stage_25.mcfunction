@@ -1,3 +1,5 @@
+fill ~146 ~25 ~105 ~150 ~25 ~140 stone_bricks
+fill ~161 ~2 ~82 ~161 ~2 ~84 stone_bricks
 fill ~162 ~2 ~82 ~162 ~3 ~84 stone_bricks
 fill ~163 ~2 ~82 ~163 ~4 ~84 stone_bricks
 fill ~164 ~2 ~82 ~164 ~5 ~84 stone_bricks
@@ -31,10 +33,10 @@ setblock ~152 ~14 ~95 cobblestone
 fill ~161 ~18 ~97 ~164 ~21 ~100 stone_bricks
 fill ~162 ~18 ~98 ~162 ~21 ~98 air
 fill ~161 ~18 ~98 ~161 ~19 ~98 air
-setblock ~162 ~18 ~98 ladder
-setblock ~162 ~19 ~98 ladder
-setblock ~162 ~20 ~98 ladder
-setblock ~162 ~21 ~98 ladder
+setblock ~162 ~18 ~98 ladder["facing_direction"=2]
+setblock ~162 ~19 ~98 ladder["facing_direction"=2]
+setblock ~162 ~20 ~98 ladder["facing_direction"=2]
+setblock ~162 ~21 ~98 ladder["facing_direction"=2]
 fill ~151 ~22 ~101 ~151 ~22 ~104 oak_stairs
 fill ~150 ~22 ~101 ~150 ~22 ~104 oak_planks
 fill ~150 ~23 ~101 ~150 ~23 ~104 oak_stairs
@@ -46,5 +48,3 @@ fill ~148 ~3 ~81 ~148 ~4 ~81 chain
 fill ~154 ~3 ~81 ~154 ~4 ~81 chain
 fill ~160 ~3 ~81 ~160 ~4 ~81 chain
 fill ~148 ~4 ~84 ~148 ~8 ~84 chain
-fill ~154 ~4 ~84 ~154 ~8 ~84 chain
-fill ~160 ~4 ~84 ~160 ~8 ~84 chain

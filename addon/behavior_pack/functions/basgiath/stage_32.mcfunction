@@ -1,3 +1,5 @@
+setblock ~55 ~-1 ~130 cornflower
+setblock ~56 ~-1 ~106 short_grass
 setblock ~56 ~-1 ~135 short_grass
 setblock ~57 ~-1 ~111 allium
 setblock ~58 ~-1 ~116 poppy
@@ -46,5 +48,3 @@ setblock ~89 ~-1 ~108 sea_lantern
 setblock ~88 ~ ~108 oak_log
 setblock ~88 ~1 ~108 lantern
 fill ~96 ~-1 ~115 ~101 ~-1 ~119 grass_path
-fill ~102 ~-1 ~116 ~102 ~-1 ~117 grass_path
-fill ~71 ~-1 ~115 ~95 ~-1 ~119 grass_path

@@ -1,3 +1,5 @@
+fill ~102 ~-1 ~116 ~102 ~-1 ~117 dirt_path
+fill ~71 ~-1 ~115 ~95 ~-1 ~119 dirt_path
 fill ~68 ~-2 ~115 ~70 ~-2 ~119 dirt_path
 fill ~45 ~-2 ~116 ~48 ~-2 ~118 dirt_path
 fill ~49 ~-2 ~116 ~67 ~-2 ~118 dirt_path
@@ -46,5 +48,3 @@ setblock ~43 ~-1 ~115 stone_pressure_plate
 time set night
 weather thunder 999999
 gamerule doDaylightCycle false
-gamerule doWeatherCycle false
-gamerule doMobSpawning false

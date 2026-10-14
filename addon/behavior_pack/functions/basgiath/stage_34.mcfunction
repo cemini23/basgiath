@@ -1,3 +1,5 @@
+gamerule doweathercycle false
+gamerule domobspawning false
 gamerule keepinventory true
 gamerule sendcommandfeedback false
 gamerule commandblockoutput false

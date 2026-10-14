@@ -11,11 +11,23 @@ asserts, in order:
 1. the entity exists after the spawn,
 2. it has `minecraft:rideable`, so a cadet can mount it,
 3. it has exactly one seat, and seat 0 is the controlling seat, so the mounted
-   cadet steers it.
+   cadet steers it,
+4. a simulated cadet spawns on the pad, the test waits twenty ticks, and the
+   dragon is still present and still rideable.
 
-If all three hold, the test calls `test.succeed()`. It is the only test in the
-pack. It replaces "a human mounted a dragon in a client and it felt right" with
-a check a machine can repeat.
+Step 4 is what keeps the test honest: an earlier version called `test.succeed()`
+on tick 0, before the entity had ticked at all, so a dragon that died or lost
+its seat after the spawn tick still read green. The test now passes only after
+the dragon has settled. It is the only test in the pack.
+
+## The engine this pack needs
+
+The test pack depends on `@minecraft/server-gametest` `1.0.0-beta`. A `-beta`
+module version is locked to one engine drop, so this world loads only on **Bedrock
+1.21.90** (the Chase the Skies drop) or a BDS build whose `-beta` revision is
+`1.21.90`. On any other engine the import dialog refuses the pack and the test
+never runs. It does **not** depend on `@minecraft/server`; the test imports only
+the GameTest module.
 
 ## What it cannot prove, and why
 

@@ -31,4 +31,10 @@ execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_
 execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run titleraw @p subtitle {"rawtext":[{"text":"Cross the Parapet"}]}
 execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run tellraw @a {"rawtext":[{"text":"Fan-made. Not official. Not affiliated with any publisher. The glowing stairs are in front of you. A fall from the span sends you back here. Cross the Parapet. The signet stone waits in the dell, after a dragon chooses you."}]}
 execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run tp @p ~8 ~0 ~66 180 0
+execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run give @p dragon_rider:flight_manual
+execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run give @p dragon_rider:dragon_codex
+execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run give @p dragon_rider:academy_archive
+execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run give @p dragon_rider:copper_mark 9
+execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run give @p dragon_rider:silver_mark 9
+execute if score bg_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run give @p dragon_rider:gold_mark 1
 scoreboard players set bg_done map_state 1

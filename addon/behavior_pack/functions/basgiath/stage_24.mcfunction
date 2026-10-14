@@ -1,6 +1,8 @@
-setblock ~133 ~-1 ~92 red_wool
-setblock ~135 ~-1 ~92 red_wool
-setblock ~137 ~-1 ~92 red_wool
+setblock ~129 ~ ~90 red_wool
+setblock ~131 ~ ~90 red_wool
+setblock ~133 ~ ~90 red_wool
+setblock ~135 ~ ~90 red_wool
+setblock ~137 ~ ~90 red_wool
 setblock ~127 ~2 ~87 lantern
 fill ~142 ~-1 ~87 ~144 ~4 ~93 stone_bricks
 fill ~143 ~ ~88 ~143 ~3 ~92 air
@@ -46,5 +48,3 @@ fill ~147 ~17 ~97 ~166 ~17 ~99 stone_bricks
 fill ~147 ~21 ~101 ~166 ~21 ~103 stone_bricks
 fill ~147 ~25 ~105 ~166 ~25 ~107 stone_bricks
 fill ~146 ~ ~80 ~168 ~ ~81 stone_bricks
-fill ~146 ~25 ~105 ~150 ~25 ~140 stone_bricks
-fill ~161 ~2 ~82 ~161 ~2 ~84 stone_bricks

@@ -1,3 +1,5 @@
+setblock ~141 ~-1 ~134 stone_bricks
+fill ~141 ~ ~134 ~141 ~2 ~134 yellow_wool
 setblock ~141 ~-1 ~138 stone_bricks
 fill ~141 ~ ~138 ~141 ~2 ~138 lime_wool
 setblock ~141 ~-1 ~142 stone_bricks
@@ -46,5 +48,3 @@ setblock ~125 ~ ~131 short_grass
 setblock ~125 ~ ~137 short_grass
 setblock ~126 ~ ~129 short_grass
 setblock ~126 ~ ~135 short_grass
-setblock ~127 ~ ~133 short_grass
-setblock ~127 ~ ~139 short_grass

@@ -16,7 +16,7 @@ execute at @s run setblock ~ ~-1 ~ stone
 execute at @s run setblock ~ ~-1 ~-1 sea_lantern
 execute at @s run setblock ~1 ~-1 ~-1 sea_lantern
 execute at @s run setblock ~-1 ~-1 ~-1 sea_lantern
-execute at @s run summon minecraft:armor_stand ~ ~ ~ {CustomName:'{"text":"build_anchor"}'}
+execute at @s run summon minecraft:armor_stand ~ ~ ~ {CustomName:'{"text":"build_anchor"}',Invisible:1b,NoGravity:1b,Invulnerable:1b}
 execute at @s run effect give @e[type=minecraft:armor_stand,name="build_anchor",limit=1] minecraft:invisibility 999999 1 true
 execute at @s run effect give @e[type=minecraft:armor_stand,name="build_anchor",limit=1] minecraft:resistance 999999 255 true
 gamerule sendCommandFeedback false

@@ -66,7 +66,14 @@ check(
 check(
     "a named summon moves the name into NBT",
     to_java('summon armor_stand "build_anchor" ~ ~ ~'),
-    "summon minecraft:armor_stand ~ ~ ~ {CustomName:'{\"text\":\"build_anchor\"}'}",
+    "summon minecraft:armor_stand ~ ~ ~ "
+    "{CustomName:'{\"text\":\"build_anchor\"}',Invisible:1b,NoGravity:1b,Invulnerable:1b}",
+)
+check(
+    "a named decoration stand shows its label on Java",
+    to_java('summon armor_stand "Roll-keeper" ~50 ~-1 ~124'),
+    "summon minecraft:armor_stand ~50 ~-1 ~124 "
+    "{CustomName:'{\"text\":\"Roll-keeper\"}',CustomNameVisible:1b,NoGravity:1b,Invulnerable:1b}",
 )
 check(
     "the dragon summon takes the mod namespace",

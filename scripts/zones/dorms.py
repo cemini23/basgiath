@@ -195,6 +195,12 @@ def _keep(ctx) -> None:
         f"~{x0 + 4} ~ ~{(z0 + z1) // 2}"
     )
 
+    # The academy vault desk and a crafting table stand inside the keep, so the
+    # bank and the mark conversions are reachable on foot rather than only by
+    # cheat. The vault script opens the desk form on interact.
+    ctx.setblock(x0 + 8, 0, z0 + 3, "dragon_rider:vault_desk")
+    ctx.setblock(x0 + 9, 0, z0 + 3, "crafting_table")
+
 
 # --------------------------------------------------------------------------
 # Dorm block
@@ -225,10 +231,12 @@ def _dorm(ctx) -> None:
     # Doorway through to the private room.
     ctx.fill(x1, -1, PRIVATE_DOOR_Z, x1, 1, PRIVATE_DOOR_Z, "air")
 
-    # Four rows of red_wool beds.
-    for z in (86, 88, 90, 92):
+    # Four rows of red_wool beds, on the floor and clear of the south wall.
+    # The south wall is z1=92 and the floor is y=-1, so a bed at y=-1 on z=92
+    # sat flush in the wall and the floor.
+    for z in (86, 87, 89, 90):
         for x in range(x0 + 3, x1 - 1, 2):
-            ctx.setblock(x, -1, z, "red_wool")
+            ctx.setblock(x, 0, z, "red_wool")
 
     # Light on each landing.
     ctx.setblock(x0 + 1, 2, z0 + 3, "lantern")
