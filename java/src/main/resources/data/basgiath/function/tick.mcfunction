@@ -67,4 +67,4 @@ execute if score bg_now map_state matches 33 as @e[type=minecraft:armor_stand,na
 execute if score bg_now map_state matches 33 run scoreboard players set bg_stage map_state 34
 execute if score bg_now map_state matches 34 as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:stage_34
 execute if score bg_now map_state matches 34 run scoreboard players set bg_stage map_state 0
-execute if score bg_now map_state matches 0 run function basgiath:live
+execute if score bg_now map_state matches 0 as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:live

@@ -30,6 +30,7 @@ execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea ad
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea remove college_d
 execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run tickingarea add circle ~120 ~32 ~110 4 college_d true
 scoreboard players set bg_done map_state 0
+scoreboard players set bg_far_done map_state 0
 scoreboard players set bg_pass map_state 1
 schedule on_area_loaded add tickingarea college_b basgiath/fill_far
 schedule on_area_loaded add tickingarea college_d basgiath/fill_far

@@ -269,7 +269,14 @@ def tick_lines(count: int) -> list[str]:
         lines.append(
             f"execute if score bg_now map_state matches {index} run scoreboard players set bg_stage map_state {nxt}"
         )
-    lines.append('execute if score bg_now map_state matches 0 run function basgiath/live')
+    # The live pass runs with the build anchor already selected as the executor
+    # and the position. One lookup here replaces the full-world armor-stand scan
+    # that the old per-line form ran on every one of the ~80 live lines, every
+    # tick. `hoist_anchor` removes those per-line lookups from the emitted body.
+    lines.append(
+        "execute if score bg_now map_state matches 0 "
+        'as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/live'
+    )
     return lines
 
 
@@ -337,6 +344,22 @@ def at_anchor(command: str) -> str:
 
 def stage_calls(prefix: str, count: int) -> list[str]:
     return [at_anchor(f"function basgiath/{prefix}_{index:02d}") for index in range(1, count + 1)]
+
+
+def fill_far_text(far_calls: list[str]) -> str:
+    """The far retry, run at most once per build.
+
+    Two chunk-load schedules and the ``open`` pass all reach this function. The
+    far fill is idempotent, but a phone that runs the whole pass twice spends
+    the load for nothing, so the ``bg_far_done`` flag lets the first pass win.
+    ``open`` still calls the far stages directly, so a late chunk cannot leave a
+    hole. The guard is folded into each call's own ``execute``; a nested
+    ``run execute`` would not parse on Java.
+    """
+    guard = "execute if score bg_far_done map_state matches 0 "
+    lines = [guard + call[len("execute ") :] for call in far_calls]
+    lines.append("scoreboard players set bg_far_done map_state 1")
+    return "\n".join(lines) + "\n"
 
 
 def _segments(a0: int, a1: int, limit: int = LOADED) -> list[tuple[int, int]]:
@@ -474,6 +497,11 @@ def build_text(stage_count: int) -> str:
         "gamemode adventure @a",
         *area_lines,
         "scoreboard players set bg_done map_state 0",
+        # Arm the far retry. The chunk-load schedules and the `open` pass can all
+        # reach basgiath/fill_far; this flag lets the first pass win so a phone
+        # does not run the whole far fill twice. `open` still calls the far
+        # stages directly, so a late chunk cannot leave a hole.
+        "scoreboard players set bg_far_done map_state 0",
         "scoreboard players set bg_pass map_state 1",
         "schedule on_area_loaded add tickingarea college_b basgiath/fill_far",
         "schedule on_area_loaded add tickingarea college_d basgiath/fill_far",
@@ -591,16 +619,45 @@ execute unless entity @e[type=armor_stand,name="build_anchor"] run tellraw @s {"
 """
 
 
+# The build anchor, named the way the tick selects it once before the live pass.
+ANCHOR_AS_AT = 'as @e[type=armor_stand,name="build_anchor",c=1] at @s '
+ANCHOR_AS = 'as @e[type=armor_stand,name="build_anchor",c=1] '
+
+
+def hoist_anchor(line: str) -> str:
+    """Drop the per-line build-anchor lookup from a live line.
+
+    ``tick_lines`` calls ``execute as <anchor> at @s run function basgiath/live``,
+    so inside the live pass the anchor is already the executor and the position.
+    The leading ``execute as <anchor> at @s `` is removed, and a line written
+    ``run <cmd>`` collapses to ``<cmd>``; a form that needs the execute keyword
+    keeps it. An anchor that sits mid-chain (the wind and storm lines) is
+    dropped in place. One lookup per tick replaces the full-world armor-stand
+    scan the old form ran on every line.
+    """
+    if line.startswith("execute " + ANCHOR_AS_AT):
+        body = line[len("execute " + ANCHOR_AS_AT) :]
+        return body[4:] if body.startswith("run ") else "execute " + body
+    # The mid-chain form. Strip the anchor and the single space before it, so no
+    # doubled space is left behind; the space that followed stays.
+    return line.replace(" " + ANCHOR_AS_AT.rstrip(), "").replace(
+        " " + ANCHOR_AS.rstrip(), ""
+    )
+
+
 def live_text() -> str:
     """The tick body: the existing wind, checkpoints, and storm first.
 
     Then the Gauntlet ropes and the Threshing event. ``zones.flight`` has no
-    live lines. Every line below already carries its own execute-at-anchor.
+    live lines. Each line names the anchor as ``ANCHOR``; ``hoist_anchor``
+    removes that lookup, because the tick selects the anchor once for the whole
+    pass.
     """
     lines = [LIVE.rstrip("\n")]
     lines.extend(build_gauntlet_live())
     lines.extend(build_valley_live())
-    return "\n".join(lines) + "\n"
+    body = "\n".join(lines)
+    return "\n".join(hoist_anchor(line) if line.strip() else line for line in body.split("\n")) + "\n"
 
 SUMMON = """execute as @e[type=armor_stand,name="build_anchor",c=1] at @s as @e[type=dragon_rider:dragon] run tp @s ~43 ~-1 ~117
 execute unless entity @e[type=dragon_rider:dragon] as @e[type=armor_stand,name="build_anchor",c=1] at @s run summon dragon_rider:dragon ~43 ~-1 ~117
@@ -780,7 +837,7 @@ def main() -> None:
         raise SystemExit("far retry has no commands")
     far_calls = stage_calls("far", far_count)
     (BASGIATH / "build.mcfunction").write_text(build_text(count), encoding="utf-8")
-    (BASGIATH / "fill_far.mcfunction").write_text("\n".join(far_calls) + "\n", encoding="utf-8")
+    (BASGIATH / "fill_far.mcfunction").write_text(fill_far_text(far_calls), encoding="utf-8")
     (BASGIATH / "raise.mcfunction").write_text(raise_text(), encoding="utf-8")
     (BASGIATH / "open.mcfunction").write_text(
         "\n".join(["scoreboard players set bg_pass map_state 2", *far_calls, *welcome_lines()]) + "\n",

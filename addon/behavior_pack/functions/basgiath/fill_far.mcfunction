@@ -1,27 +1,28 @@
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_01
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_02
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_03
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_04
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_05
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_06
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_07
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_08
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_09
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_10
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_11
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_12
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_13
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_14
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_15
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_16
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_17
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_18
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_19
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_20
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_21
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_22
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_23
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_24
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_25
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_26
-execute as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_27
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_01
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_02
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_03
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_04
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_05
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_06
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_07
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_08
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_09
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_10
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_11
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_12
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_13
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_14
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_15
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_16
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_17
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_18
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_19
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_20
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_21
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_22
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_23
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_24
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_25
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_26
+execute if score bg_far_done map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/far_27
+scoreboard players set bg_far_done map_state 1

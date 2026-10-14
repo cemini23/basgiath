@@ -373,10 +373,24 @@ def check_map() -> None:
     # well before the edge. West wind ends at x=28. East wind starts at x=65.
     wind_lines = [line for line in live.splitlines() if "~0.18" in line]
     if wind_lines != [
-        'execute if score bg_wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~15 ~33 ~19 as @a[dx=13,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18',
-        'execute if score bg_wind map_state matches 0 as @e[type=armor_stand,name="build_anchor",c=1] at @s positioned ~65 ~33 ~19 as @a[dx=13,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18',
+        "execute if score bg_wind map_state matches 0 positioned ~15 ~33 ~19 as @a[dx=13,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18",
+        "execute if score bg_wind map_state matches 0 positioned ~65 ~33 ~19 as @a[dx=13,dy=2,dz=2] at @s run tp @s ~ ~ ~0.18",
     ]:
         fail("wind still covers the run-up, or the calm stretch moved")
+    # The live pass runs with the build anchor already selected by the tick, so
+    # no live line may scan for it: that scan is a full-world entity query on
+    # every line, every tick. The tick selects it exactly once.
+    if 'name="build_anchor"' in live:
+        fail("the live pass still scans for the build anchor on every line")
+    if (
+        'as @e[type=armor_stand,name="build_anchor",c=1] at @s run function basgiath/live'
+        not in tick_fn
+    ):
+        fail("the tick does not select the anchor once before the live pass")
+    # The far retry is reached by two chunk-load schedules and by `open`. The
+    # flag lets the first pass win, so a phone does not run the whole fill twice.
+    if "if score bg_far_done map_state matches 0" not in fill_far:
+        fail("the far retry is not gated, so a chunk-load firing reruns it")
     road = "\n".join(path.read_text() for path in sorted(folder.glob("*.mcfunction")))
     if "fill ~90 ~-1 ~80 ~95 ~-1 ~114 grass_path" not in road:
         fail("the forest road is missing")

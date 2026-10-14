@@ -22,6 +22,7 @@ execute at @s run effect give @e[type=minecraft:armor_stand,name="build_anchor",
 gamerule sendCommandFeedback false
 gamemode adventure @a
 scoreboard players set bg_done map_state 0
+scoreboard players set bg_far_done map_state 0
 scoreboard players set bg_pass map_state 1
 schedule function basgiath:raise 300t
 execute as @e[type=minecraft:armor_stand,name="build_anchor",limit=1] at @s run function basgiath:stage_01
