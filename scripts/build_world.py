@@ -15,6 +15,7 @@ OUT = DIST / "basgiath.mcworld"
 
 BEHAVIOR_SRC = ROOT / "addon" / "behavior_pack"
 RESOURCE_SRC = ROOT / "addon" / "resource_pack"
+WORLD_ICON = ROOT / "assets" / "world_icon.jpeg"
 
 FLAT_LAYERS = (
     '{"biome_id":1,"block_layers":[{"block_name":"minecraft:bedrock","count":1},'
@@ -112,6 +113,10 @@ def main() -> None:
         zf.writestr("levelname.txt", "Basgiath\n")
         zf.writestr("world_behavior_packs.json", behavior_json)
         zf.writestr("world_resource_packs.json", resource_json)
+        # The world icon, if it has been generated. It is optional: a missing
+        # icon only means the world list shows the default.
+        if WORLD_ICON.exists():
+            zf.writestr("world_icon.jpeg", WORLD_ICON.read_bytes())
         _add_tree(zf, BEHAVIOR_SRC, "behavior_packs/basgiath")
         _add_tree(zf, RESOURCE_SRC, "resource_packs/basgiath")
 

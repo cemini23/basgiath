@@ -5,8 +5,8 @@ fill ~126 ~-1 ~100 ~140 ~8 ~110 stone_bricks
 fill ~127 ~ ~101 ~139 ~7 ~109 air
 fill ~127 ~-1 ~101 ~139 ~-1 ~109 polished_andesite
 fill ~126 ~-1 ~104 ~126 ~1 ~105 air
-setblock ~126 ~2 ~104 stone_brick_stairs
-setblock ~126 ~2 ~105 stone_brick_stairs
+setblock ~126 ~2 ~104 stone_brick_stairs["upside_down_bit"=true,"weirdo_direction"=1]
+setblock ~126 ~2 ~105 stone_brick_stairs["upside_down_bit"=true,"weirdo_direction"=1]
 setblock ~126 ~3 ~104 stone_bricks
 setblock ~126 ~3 ~105 stone_bricks
 setblock ~126 ~2 ~103 stone_bricks
@@ -24,8 +24,8 @@ fill ~127 ~-1 ~85 ~139 ~-1 ~91 polished_andesite
 fill ~127 ~2 ~85 ~139 ~2 ~91 stone_bricks
 fill ~127 ~5 ~85 ~139 ~5 ~91 stone_bricks
 fill ~132 ~-1 ~84 ~133 ~1 ~84 air
-setblock ~131 ~2 ~84 stone_brick_stairs
-setblock ~134 ~2 ~84 stone_brick_stairs
+setblock ~131 ~2 ~84 stone_brick_stairs["upside_down_bit"=true,"weirdo_direction"=3]
+setblock ~134 ~2 ~84 stone_brick_stairs["upside_down_bit"=true,"weirdo_direction"=3]
 setblock ~127 ~2 ~85 air
 setblock ~127 ~1 ~85 ladder["facing_direction"=2]
 setblock ~127 ~5 ~85 air

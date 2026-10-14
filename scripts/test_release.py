@@ -305,11 +305,12 @@ def check_map() -> None:
         fail("the Roll-keeper branch is missing")
     if "readRollCall" in roll_branch.group(0):
         fail("the Roll-keeper branch reads the rider roll")
-    # A player-typed name must never reach a command string. The only
-    # runCommand in the script is the fixed map tick.
+    # Player input must never reach a command string. Every runCommand in the
+    # script names a fixed map function, and nothing else.
     commands = re.findall(r"runCommand\(\s*([^)]*)\)", script)
-    if commands != ['"function basgiath/tick"']:
-        fail(f"script runs a command that is not the fixed map tick: {commands}")
+    fixed = ['"function basgiath/build"', '"function basgiath/tick"']
+    if sorted(commands) != sorted(fixed):
+        fail(f"script runs a command that is not a fixed map function: {commands}")
     folder = functions / "basgiath"
     build = (folder / "build.mcfunction").read_text()
     if 'titleraw @s title {"rawtext":[{"text":"Building"}]}' not in build:

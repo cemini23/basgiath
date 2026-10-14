@@ -171,10 +171,13 @@ def _keep(ctx) -> None:
     ctx.shell(x0, -1, z0, x1, KEEP_TOP, z1, "stone_bricks")
     ctx.fill(x0 + 1, -1, z0 + 1, x1 - 1, -1, z1 - 1, "polished_andesite")
 
-    # One arched door on the west face.
+    # One arched door on the west face. The two cap stones are upside-down
+    # stairs whose step faces the opening (west), so the door reads as an arch
+    # rather than two bare blocks.
     ctx.fill(x0, -1, KEEP_DOOR_Z, x0, 1, KEEP_DOOR_Z + 1, "air")
-    ctx.setblock(x0, 2, KEEP_DOOR_Z, "stone_brick_stairs")
-    ctx.setblock(x0, 2, KEEP_DOOR_Z + 1, "stone_brick_stairs")
+    keep_arch = 'stone_brick_stairs["upside_down_bit"=true,"weirdo_direction"=1]'
+    ctx.setblock(x0, 2, KEEP_DOOR_Z, keep_arch)
+    ctx.setblock(x0, 2, KEEP_DOOR_Z + 1, keep_arch)
     ctx.setblock(x0, 3, KEEP_DOOR_Z, "stone_bricks")
     ctx.setblock(x0, 3, KEEP_DOOR_Z + 1, "stone_bricks")
     ctx.setblock(x0, 2, KEEP_DOOR_Z - 1, "stone_bricks")
@@ -216,10 +219,12 @@ def _dorm(ctx) -> None:
     for y in (2, 5):
         ctx.fill(x0 + 1, y, z0 + 1, x1 - 1, y, z1 - 1, "stone_bricks")
 
-    # Door gap on the north face, toward the quad.
+    # Door gap on the north face, toward the quad. The cap stones are
+    # upside-down stairs facing north, into the doorway.
     ctx.fill(x0 + 6, -1, z0, x0 + 7, 1, z0, "air")
-    ctx.setblock(x0 + 5, 2, z0, "stone_brick_stairs")
-    ctx.setblock(x0 + 8, 2, z0, "stone_brick_stairs")
+    dorm_arch = 'stone_brick_stairs["upside_down_bit"=true,"weirdo_direction"=3]'
+    ctx.setblock(x0 + 5, 2, z0, dorm_arch)
+    ctx.setblock(x0 + 8, 2, z0, dorm_arch)
 
     # A ladder shaft at the north-west corner so all three stories connect.
     ladder_x, ladder_z = x0 + 1, z0 + 1
@@ -261,8 +266,9 @@ def _classroom(ctx) -> None:
     ctx.shell(x0, -1, z0, x1, 5, z1, "stone_bricks")
     ctx.fill(x0 + 1, -1, z0 + 1, x1 - 1, -1, z1 - 1, "polished_andesite")
     ctx.fill(x0, -1, 116, x0, 1, 117, "air")
-    ctx.setblock(x0, 2, 116, "stone_brick_stairs")
-    ctx.setblock(x0, 2, 117, "stone_brick_stairs")
+    class_arch = 'stone_brick_stairs["upside_down_bit"=true,"weirdo_direction"=1]'
+    ctx.setblock(x0, 2, 116, class_arch)
+    ctx.setblock(x0, 2, 117, class_arch)
 
     lecterns = (
         (x0 + 4, z0 + 3, 2),

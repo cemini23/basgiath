@@ -532,6 +532,56 @@ world.afterEvents.itemUse.subscribe((event) => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// The first run
+//
+// A player who opens the shipped world lands on a flat plain with nothing built
+// and no instruction inside the world. The README says to run
+// /function basgiath/build, but a player who never reads it sees an empty dark
+// world and assumes the download is broken. On the first spawn, offer to raise
+// the college. The command is a fixed string, so no player input reaches
+// runCommand, the same rule the rest of this file keeps.
+world.afterEvents.playerSpawn.subscribe((event) => {
+  if (!event.initialSpawn) return;
+  const player = event.player;
+  // Let the world settle before the anchor is looked for.
+  system.runTimeout(() => {
+    let built;
+    try {
+      built = buildOrigin() !== null;
+    } catch (e) {
+      return; // No dimension yet; the player can still run the function.
+    }
+    if (built) return;
+    const form = new MessageFormData()
+      .title("Raise Basgiath College")
+      .body(
+        "The college is not built here yet. Raise it now? It takes about fifteen seconds."
+      )
+      .button1("Raise it")
+      .button2("Not now");
+    form
+      .show(player)
+      .then((response) => {
+        if (response?.selection !== 0) return;
+        system.run(() => {
+          try {
+            player.runCommand("function basgiath/build");
+          } catch (e) {
+            // The player left, or the function is not loaded.
+          }
+        });
+      })
+      .catch(() => {
+        try {
+          player.sendMessage("§7Run /function basgiath/build to raise the college.");
+        } catch (e) {
+          // The player is gone.
+        }
+      });
+  }, 20);
+});
+
 // A lodestone use is always cancelled so the compass screen never opens.
 // The form itself waits for the bond. The plaza stone stays where it is.
 // A keeper lectern is cancelled the same way, so the page screen never opens.

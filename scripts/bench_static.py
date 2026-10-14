@@ -674,6 +674,8 @@ const world = {
     // main.js subscribes here for the codices. The proof drives the block-interact
     // path, so this only has to exist for the module to link.
     itemUse: { subscribe: () => {} },
+    // main.js subscribes here for the first-run prompt. Same reason.
+    playerSpawn: { subscribe: () => {} },
   },
   sendMessage: (text) => { messages.push(String(text)); },
   getDynamicProperty: () => undefined,

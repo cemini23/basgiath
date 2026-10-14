@@ -117,6 +117,14 @@ STATE_MAP: dict[str, tuple[str, dict[str, str] | None]] = {
         "facing",
         {"0": "north", "1": "east", "2": "south", "3": "west"},
     ),
+    # Bedrock stairs carry two states Java splits in two. `upside_down_bit` is
+    # Java `half`; `weirdo_direction` is the stair's `facing`, and its order is
+    # not the compass order the other tables use.
+    "upside_down_bit": ("half", {"true": "top", "false": "bottom"}),
+    "weirdo_direction": (
+        "facing",
+        {"0": "east", "1": "west", "2": "south", "3": "north"},
+    ),
 }
 
 # Commands whose meaning Java has no equivalent for. Dropping one is a decision,

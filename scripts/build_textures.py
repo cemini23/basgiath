@@ -11,14 +11,27 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 ITEM_OUT = ROOT / "addon/resource_pack/textures/item"
 BLOCK_OUT = ROOT / "addon/resource_pack/textures/blocks"
+BP_ICON = ROOT / "addon/behavior_pack/pack_icon.png"
+RP_ICON = ROOT / "addon/resource_pack/pack_icon.png"
+WORLD_ICON = ROOT / "assets/world_icon.jpeg"
 
 SIZE = 16
 TRANSPARENT = (0, 0, 0, 0)
+
+# The pack emblem. A gold mark over a dark ground, with a dragon wing in the
+# scale and membrane colours. Original: simple geometry drawn here, nothing
+# traced.
+ICON_BG = (24, 26, 34)
+ICON_GOLD = (226, 188, 66)
+ICON_GOLD_DK = (150, 118, 30)
+ICON_GOLD_LT = (250, 232, 152)
+ICON_SCALE = (52, 22, 30)
+ICON_MEMBRANE = (116, 52, 82)
 
 # (name, face, rim, shine)
 COINS = (
@@ -114,6 +127,41 @@ def vault_desk(panel, edge, seam, slot) -> Image.Image:
     return image
 
 
+def emblem(size: int) -> Image.Image:
+    """The pack emblem at the given pixel size: a gold mark and a wing."""
+    image = Image.new("RGB", (size, size), ICON_BG)
+    draw = ImageDraw.Draw(image)
+    c = size / 2
+    r = size * 0.34
+    width = max(2, size // 40)
+    draw.ellipse([c - r, c - r, c + r, c + r], fill=ICON_GOLD, outline=ICON_GOLD_DK, width=width)
+    draw.ellipse(
+        [c - r + 2 * width, c - r + 2 * width, c + r - 2 * width, c + r - 2 * width],
+        outline=ICON_GOLD_LT,
+        width=width,
+    )
+    # The wing: a darker upper sweep and a membrane lower sweep.
+    draw.polygon(
+        [(c - r * 0.5, c - r * 0.1), (c + r * 1.25, c - r * 0.75), (c + r * 0.15, c + r * 0.3)],
+        fill=ICON_SCALE,
+    )
+    draw.polygon(
+        [(c - r * 0.5, c + r * 0.1), (c + r * 1.05, c - r * 0.2), (c + r * 0.05, c + r * 0.6)],
+        fill=ICON_MEMBRANE,
+    )
+    return image
+
+
+def world_banner(width: int = 800, height: int = 450) -> Image.Image:
+    """The world icon: the emblem on a dark banner with a low horizon glow."""
+    image = Image.new("RGB", (width, height), ICON_BG)
+    draw = ImageDraw.Draw(image)
+    draw.rectangle([0, int(height * 0.66), width, height], fill=(40, 30, 44))
+    mark = emblem(min(width, height) // 2)
+    image.paste(mark, ((width - mark.width) // 2, (height - mark.height) // 2))
+    return image
+
+
 def main() -> None:
     ITEM_OUT.mkdir(parents=True, exist_ok=True)
     BLOCK_OUT.mkdir(parents=True, exist_ok=True)
@@ -135,6 +183,20 @@ def main() -> None:
     path = BLOCK_OUT / f"{name}.png"
     vault_desk(panel, edge, seam, slot).save(path)
     written.append(path)
+
+    # The pack icons. Bedrock shows these in the pack list; without one the pack
+    # reads as an unfinished import. Both packs carry the same mark.
+    icon = emblem(128)
+    for path in (RP_ICON, BP_ICON):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        icon.save(path)
+        written.append(path)
+
+    # The world icon, shown for the .mcworld in the world list. build_world.py
+    # copies it into the zip root when it is present.
+    WORLD_ICON.parent.mkdir(parents=True, exist_ok=True)
+    world_banner().save(WORLD_ICON, "JPEG", quality=88)
+    written.append(WORLD_ICON)
 
     for path in written:
         print(f"wrote {path.relative_to(ROOT)}")

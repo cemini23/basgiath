@@ -13,8 +13,8 @@ fill ~102 ~-1 ~112 ~122 ~5 ~120 stone_bricks
 fill ~103 ~ ~113 ~121 ~4 ~119 air
 fill ~103 ~-1 ~113 ~121 ~-1 ~119 polished_andesite
 fill ~102 ~-1 ~116 ~102 ~1 ~117 air
-setblock ~102 ~2 ~116 stone_brick_stairs
-setblock ~102 ~2 ~117 stone_brick_stairs
+setblock ~102 ~2 ~116 stone_brick_stairs[half=top,facing=west]
+setblock ~102 ~2 ~117 stone_brick_stairs[half=top,facing=west]
 setblock ~106 ~1 ~115 lectern[facing=east]
 setblock ~110 ~1 ~115 lectern[facing=east]
 setblock ~114 ~1 ~115 lectern[facing=east]
